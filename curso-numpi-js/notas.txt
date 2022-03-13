@@ -1,0 +1,2 @@
+Los ficheros son acerca de funciones y operaciones especiales en JS, a diferencia de sentencias como if, switch, while, do-while y for coincidentes con otros lenguajes como el C/C++ y Java.
+

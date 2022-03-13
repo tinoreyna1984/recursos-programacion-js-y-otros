@@ -1,0 +1,167 @@
+Preparación de VS Code
+======================
+
+En VS Code, instalar las extensiones:
+
+* Night Owl
+* Bracket Pair Colorizer (logo circular)
+* ES7 + React/Redux/GraphQL/React-native snippets
+* Intellisense for CSS class names in HTML
+* Material Icon Theme
+* Path Intellisense
+* Lorem ipsum (textos de prueba)
+
+
+Instalación de React JS
+=======================
+
+Para hacer la instalación de ReactJS vamos a seguir estos sencillos pasos:
+
+Paso 1. Instalar NodeJS en su ultima versión, para eso entraremos a su web oficial y descargaremos el instalador más actualizado https://nodejs.org/es/
+
+Paso 2. Actualizar NPM, el gestor de paquetes de node, para bajarnos las dependencias más actuales:
+
+npm install -g npm@latest
+
+Paso 3. Borrar la cache de NPM:
+
+npm cache clean --force
+
+Paso 4. Instalar Create React App, que es un interprete de consola(CLI) que nos va a permitir instalar React facilmente e incluirá webpack para la compilación y minificación del proyecto, un live reload, una estructura básica para los proyectos de ReactJS, etc, veamos como instalar este paquete:
+
+npm install -g create-react-app
+
+Ahora ya tenemos instalado «create react app» y ya podemos generar un nuevo proyecto de React.js
+
+Crear proyecto en React JS
+==========================
+
+Para generar un nuevo proyecto de React.js y finalmente instalarlo, entraremos al directorio donde queramos generar el proyecto de reactjs y ejecutamos este comando:
+
+create-react-app NombreDeMiProyecto
+
+Ahora entraremos al directorio de nuestro proyecto y lanzaremos el servidor local de pruebas para React:
+
+cd NombreDeMiProyecto
+npm start
+
+Puedes comprobar la versión de React que tienes dentro del fichero package.json.
+
+Ahora tendremos disponible la webapp de React 16 en http://localhost:3000/ y veremos nuestro proyecto corriendo, con la página de bienvenida por defecto.
+
+Con esto ya sabemos como instalar React desde cero y como generar un proyecto base.
+
+Edición del sitio en ReactJS
+============================
+
+La centralidad del proyecto está en el archivo App.js en su raíz.
+
+Agregar otras extensiones
+=========================
+
+React Bootstrap (recomendado)
+-----------------------------
+
+Instalación:
+
+npm install react-bootstrap bootstrap
+
+Configuración:
+
+* En index.js:
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+React Router
+------------
+
+Instalación:
+
+npm install react-router-dom
+
+Bootstrap + PopperJS
+--------------------
+
+Instalación:
+
+npm i bootstrap
+npm i @popperjs/core
+
+Configuración:
+
+* En index.js:
+
+import * as bootstrap from 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+* En App.js:
+
+Asegurarse de que esté la siguiente línea al inicio del fichero:
+
+import React from 'react';
+
+Font Awesome
+============
+
+Instalación:
+
+npm i --save @fortawesome/fontawesome-svg-core  @fortawesome/free-solid-svg-icons @fortawesome/react-fontawesome @fortawesome/free-brands-svg-icons
+
+Uso:
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+
+Uso de Git
+==========
+
+Comandos:
+
+Config. de usuario:
+git config --global user.name "Tino Reyna"
+git config --global user.email "tinoreyna1984@gmail.com"
+
+Verificar estado de archivos:
+git status
+
+Agregar archivos:
+git add <archivo o archivos específicos>
+git add . # agrega todos
+
+Guardar en branch local:
+git commit -m "Mensaje de cambio"
+
+Crear repositorio en Github.
+
+Enviar al repositorio creado en Github:
+git remote add origin https://github.com/usuario/<nuevo-repo>.git
+Y después:
+git push origin master
+
+Para cambios desde PC, actualizar rama remota:
+git push origin master
+
+Linea de tiempo vertical
+========================
+
+Instalación:
+
+npm i react-vertical-timeline-component
+
+Uso:
+
+import { VerticalTimeline, VerticalTimelineElement }  from 'react-vertical-timeline-component';
+import 'react-vertical-timeline-component/style.min.css';
+
+Desinstalación de paquete
+=========================
+
+npm uninstall <paquete>
+
+
+
+
+
+
+
+
