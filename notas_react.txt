@@ -111,6 +111,35 @@ Uso:
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+Scroll-to-top (botón para regresar a parte superior)
+====================================================
+
+Instalación:
+
+npm i react-scroll-to-top
+
+Uso (ejemplo):
+
+import ScrollToTop from "react-scroll-to-top";
+...
+<ScrollToTop smooth />
+Para personalizarlo, revisar: https://www.npmjs.com/package/react-scroll-to-top
+
+
+i18next (internacionalización)
+===============================
+
+Instalación:
+
+npm install react-i18next i18next i18next-localstorage-backend i18next-browser-languagedetector --save
+
+Uso:
+
+Revisar: https://youtu.be/C6PtKxW4rvk
+Nota: para el idioma por defecto, poner en el objeto i18next, en init:
+lng: 'es',
+Para definir el idioma por defecto (en este ejemplo, el español).
+
 
 Uso de Git
 ==========
