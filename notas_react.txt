@@ -170,6 +170,20 @@ git push origin master
 Para cambios desde PC, actualizar rama remota:
 git push origin master
 
+Subir proyecto a Heroku
+=======================
+
+Link: https://www.youtube.com/watch?v=gItqzShex5M
+
+Subir a Heroku (solo React JS):
+===============================
+
+heroku create -b https://github.com/mars/create-react-app-buildpack.git <proyecto>
+git add .
+git commit -m "react-create-app on Heroku"
+git push heroku master
+heroku open
+
 Linea de tiempo vertical
 ========================
 
@@ -186,9 +200,6 @@ Desinstalación de paquete
 =========================
 
 npm uninstall <paquete>
-
-
-
 
 
 
