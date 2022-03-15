@@ -184,6 +184,21 @@ git commit -m "react-create-app on Heroku"
 git push heroku master
 heroku open
 
+Subir a hosting compartido (solo frontend):
+===========================================
+
+Editar package.json con la siguiente línea después de dependencies:
+
+"homepage" : "https://tinexlab.com/",
+
+Ejecutar:
+
+npm run build
+
+Mover los archivos del build al public_html.
+
+Nota: usar un .htaccess adicional para asegurar el ruteo.
+
 Linea de tiempo vertical
 ========================
 
