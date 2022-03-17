@@ -1,0 +1,135 @@
+Conceptos clave y distintivos de React JS
+=========================================
+
+Propiedades o "props"
+---------------------
+
+Es el concepto clave de React. Los props son, simplemente, las propiedades de un componente hecho en React JS, del mismo modo que conocemos los tags de un bloque HTML como, por ejemplo, el de imagen:
+
+<img src=".png" alt="" border="0" align="left" width="" height="" />
+
+En términos de JSX, img sería un componente y los tags src, alt, border, align, width y height serían los props.
+
+Si, por ejemplo, tenemos un componente llamado Persona en JSX (en App.js o donde se llame al componente):
+
+<Persona nombre="Tino" edad=37 />
+
+Los props serían nombre y edad. En la definición de componente sería:
+
+export function Persona(){
+	
+	return(
+		<>
+			Nombre: {this.props.nombre} <br/>
+			Edad: {this.props.edad}
+		</>
+	);
+	
+}
+
+o, más típicamente:
+
+export function Persona(props){
+	
+	return(
+		<>
+			Nombre: {props.nombre} <br/>
+			Edad: {props.edad}
+		</>
+	);
+	
+}
+
+Pueden tener valores por defecto a través de la creación del objeto defaultProps:
+
+Persona.defaultProps = {
+	nombre : "Usuario",
+	edad : 25,
+}
+
+Los props pueden también recibirse como objeto:
+
+Sea:
+
+const persona = {
+nombre: "Tino",
+edad: 37,
+correo: 'tinoreyna1984@gmail.com'
+};
+
+Pasamos persona a un componente como este (en App.js o donde se llame al componente):
+
+<Persona persona={persona} />
+
+El componente leerá la persona de la siguiente forma:
+
+export function Persona(props){
+	return(
+		<>
+			Nombre: {props.persona.nombre} <br/>
+			Edad: {props.persona.edad} <br/>
+			Correo: {props.persona.correo} 
+		</>
+	);
+}
+
+o:
+
+export function Persona(props){
+
+	// la forma más limpia: desestructurando objetos
+	{persona} = props;
+	{nombre, edad, correo} = persona;
+	
+	return(
+		<>
+			Nombre: {nombre} <br/>
+			Edad: {edad} <br/>
+			Correo: {correo} 
+		</>
+	);
+}
+
+Los props también pueden incluir funciones:
+
+Sea la función declarada en App.js o en otro componente:
+
+const saludoFn = (nombre) => {
+	alert("Hola, " + nombre);
+};
+
+Sea el componente declarado en App.js o en otro componente:
+
+<Saludo persona={persona} saludoFn={saludoFn} />
+
+El componente sería el siguiente:
+
+export default function Saludo(props) {
+
+  // Notese que las variables las he obtenido con el operador desestructuracion (llaves)
+
+  const { saludoFn, persona } = props;
+  const { nombre = 'Usuario' } = persona; // se le puede asignar tambien un valor por defecto de esta forma
+
+  return (
+    <>
+      <button onClick={() => saludoFn(nombre)}>Saludar</button>
+      {/* el componente genera un botón que emplea un callback, aprovechando la función procedente del props */}
+    </>
+  );
+}
+
+Hooks
+=====
+
+Son funcionalidades que permiten cambiar dinámica y sencillamente los estados de los props.
+
+Los más típicos son useState y useEffect.
+
+
+
+
+
+
+
+
