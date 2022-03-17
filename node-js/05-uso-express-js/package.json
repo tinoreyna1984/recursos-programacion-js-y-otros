@@ -1,0 +1,21 @@
+{
+  "name": "05-uso-express",
+  "version": "1.0.0",
+  "description": "Prueba de Express.js",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "uso",
+    "de",
+    "Express.js",
+    "Express",
+    "js"
+  ],
+  "author": "Tino Reyna",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.3"
+  }
+}
