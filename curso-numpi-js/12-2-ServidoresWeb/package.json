@@ -1,0 +1,20 @@
+{
+  "name": "12-2-servidoresweb",
+  "version": "1.0.0",
+  "description": "Practica con servidores web en Node.js",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "keywords": [
+    "node",
+    "js",
+    "node.js"
+  ],
+  "author": "Tino Reyna",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.3",
+    "nodemon": "^2.0.15"
+  }
+}

@@ -122,11 +122,70 @@ export default function Saludo(props) {
 Hooks
 =====
 
+Referencias:
+https://es.reactjs.org/docs/hooks-state.html
+https://es.reactjs.org/docs/hooks-effect.html
+
 Son funcionalidades que permiten cambiar dinámica y sencillamente los estados de los props.
 
-Los más típicos son useState y useEffect.
+Los más típicos son useState y useEffect, los cuales manejan estados y efectos, respectivamente.
 
+Reglas de Hooks:
 
+1. Solo llamar Hooks en el nivel superior. No llames Hooks dentro de loops, condiciones o funciones anidadas.
+2. Solo llamar Hooks desde componentes de función de React. No llames Hooks desde las funciones regulares de JavaScript. (Solo hay otro lugar válido para llamar Hooks: tus propios Hooks personalizados. En un momento aprenderemos sobre estos).
+
+Referencia: https://es.reactjs.org/docs/hooks-rules.html
+
+useState:
+
+Ejemplo:
+
+ 1:  import React, { useState } from 'react';
+ 2:
+ 3:  function Example() {
+ 4:    const [count, setCount] = useState(0);
+ 5:
+ 6:    return (
+ 7:      <div>
+ 8:        <p>Hiciste clic {count} veces</p>
+ 9:        <button onClick={() => setCount(count + 1)}>
+10:         Click me
+11:        </button>
+12:      </div>
+13:    );
+14:  }
+
+Línea 1: Importamos el Hook useState desde React que nos permite mantener un estado local en un componente de función.
+
+Línea 4: Dentro del componente Example declaramos una nueva variable de estado llamando al Hook useState. Este nos devuelve un par de valores, a los que damos un nombre. Llamamos count a nuestra variable porque guarda el número de clicks en el botón. La inicializamos a cero pasando 0 como único argumento a useState. El segundo elemento retornado es una función que nos permite actualizar count, por lo que le llamamos setCount.
+
+Línea 9: Cuando el usuario hace click, llamamos a setCount con un nuevo valor. React actualizará entonces el componente Example pasándole el nuevo valor de count.
+
+useEffect:
+
+import React, { useState, useEffect } from 'react';
+
+function Example() {
+  const [count, setCount] = useState(0);
+
+  // De forma similar a componentDidMount y componentDidUpdate
+  useEffect(() => {
+    // Actualiza el título del documento usando la API del navegador
+    document.title = `Hiciste clic ${count} veces`;
+  }, [count]); // el [count] es opcional pero ayuda en determinados casos 
+
+  return (
+    <div>
+      <p>Hiciste clic {count} veces</p>
+      <button onClick={() => setCount(count + 1)}>
+        Click me
+      </button>
+    </div>
+  );
+}
+
+Este fragmento está basado en el ejemplo de contador de la página anterior, pero le hemos añadido una funcionalidad nueva: actualizamos el título del documento con un mensaje personalizado que incluye el número de clicks.
 
 
 

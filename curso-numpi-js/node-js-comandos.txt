@@ -1,0 +1,60 @@
+Uso de NodeJS en consola
+========================
+
+Ejecutar fichero:
+
+node <fichero>.js
+
+
+Crear proyecto
+==============
+
+Dentro de la carpeta de proyecto, proceder:
+
+Inicializar proyecto NodeJS:
+
+npm init
+
+
+Luego, dar Enter para dejar valores de proyecto por defecto.
+
+o
+
+npm init -y
+
+Para dar sí a todo por defecto.
+
+En la carpeta, crear un archivo index.js
+
+En package.json, cambiar la línea de test por: "start": "node index.js"
+
+La ejecución puede ser con:
+
+node <fichero>.js o npm start
+
+Express.js
+==========
+
+Instalación:
+
+npm install express
+
+Nodemon (desarrollo):
+=====================
+
+Instalación:
+
+npm i nodemon
+
+Uso de Axios
+============
+
+Instalar Axios:
+
+npm install axios
+
+Iniciar servicio NodeJS:
+
+node <archivo (por defecto, index.js)>
+
+
