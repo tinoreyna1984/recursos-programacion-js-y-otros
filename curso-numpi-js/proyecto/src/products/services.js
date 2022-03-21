@@ -25,14 +25,32 @@ const generateReport = async (name, res) => {
     ProductsUtils.excelGenerator(products, name, res);
 }
 
-// pendiente update y delete
+const update = async (id, newProduct) => {
+    const collection = await Database(COLLECTION);
+    return await collection.replaceOne(
+        {
+            _id : ObjectId(id)
+        },
+        {
+            name : newProduct.name,
+            precio : newProduct.precio,
+            cantidad : newProduct.cantidad
+        }
+    );
+}
 
+const remove = async (id) => {
+    const collection = await Database(COLLECTION);
+    return await collection.deleteOne({_id : ObjectId(id)});
+}
 
 module.exports.ProductsService = {
     getAll,
     getById,
     create,
-    generateReport
+    generateReport,
+    update,
+    remove
 }
 
 

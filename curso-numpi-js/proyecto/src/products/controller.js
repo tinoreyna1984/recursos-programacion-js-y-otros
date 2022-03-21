@@ -42,6 +42,37 @@ module.exports.ProductsController = {
             Response.error(res);
         }
     },
+    updateProduct : async (req, res) => {
+        try {
+            const { params : {id} } = req;
+            const { body } = req;
+            let product = await ProductsService.getById(id);
+            if(!product){
+                Response.error(res, new createError.NotFound());
+            }
+            else{
+                const updateId = await ProductsService.update(id, body);
+                Response.success(res, 201, 'Producto actualizado', updateId);
+            }
+        } catch (error) {
+            debug(error);
+            Response.error(res);
+        }
+    },
+    deleteProduct: async (req, res) => {
+        try {
+            const { params : {id} } = req;
+            let deletedId = await ProductsService.remove(id);
+            if(!deletedId){
+                Response.error(res, new createError.NotFound());
+            }
+            else
+                Response.success(res, 201, 'Producto eliminado', deletedId);
+        } catch (error) {
+            debug(error);
+            Response.error(res);
+        }
+    } ,
     generateReport : (req, res) => {
         try {
             ProductsService.generateReport('Inventario', res);
