@@ -15,4 +15,4 @@ module.exports.ProductsAPI = (app) => {
     app.use('/api/products', router);
 }
 
-// pendiente update y delete
+
