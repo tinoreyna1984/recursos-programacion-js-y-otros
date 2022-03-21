@@ -57,4 +57,15 @@ Iniciar servicio NodeJS:
 
 node <archivo (por defecto, index.js)>
 
+Instalar dependencias en caso de reutilizar proyecto de NodeJS, React, Angular, etc.
+====================================================================================
+
+npm install
+
+o
+
+npm i
+
+Solo instalará lo que se encuentre escrito en package.json.
+
 
