@@ -39,12 +39,12 @@ Instalación:
 
 npm install express
 
-Nodemon (desarrollo):
-=====================
+Nodemon (solo en desarrollo):
+=============================
 
 Instalación:
 
-npm i nodemon
+npm i -D nodemon
 
 Uso de Axios
 ============

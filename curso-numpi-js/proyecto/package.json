@@ -1,0 +1,28 @@
+{
+  "name": "proyecto",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "set DEBUG=app:* & nodemon index.js",
+    "start" : "node index.js"
+  },
+  "keywords": [
+    "proyecto",
+    "node",
+    "js"
+  ],
+  "author": "Tino Reyna",
+  "license": "ISC",
+  "dependencies": {
+    "debug": "^4.3.4",
+    "dotenv": "^16.0.0",
+    "excel4node": "^1.7.2",
+    "express": "^4.17.3",
+    "http-errors": "^2.0.0",
+    "mongodb": "^4.4.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
