@@ -9,6 +9,7 @@ module.exports.IndexAPI = (app) => {
     router.get('/', (req, res) => {
         const menu = {
             products : `https://${req.headers.host}/api/products`,
+            sales : `https://${req.headers.host}/api/sales`,
             users : `https://${req.headers.host}/api/users`,
         }
 
