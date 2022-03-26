@@ -1,0 +1,3 @@
+Crear esquema en carpeta:
+
+sqlite3 <esquema>

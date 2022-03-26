@@ -57,6 +57,26 @@ Iniciar servicio NodeJS:
 
 node <archivo (por defecto, index.js)>
 
+Uso de sequelize (ORM)
+======================
+
+Instalación:
+
+npm install --save sequelize
+
+Instalación de componentes para acceso a BD:
+
+npm install --save mysql # Para MYSQL y Mariadb
+
+npm install --save pg pg-hstore # Para PostgreSQL
+
+npm install --save sqlite3 # Para SQLite v3
+
+npm install --save sqlite # Para SQLite
+
+npm install --save tedious # Para MSSQL
+
+
 Instalar dependencias en caso de reutilizar proyecto de NodeJS, React, Angular, etc.
 ====================================================================================
 
@@ -67,5 +87,18 @@ o
 npm i
 
 Solo instalará lo que se encuentre escrito en package.json.
+
+
+Estructura aconsejada para crear un API REST con Sequelize:
+===========================================================
+
+src >
+- controllers
+- models
+- routes
+- index.js
+
+
+
 
 
