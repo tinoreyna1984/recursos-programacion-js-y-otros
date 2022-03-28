@@ -1,0 +1,28 @@
+API REST con Node.js, Express JS y Sequelize
+============================================
+
+(Ejemplo inicial o por default con SQLite)
+
+Metodología del CRUD:
+
+Arbol de directorios:
+
+> src
+>> index.js
+>> config
+>>> config.js
+>>> db.js
+>> controllers
+>>> <entidad>Controller.js
+>> models
+>>> <entidad>Model.js
+>> routes
+>>> <entidad>.routes.js
+
+Cada entidad debe tener lo siguiente: en este orden:
+
+1. Modelo: es la base del ORM de cada tabla u objeto DDL de la base de datos.
+2. Controller: es el controlador de operaciones CRUD para el manejo del DML de cada tabla.
+3. Ruta: es el punto de operación que permite a la vista interactuar con el API.
+
+

@@ -170,6 +170,9 @@ git push origin master
 Para cambios desde PC, actualizar rama remota:
 git push origin master
 
+Para actualizar desde repositorio (traer cambios a escritorio):
+git pull origin master
+
 Subir proyecto a Heroku
 =======================
 
@@ -178,11 +181,19 @@ Link: https://www.youtube.com/watch?v=gItqzShex5M
 Subir a Heroku (solo React JS):
 ===============================
 
-heroku create -b https://github.com/mars/create-react-app-buildpack.git <proyecto>
+heroku login
+
+Si no se ha creado en GitHub:
+
+heroku create -b https://github.com/mars/create-react-app-buildpack.git <proyecto de Heroku>
 git add .
-git commit -m "react-create-app on Heroku"
+git commit -m "Commit"
 git push heroku master
 heroku open
+
+Si fue creado previamente en GitHub:
+
+heroku git:remote -a <repositorio-github>
 
 Subir a hosting compartido (solo frontend):
 ===========================================
