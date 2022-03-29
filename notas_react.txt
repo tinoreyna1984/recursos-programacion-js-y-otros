@@ -59,19 +59,6 @@ La centralidad del proyecto está en el archivo App.js en su raíz.
 Agregar otras extensiones
 =========================
 
-React Bootstrap (recomendado)
------------------------------
-
-Instalación:
-
-npm install react-bootstrap bootstrap
-
-Configuración:
-
-* En index.js:
-
-import 'bootstrap/dist/css/bootstrap.min.css';
-
 React Router
 ------------
 
@@ -79,8 +66,8 @@ Instalación:
 
 npm install react-router-dom
 
-Bootstrap + PopperJS
---------------------
+Bootstrap + PopperJS (recomendado)
+----------------------------------
 
 Instalación:
 
@@ -99,6 +86,28 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 Asegurarse de que esté la siguiente línea al inicio del fichero:
 
 import React from 'react';
+
+React International
+-------------------
+
+Instalación:
+
+npm i react-intl
+
+Uso con context: https://www.youtube.com/watch?v=OueflnXmo1U
+
+React Bootstrap
+---------------
+
+Instalación:
+
+npm install react-bootstrap bootstrap
+
+Configuración:
+
+* En index.js:
+
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 Font Awesome
 ============
@@ -124,21 +133,6 @@ import ScrollToTop from "react-scroll-to-top";
 ...
 <ScrollToTop smooth />
 Para personalizarlo, revisar: https://www.npmjs.com/package/react-scroll-to-top
-
-
-i18next (internacionalización)
-===============================
-
-Instalación:
-
-npm install react-i18next i18next i18next-localstorage-backend i18next-browser-languagedetector --save
-
-Uso:
-
-Revisar: https://youtu.be/C6PtKxW4rvk
-Nota: para el idioma por defecto, poner en el objeto i18next, en init:
-lng: 'es',
-Para definir el idioma por defecto (en este ejemplo, el español).
 
 
 Uso de Git
