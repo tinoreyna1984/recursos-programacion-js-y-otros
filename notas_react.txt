@@ -167,13 +167,20 @@ git push origin master
 Para actualizar desde repositorio (traer cambios a escritorio):
 git pull origin master
 
-Subir proyecto a Heroku
-=======================
+Subir proyecto a Heroku (solo React JS)
+======================================
 
 Link: https://www.youtube.com/watch?v=gItqzShex5M
 
-Subir a Heroku (solo React JS):
-===============================
+heroku login
+heroku create -b https://github.com/mars/create-react-app-buildpack.git <proyecto de Heroku>
+git add .
+git commit -m "Commit"
+git push heroku master
+heroku open
+
+Subir a Heroku:
+===============
 
 heroku login
 
