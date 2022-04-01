@@ -167,6 +167,9 @@ git push origin master
 Para actualizar desde repositorio (traer cambios a escritorio):
 git pull origin master
 
+Para cambiar de repositorio remoto:
+git remote set-url origin https://github.com/usuario/<nuevo-repo>.git
+
 Subir proyecto a Heroku (solo React JS)
 ======================================
 
