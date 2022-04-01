@@ -132,29 +132,30 @@ Los más típicos son useState y useEffect, los cuales manejan estados y efectos
 
 Reglas de Hooks:
 
-1. Solo llamar Hooks en el nivel superior. No llames Hooks dentro de loops, condiciones o funciones anidadas.
-2. Solo llamar Hooks desde componentes de función de React. No llames Hooks desde las funciones regulares de JavaScript. (Solo hay otro lugar válido para llamar Hooks: tus propios Hooks personalizados. En un momento aprenderemos sobre estos).
+1. Solo llamar Hooks en el nivel superior. No llamar Hooks dentro de loops, condiciones o funciones anidadas.
+2. Solo llamar Hooks desde componentes de función de React. No llamar Hooks desde las funciones regulares de JavaScript. (Solo hay otro lugar válido para llamar Hooks: los Hooks personalizados por el usuario).
 
 Referencia: https://es.reactjs.org/docs/hooks-rules.html
 
-useState:
+useState
+--------
 
 Ejemplo:
 
- 1:  import React, { useState } from 'react';
- 2:
- 3:  function Example() {
- 4:    const [count, setCount] = useState(0);
- 5:
- 6:    return (
- 7:      <div>
- 8:        <p>Hiciste clic {count} veces</p>
- 9:        <button onClick={() => setCount(count + 1)}>
-10:         Click me
-11:        </button>
-12:      </div>
-13:    );
-14:  }
+import React, { useState } from 'react';
+
+function Example() {
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <p>Hiciste clic {count} veces</p>
+      <button onClick={() => setCount(count + 1)}>
+       Click me
+      </button>
+    </div>
+  );
+}
 
 Línea 1: Importamos el Hook useState desde React que nos permite mantener un estado local en un componente de función.
 
@@ -162,7 +163,36 @@ Línea 4: Dentro del componente Example declaramos una nueva variable de estado 
 
 Línea 9: Cuando el usuario hace click, llamamos a setCount con un nuevo valor. React actualizará entonces el componente Example pasándole el nuevo valor de count.
 
-useEffect:
+La logica del useState puede ser definida como la siguiente función:
+
+const useState = (valor) => {
+    return [valor, (valor) => {function(valor)}];
+}
+
+Para el ejemplo anterior:
+
+/* eslint-disable react-hooks/rules-of-hooks */
+import React from 'react';
+
+function Example() {
+  const useState = (count) => {
+    return [count, (count) => setCount(count)];
+  }
+
+  const [count, setCount] = useState(0);
+
+  return (
+    <div>
+      <p>Hiciste clic {count} veces</p>
+      <button onClick={() => setCount(count + 1)}>
+       Click me
+      </button>
+    </div>
+  );
+}
+
+useEffect
+---------
 
 import React, { useState, useEffect } from 'react';
 
