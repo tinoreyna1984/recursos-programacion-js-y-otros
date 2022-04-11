@@ -1,0 +1,244 @@
+Pruebas en React
+****************
+****************
+
+Proyecto de ejemplo: CounterApp
+
+Pruebas
+*******
+
+- Unitarias.
+- De integración.
+
+Características de las pruebas:
+
+1. Fáciles de escribir.
+2. Fáciles de leer.
+3. Confiables.
+4. Rápidas.
+5. Principalmente unitarias.
+
+Proceso AAA
+***********
+
+Arrange, Act, Assert: arreglar, actuar, afirmar.
+
+Arrange: estado inicial, sujeto a probar.
+Act: aplicar acciones al sujeto de prueba.
+Assert: observar el comportamiento resultante de la prueba.
+
+
+Procedimiento en el curso
+=========================
+
+*. Levantar CounterApp.
+*. Copiar carpeta de pruebas (base) en src.
+
+Primera prueba:
+
+* Crear en src un directorio de pruebas: src/test
+En ella, crear un archivo de prueba inicial: demo.test.js
+Poner como contenido el comando test propio de Jest (incluido en React JS):
+
+test(<mensaje referido a la prueba>, <callback a probar>)
+
+Ej:
+
+test('debe funcionar', () => { console.log("Hola mundo") });
+
+Ejecutar desde la raíz del proyecto el comando:
+
+npm run test
+
+Uso de Jest
+===========
+
+test('los strings deben ser iguales', () => { 
+    
+	// 1. inicialización
+	const mensaje1 = "Hola mundo";
+
+	// 2. estímulo
+	const mensaje2 = `Hola mundo`;
+
+	// 3. observar el comportamiento
+expect(mensaje1).toBe(mensaje2); // ===
+})
+
+Adicionalmente:
+
+describe(<título>, <callback de los tests>)
+
+Ejemplo:
+
+describe("Pruebas en demo.test.js", () => {
+  test("los strings deben ser iguales", () => {
+    // 1. inicialización
+    const mensaje1 = "Hola mundo";
+
+    // 2. estímulo
+    const mensaje2 = `Hola mundo`;
+
+    // 3. observar el comportamiento
+    expect(mensaje1).toBe(mensaje2); // ===
+  });
+});
+
+Caso de prueba: probar 02-template-string.js
+
+En src/test, crear la carpeta base y en ella el archivo 02-template-string.test.js
+
+Importar método getSaludo y librerías de Jest:
+
+import '@testing-library/jest-dom';
+import { getSaludo } from "../../base/02-template-string";
+
+En 02-template-string.js, exportar getSaludo y comentar los console.log:
+
+export function getSaludo(nombre) {
+    return 'Hola ' + nombre;
+}
+
+Caso de prueba: probar 05-funciones.js
+
+En src/test/base, crear el archivo 02-template-string.test.js y e importar de forma similar al caso anterior:
+
+import '@testing-library/jest-dom';
+import { getSaludo } from "../../base/05-funciones";
+
+En el archivo de funciones, exportar las funciones getUser y getUsuarioActivo. Luego, probar valores de getUser con la función toEqual, ya que esta es especial para objetos:
+
+describe("pruebas en 05-funciones", () => {
+  test("getUser debe retornar un objeto", () => {
+    const userTest = {
+      uid: "ABC123",
+      username: "El_Papi1502",
+    };
+    const user = getUser();
+
+    expect(userTest).toEqual(user);
+  });
+});
+
+También se puede usar toEqual si el retorno de una función es un arreglo:
+
+test("debe de retornar un arreglo con los heroes de Marvel", () => {
+
+	const owner = 'Marvel';
+	const heroesMarvel = getHeroesByOwner(owner);
+	const heroesData = heroes.filter( (heroe) => heroe.owner === owner );
+	/*
+		[
+		  { id: 2, name: 'Spiderman', owner: 'Marvel' },
+		  { id: 5, name: 'Wolverine', owner: 'Marvel' }
+		]
+	*/
+
+	expect(heroesMarvel).toEqual(heroesData);
+});
+
+Pruebas con promesas:
+
+Los tests tendrían este formato:
+
+test(<mensaje>, (done) => {
+    const id = 1;
+	
+	// funcionPromesa: then o catch
+	
+	promesa(args).funcionPromesa(() => {
+		// lógica del callback
+		// sentencia expect
+		done();
+	});
+    
+});
+
+Ejemplo:
+
+import "@testing-library/jest-dom";
+import { getHeroeByIdAsync } from "../../base/09-promesas";
+import heroes from "../../data/heroes";
+
+describe("Pruebas con promesas", () => {
+  test("obtener un heroe de forma asincrona", (done) => {
+    const id = 1;
+
+    getHeroeByIdAsync(id).then((heroe) => {
+      expect(heroe).toBe(heroes[0]);
+      done();
+    });
+  });
+  test("obtener un error si no se encuentra el heroe", (done) => {
+    const id = 10;
+
+    getHeroeByIdAsync(id).catch((e) => {
+      expect(e).toBe("No se pudo encontrar el héroe");
+      done();
+    });
+  });
+});
+
+
+Pruebas asíncronas:
+
+Los tests tienen el formato:
+
+test(<mensaje>, async () => { 
+	// lógica a probar
+	// sentencia expect
+ })
+
+Ejemplo:
+
+import "@testing-library/jest-dom";
+import { getImagen } from "../../base/11-async-await";
+
+describe("Pruebas con async-await", () => {
+  test("Debe retornar el URL de la imagen", async () => {
+    const url = await getImagen();
+    expect(typeof url).toBe("string");
+  });
+});
+
+
+Pruebas con React
+=================
+
+Al crear por defecto un proyecto en React, en src ya existe un fichero llamado setupTests.js, el cual importa la librería:
+
+import '@testing-library/jest-dom';
+
+Esta incluye la utilidad extend-expect para probar los componentes de React.
+
+Revisión de Jest o React Testing Library (pendiente).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

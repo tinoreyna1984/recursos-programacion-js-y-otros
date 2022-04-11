@@ -1,6 +1,74 @@
 Conceptos clave y distintivos de React JS
 =========================================
 
+Componente
+----------
+
+Es todo objeto que se visualiza en la aplicación web. Ejemplo:
+
+import logo from './logo.svg';
+import './App.css';
+
+function App() {
+  return (
+    <div className="App">
+      <h1>Hola mundo</h1>
+    </div>
+  );
+}
+
+export default App;
+
+Al crear un proyecto React JS, por defecto crea el componente principal App.js. Si se desea crear un componente principal alternativo, se crearía un archivo de JavaScript y se definiría como sigue:
+
+import logo from './logo.svg';
+import './App.css';
+
+function MiComponente() {
+  return (
+    <div className="App">
+      <h1>Hola mundo</h1>
+    </div>
+  );
+}
+
+export default MiComponente;
+
+Renderización del componente principal
+--------------------------------------
+
+import React from "react";
+import { createRoot } from "react-dom/client"; // ahora se exige en React 18
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+
+/**
+ * Notar que ya no se invoca a la clase ReactDOM ni al metodo render
+ * como tradicionalmente se hacía hasta la version 17.
+ */
+const root = createRoot(document.getElementById("root"));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
+
+Siguiendo el ejemplo anterior, el componente principal creado, al renderizarse, podría ser MiComponente, el cual podría aparecer de la siguiente forma:
+
+const root = createRoot(document.getElementById("root"));
+root.render(
+  <React.StrictMode>
+    <MiComponente />
+  </React.StrictMode>
+);
+
+
 Propiedades o "props"
 ---------------------
 
@@ -203,7 +271,7 @@ function Example() {
   useEffect(() => {
     // Actualiza el título del documento usando la API del navegador
     document.title = `Hiciste clic ${count} veces`;
-  }, [count]); // el [count] es opcional pero ayuda en determinados casos 
+  }, [count]); // count es la única condición que permite la ejecución del hook
 
   return (
     <div>
@@ -217,6 +285,7 @@ function Example() {
 
 Este fragmento está basado en el ejemplo de contador de la página anterior, pero le hemos añadido una funcionalidad nueva: actualizamos el título del documento con un mensaje personalizado que incluye el número de clicks.
 
+El useEffect nos permite ejecutar una instrucción de forma condicionada. El primer argumento es lo que se desea presentar en el renderizado y el segundo argumento es la lista de condiciones por las cuales se permite la ejecución.
 
 
 
