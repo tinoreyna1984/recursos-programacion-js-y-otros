@@ -21,7 +21,7 @@ Paso 1. Instalar NodeJS en su ultima versión, para eso entraremos a su web ofic
 
 Paso 2. Actualizar NPM, el gestor de paquetes de node, para bajarnos las dependencias más actuales:
 
-npm install -g npm@latest
+npm i -g npm@latest
 
 Paso 3. Borrar la cache de NPM:
 
@@ -29,9 +29,21 @@ npm cache clean --force
 
 Paso 4. Instalar Create React App, que es un interprete de consola(CLI) que nos va a permitir instalar React facilmente e incluirá webpack para la compilación y minificación del proyecto, un live reload, una estructura básica para los proyectos de ReactJS, etc, veamos como instalar este paquete:
 
-npm install -g create-react-app
+npm i -g create-react-app@latest
 
 Ahora ya tenemos instalado «create react app» y ya podemos generar un nuevo proyecto de React.js
+
+Si salen las llamadas vulnerabilidades, ejecutar:
+
+npm audit fix --force
+
+NOTA: actualizar el tar en caso de que salga warning de deprecación:
+
+npm i -g tar@latest
+
+NOTA: para actualizar React, usar el siguiente comando:
+
+npm i -g react react-dom
 
 Crear proyecto en React JS
 ==========================
@@ -50,6 +62,35 @@ Puedes comprobar la versión de React que tienes dentro del fichero package.json
 Ahora tendremos disponible la webapp de React 16 en http://localhost:3000/ y veremos nuestro proyecto corriendo, con la página de bienvenida por defecto.
 
 Con esto ya sabemos como instalar React desde cero y como generar un proyecto base.
+
+NOTA: si al crear un proyecto del React aparece el siguiente error por dependencia de testing:
+
+Installing template dependencies using npm...
+npm ERR! code ERESOLVE
+npm ERR! ERESOLVE unable to resolve dependency tree
+npm ERR!
+npm ERR! While resolving: 05-hook-app@0.1.0
+npm ERR! Found: react@18.0.0
+npm ERR! node_modules/react
+npm ERR!   react@"^18.0.0" from the root project
+npm ERR!
+npm ERR! Could not resolve dependency:
+npm ERR! peer react@"<18.0.0" from @testing-library/react@12.1.5
+npm ERR!   @testing-library/react@"^12.0.0" from the root project
+npm ERR!
+npm ERR! Fix the upstream dependency conflict, or retry
+npm ERR! this command with --force, or --legacy-peer-deps
+npm ERR! to accept an incorrect (and potentially broken) dependency resolution.
+npm ERR!
+npm ERR! See C:\Users\Tino\AppData\Local\npm-cache\eresolve-report.txt for a full report.
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     C:\Users\Tino\AppData\Local\npm-cache\_logs\2022-04-12T05_36_29_482Z-debug-0.log
+`npm install --no-audit --save @testing-library/jest-dom@^5.14.1 @testing-library/react@^12.0.0 @testing-library/user-event@^13.2.1 web-vitals@^2.1.0` failed
+
+Aplicar (de forma global):
+
+npm config set legacy-peer-deps true
 
 Edición del sitio en ReactJS
 ============================
