@@ -187,6 +187,44 @@ export default function Saludo(props) {
   );
 }
 
+Manejo de eventos
+=================
+
+Se tocará lo más típico:
+
+import React, { useState } from "react";
+import PropTypes from "prop-types";
+
+export default function AddCategory({setCategories}) {
+  // hooks para el campo de texto
+  const [inputValue, setInputValue] = useState("");
+
+  // cada vez que cambio el valor en el campo de texto
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  // cada vez que doy enter o cliquee en algun boton para enviar el dato del formulario
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if(inputValue.trim().length > 2){
+        setCategories(categories => [inputValue, ...categories]);
+        setInputValue('');
+    }
+    
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+        <input type="text" value={inputValue} onChange={handleInputChange} />
+    </form>
+  );
+}
+
+onChange: evento propio de cambios en campos de texto. Se invoca un callback que determine el valor mapeado en el instante en el que se introduce un nuevo valor en ese objeto.
+onSubmit: es para el envío de un conjunto de valores desde formulario.
+onClick: ocurre cuando se hace click en un objeto del tipo botón.
+
 Hooks
 =====
 
