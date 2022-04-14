@@ -321,9 +321,213 @@ function Example() {
   );
 }
 
+El useEffect nos permite ejecutar un efecto secundario cuando algo sucede en el componente.
+
 Este fragmento está basado en el ejemplo de contador de la página anterior, pero le hemos añadido una funcionalidad nueva: actualizamos el título del documento con un mensaje personalizado que incluye el número de clicks.
 
 El useEffect nos permite ejecutar una instrucción de forma condicionada. El primer argumento es lo que se desea presentar en el renderizado y el segundo argumento es la lista de condiciones por las cuales se permite la ejecución.
+
+useRef
+------
+
+Usa el concepto de referencia de un componente, esto es, el atributo ref de un objeto HTML. Se emplea una variable para inicializar con el hook useRef y aprovecharla ante un evento asociado al objeto en cuestión.
+
+Ejemplo:
+
+import React, { useRef } from "react";
+import "./effects.css";
+
+export const FocusScreen = () => {
+  /**
+   * useRef permite almacenar el valor del elemento de foco en una variable
+   */
+  const inputRef = useRef();
+  const handleClick = () => {
+    inputRef.current.select();
+  };
+
+  return (
+    <div>
+      <h1>FocusScreen</h1>
+      <hr />
+      <input
+        ref={inputRef}
+        className="form-control"
+        placeholder="escribe tu nombre"
+      />
+      <button className="btn btn-outline-primary mt-5" onClick={handleClick}>
+        Focus
+      </button>
+    </div>
+  );
+};
+
+useLayoutEffect
+---------------
+
+Funciona como el useEffect, pero el efecto generado ocurre después de todas las mutaciones en el DOM.
+La sintaxis es similar al useEffect.
+
+useMemo
+-------
+
+Permite almacenar el valor de la ejecución de un proceso, el cual ocurre de manera controlada.
+El nombre del hook viene a que este memoriza ese proceso para optimizar el desempeño del app.
+
+Ejemplo:
+
+import React, { useMemo, useState } from "react";
+import "./effects.css";
+import { useCounter } from "../../hooks/useCounter";
+import { procesoPesado } from "../../helpers/procesoPesado";
+
+export const MemoHook = () => {
+  const { counter, increment } = useCounter(5000);
+  const [show, setShow] = useState(true);
+
+
+
+  /**
+   * useMemo: hook que permite devolver un valor memorizado a partir de un proceso
+   * y un conjunto de condiciones que lo controlan
+   */
+  const memoProcesoPesado = useMemo(() => procesoPesado(counter), [counter]);
+
+  return (
+    <div>
+        <h1>MemoHook</h1>
+      <h3>
+        Counter: <small>{counter}</small>
+      </h3>
+      <hr />
+      <p>{memoProcesoPesado}</p>
+      <button className="btn btn-primary" onClick={increment}>
+        +1
+      </button>
+      <button
+        className="btn btn-outline-primary ml-3"
+        onClick={() => setShow(!show)}
+      >
+        Show/hide {JSON.stringify(show)}
+      </button>
+    </div>
+  );
+};
+
+useCallback
+-----------
+
+Devuelve un callback memorizado.
+Ejemplo:
+
+ShowIncrement.js:
+
+import React from "react";
+
+export const ShowIncrement = React.memo(({ increment }) => {
+  console.log("Me volví a generar.");
+  return (
+    <button
+      className="btn btn-outline-primary"
+      onClick={() => {
+        increment(5);
+      }}
+    >
+      Incrementar
+    </button>
+  );
+});
+
+CallbackHook.js:
+
+import React, { useCallback, useState } from "react";
+import "./effects.css";
+import { ShowIncrement } from "./ShowIncrement";
+
+export const CallbackHook = () => {
+  const [counter, setCounter] = useState(10);
+
+  /* const increment = () => {
+    setCounter(counter + 1);
+  }; */
+
+  /**
+   * useCallback: devuelve un callback memorizado
+   */
+  const increment = useCallback(
+    (num) => {
+        setCounter((c) => c + num);
+    },
+    [setCounter],
+  )
+  
+
+  return (
+    <div>
+      <h1>useCallbackHook: {counter}</h1>
+      <hr />
+      <ShowIncrement increment={increment} />
+    </div>
+  );
+};
+
+
+
+
+React.memo
+==========
+
+Optimiza el renderizado de un componente con los mismos valores de props ingresados.
+Ejemplo:
+
+Small.js:
+
+import React from 'react';
+
+export const Small = React.memo(({value}) => {
+  console.log("Me volvi a llamar");
+  return (
+    <small>{value}</small>
+  )
+});
+
+Memorize.js: (llama al componente memorizado Small)
+
+import React, { useState } from "react";
+import "./effects.css";
+import { useCounter } from "../../hooks/useCounter";
+import {Small} from "./Small";
+
+export const Memorize = () => {
+  const { counter, increment } = useCounter(10);
+  const [show, setShow] = useState(true);
+
+  return (
+    <div>
+      <h1>
+        Counter: <Small value={counter} />{" "}
+      </h1>
+      <hr />
+      <button className="btn btn-primary" onClick={increment}>
+        +1
+      </button>
+      <button
+        className="btn btn-outline-primary ml-3"
+        onClick={() => setShow(!show)}
+      >
+        Show/hide {JSON.stringify(show)}
+      </button>
+    </div>
+  );
+};
+
+
+
+
+
+
+
+
 
 
 
