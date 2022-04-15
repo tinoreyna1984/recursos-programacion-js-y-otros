@@ -234,7 +234,7 @@ https://es.reactjs.org/docs/hooks-effect.html
 
 Son funcionalidades que permiten cambiar dinámica y sencillamente los estados de los props.
 
-Los más típicos son useState y useEffect, los cuales manejan estados y efectos, respectivamente.
+Los más típicos son useState y useEffect, los cuales manejan estados y efectos resultantes de los estados, respectivamente.
 
 Reglas de Hooks:
 
@@ -472,8 +472,6 @@ export const CallbackHook = () => {
 };
 
 
-
-
 React.memo
 ==========
 
@@ -520,6 +518,100 @@ export const Memorize = () => {
     </div>
   );
 };
+
+Reducers: definición y uso del hook useReducer
+==============================================
+
+Un reducer:
+1. Es una función corriente que no puede ser asíncrona.
+2. Debe ser una función pura: debe resolver todo lo que se le pide sin necesidad de usar otras funciones. No debe de generar efectos secundarios ni usar funciones como localStorage o sessionStorage. No debe de requerir más que una acción que puede tener un argumento.
+3. Inmutabilidad de datos: debe retornar un estado nuevo.
+4. Usualmente recibe solo dos argumentos: el valor inicial y la acción a ejecutar.
+
+Procedimiento de uso de un reducer y su hook useReducer
+-------------------------------------------------------
+
+1. Definir el estado inicial (usualmente es un arreglo vacío) y una función de inicialización.
+2. Definir el reducer. El reducer es una función que usa dos argumentos: una variable de estado (que es el que almacena los cambios de estado) y una acción, la cual es un objeto que genera el valor para el próximo estado según las propiedades definidas en dicho objeto.
+3. Emplear el hook useReducer, el cual recibirá como parámetros el reducer y el estado inicial (en ese orden). El resultado es un arreglo de dos elementos: una lista de elementos con los estados cambiados y una función de despacho (dispatch).
+4. Desestructurar el arreglo en una variable con los elementos de estados cambiados y el dispatch.
+
+Cambio de estado con la acción despachadora (dispatch)
+------------------------------------------------------
+1. Establecer un nuevo estado con la misma figura que el estado inicial.
+2. Se genera un nuevo objeto de acción que recibe como propiedades el tipo de acción y el nuevo estado definido en el paso anterior.
+3. Se despacha el cambio usando la acción definida en el paso previo.
+
+Ejemplo:
+
+todoReducer.js: (reducer)
+
+/**
+ * Paso 2 del Procedimiento de uso de un reducer y su hook useReducer
+ */
+
+export const todoReducer = (state = [], action) => {
+  switch (action.type) {
+    case 'add':
+      return [...state, action.payload];
+
+    default:
+      return state;
+  }
+};
+
+TodoApp.js:
+
+import React, { useReducer } from "react";
+import "./styles.css";
+import { todoReducer } from "./todoReducer";
+/**
+   * Paso 1 del Procedimiento de uso de un reducer y su hook useReducer
+   */
+const init = () => {
+    return [
+        {
+          id: new Date().getTime(),
+          desc: "Aprender React",
+          done: false,
+        },
+      ];
+}
+
+export const TodoApp = () => {
+  
+  /**
+   * Pasos 3 al 4 del Procedimiento de uso de un reducer y su hook useReducer
+   */
+  const [todos, dispatch] = useReducer(todoReducer, [], init); // el arreglo vacío es del paso 1 del Procedimiento de uso de un reducer y su hook useReducer
+
+  const handleAddTodo = (e) => {
+    e.preventDefault();
+    
+    /**
+     * Cambio de estado con los pasos del 1 al 3
+     */
+    const newTodo = {
+        id: new Date().getTime(),
+        desc: "Nueva tarea",
+        done: false,
+      }
+    const action = {
+        type: 'add',
+        payload: newTodo,
+    }
+    dispatch(action);
+    
+  }
+
+  return (
+    ...
+  );
+};
+
+
+
+
 
 
 
