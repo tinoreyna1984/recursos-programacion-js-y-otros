@@ -27,12 +27,6 @@ Paso 3. Borrar la cache de NPM:
 
 npm cache clean --force
 
-Paso 4. Instalar Create React App, que es un interprete de consola(CLI) que nos va a permitir instalar React facilmente e incluirá webpack para la compilación y minificación del proyecto, un live reload, una estructura básica para los proyectos de ReactJS, etc, veamos como instalar este paquete:
-
-npm i -g create-react-app@latest
-
-Ahora ya tenemos instalado «create react app» y ya podemos generar un nuevo proyecto de React.js
-
 Si salen las llamadas vulnerabilidades, ejecutar:
 
 npm audit fix --force
@@ -50,7 +44,11 @@ Crear proyecto en React JS
 
 Para generar un nuevo proyecto de React.js y finalmente instalarlo, entraremos al directorio donde queramos generar el proyecto de reactjs y ejecutamos este comando:
 
-create-react-app NombreDeMiProyecto
+npx create-react-app NombreDeMiProyecto
+
+o:
+
+npm init react-app NombreDeMiProyecto
 
 Ahora entraremos al directorio de nuestro proyecto y lanzaremos el servidor local de pruebas para React:
 
@@ -210,6 +208,9 @@ git pull origin master
 
 Para cambiar de repositorio remoto:
 git remote set-url origin https://github.com/usuario/<nuevo-repo>.git
+
+Deshacer todos los cambios en un proyecto:
+git reset --hard
 
 Subir proyecto a Heroku (solo React JS)
 ======================================

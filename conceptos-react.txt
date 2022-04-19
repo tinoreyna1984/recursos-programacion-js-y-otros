@@ -225,156 +225,6 @@ onChange: evento propio de cambios en campos de texto. Se invoca un callback que
 onSubmit: es para el envío de un conjunto de valores desde formulario.
 onClick: ocurre cuando se hace click en un objeto del tipo botón.
 
-Uso de rutas a través de React Router
-=====================================
-
-Para la generación de rutas y hacer que la página funcione como un SPA, es necesario usar la librería React Router.
-
-Para instalar React Router, ingresar:
-
-npm install react-router-dom
-
-Aquí un ejemplo de cómo configurar el Router de React (v6):
-
-App.js:
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // React Router
-
-// componentes
-import Navigation from "./components/Navigation";
-import Footer from "./components/Footer";
-
-// paginas
-import Home from "./pages/Home";
-import About from "./pages/About";
-import NotFound from "./pages/NotFound";
-
-function App() {
-  return (
-    <>
-      <Router>
-        <Navigation />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        <Footer />
-      </Router>
-    </>
-  );
-}
-
-export default App;
-
-Y una configuración de enlaces en Footer:
-
-Footer.js:
-
-import React from "react";
-import { Link } from "react-router-dom";
-
-export default function Footer() {
-  return (
-    <div className="container-fluid bg-dark border-bottom">
-      <div className="container">
-        <div className="row">
-          <div className="col">
-            <ul className="list-unstyled">
-              <li className="list-unstyled-item">
-                <Link
-                  className="nav-link h6"
-                  aria-current="page"
-                  to="/"
-                >
-                  Home
-                </Link>
-                <Link
-                  className="nav-link h6"
-                  aria-current="page"
-                  to="/tino"
-                >
-                  Tino
-                </Link>
-              </li>
-              <li className="list-unstyled-item">
-                <Link
-                  className="nav-link h6"
-                  aria-current="page"
-                  to="/cv"
-                >
-                  CV
-                </Link>
-              </li>
-              <li className="list-unstyled-item">
-                <Link
-                  className="nav-link h6"
-                  aria-current="page"
-                  to="/portafolio"
-                >
-                  <FormattedMessage
-                    id="menu.portfolio"
-                    defaultMessage="Portafolio"
-                  />
-                </Link>
-              </li>
-              <li className="list-unstyled-item">
-                <Link
-                  className="nav-link h6"
-                  aria-current="page"
-                  to="/contacto"
-                >
-                  <FormattedMessage
-                    id="menu.contact"
-                    defaultMessage="Contacto"
-                  />
-                </Link>
-              </li>
-            </ul>
-          </div>
-      </div>
-    </div>
-  );
-}
-
-Es posible notar dos cosas:
-
-1. Los elementos y rutas de navegación funcionan dentro del contexto de Router. Esto es, si se desarrollan un panel de navegación y un footer, los enlaces funcionan dentro del bloque Router.
-2. Link reemplaza al objeto <a> del HTML con todas las propiedades típicas de un enlace. Nuevamente, esto funciona solo dentro del contexto de Router. El beneficio de Link es que hace que los enlaces sean persistentes y no obliguen al sitio a refrescarse totalmente, cumpliendo la funcionalidad de una SPA.
-
-También existe un elemento NavLink, el cual funciona como Link pero tiene, en adición, las propiedades de ruta exacta y la clase que determina que el link activo actual. Ejemplo:
-
-NavBar.js:
-
-import React from "react";
-import { Link, NavLink } from "react-router-dom";
-
-export const NavBar = () => {
-  return (
-    <nav className="navbar navbar-expand-sm navbar-dark bg-dark">
-      <div className="container-fluid">
-        <Link className="navbar-brand" to="/">
-          useContext
-        </Link>
-        <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <div className="navbar-nav">
-            <NavLink exact activeClassName="active" className="nav-link" aria-current="page" to="/">
-              Home
-            </NavLink>
-            <NavLink exact activeClassName="active" className="nav-link" to="/login">
-              Login
-            </NavLink>
-            <NavLink exact activeClassName="active" className="nav-link" to="/about">
-              About
-            </NavLink>
-          </div>
-        </div>
-      </div>
-    </nav>
-  );
-};
-
-NOTA: en la v6, ya no es necesaria la palabra exact, ni establecer el atributo activeClassName.
-
 Hooks
 =====
 
@@ -522,7 +372,7 @@ useMemo
 -------
 
 Permite almacenar el valor de la ejecución de un proceso, el cual ocurre de manera controlada.
-El nombre del hook viene a que este memoriza ese proceso para optimizar el desempeño del app.
+El nombre del hook viene a que este memoriza ese proceso para optimizar el desempeño del app (evita posibles llamadas recurrentes a cambios de estado que obliguen a renderizar varias veces el componente).
 
 Ejemplo:
 
@@ -534,8 +384,6 @@ import { procesoPesado } from "../../helpers/procesoPesado";
 export const MemoHook = () => {
   const { counter, increment } = useCounter(5000);
   const [show, setShow] = useState(true);
-
-
 
   /**
    * useMemo: hook que permite devolver un valor memorizado a partir de un proceso
@@ -916,7 +764,469 @@ export const AboutScreen = () => {
 };
 
 
+Uso de rutas a través de React Router
+=====================================
 
+Para la generación de rutas y hacer que la página funcione como un SPA, es necesario usar la librería React Router.
+
+Para instalar React Router, ingresar:
+
+npm install react-router-dom
+
+Aquí un ejemplo de cómo configurar el Router de React (v6):
+
+App.js:
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // React Router
+
+// componentes
+import Navigation from "./components/Navigation";
+import Footer from "./components/Footer";
+
+// paginas
+import Home from "./pages/Home";
+import About from "./pages/About";
+import NotFound from "./pages/NotFound";
+
+function App() {
+  return (
+    <>
+      <Router>
+        <Navigation />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Footer />
+      </Router>
+    </>
+  );
+}
+
+export default App;
+
+Y una configuración de enlaces en Footer:
+
+Footer.js:
+
+import React from "react";
+import { Link } from "react-router-dom";
+
+export default function Footer() {
+  return (
+    <div className="container-fluid bg-dark border-bottom">
+      <div className="container">
+        <div className="row">
+          <div className="col">
+            <ul className="list-unstyled">
+              <li className="list-unstyled-item">
+                <Link
+                  className="nav-link h6"
+                  aria-current="page"
+                  to="/"
+                >
+                  Home
+                </Link>
+                <Link
+                  className="nav-link h6"
+                  aria-current="page"
+                  to="/tino"
+                >
+                  Tino
+                </Link>
+              </li>
+              <li className="list-unstyled-item">
+                <Link
+                  className="nav-link h6"
+                  aria-current="page"
+                  to="/cv"
+                >
+                  CV
+                </Link>
+              </li>
+              <li className="list-unstyled-item">
+                <Link
+                  className="nav-link h6"
+                  aria-current="page"
+                  to="/portafolio"
+                >
+                  <FormattedMessage
+                    id="menu.portfolio"
+                    defaultMessage="Portafolio"
+                  />
+                </Link>
+              </li>
+              <li className="list-unstyled-item">
+                <Link
+                  className="nav-link h6"
+                  aria-current="page"
+                  to="/contacto"
+                >
+                  <FormattedMessage
+                    id="menu.contact"
+                    defaultMessage="Contacto"
+                  />
+                </Link>
+              </li>
+            </ul>
+          </div>
+      </div>
+    </div>
+  );
+}
+
+Es posible notar dos cosas:
+
+1. Los elementos y rutas de navegación funcionan dentro del contexto de Router. Esto es, si se desarrollan un panel de navegación y un footer, los enlaces funcionan dentro del bloque Router.
+2. Link reemplaza al objeto <a> del HTML con todas las propiedades típicas de un enlace. Nuevamente, esto funciona solo dentro del contexto de Router. El beneficio de Link es que hace que los enlaces sean persistentes y no obliguen al sitio a refrescarse totalmente, cumpliendo la funcionalidad de una SPA.
+
+También existe un elemento NavLink, el cual funciona como Link pero tiene, en adición, las propiedades de ruta exacta y la clase que determina que el link activo actual. Ejemplo:
+
+NavBar.js:
+
+import React from "react";
+import { Link, NavLink } from "react-router-dom";
+
+export const NavBar = () => {
+  return (
+    <nav className="navbar navbar-expand-sm navbar-dark bg-dark">
+      <div className="container-fluid">
+        <Link className="navbar-brand" to="/">
+          useContext
+        </Link>
+        <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div className="navbar-nav">
+            <NavLink exact activeClassName="active" className="nav-link" aria-current="page" to="/">
+              Home
+            </NavLink>
+            <NavLink exact activeClassName="active" className="nav-link" to="/login">
+              Login
+            </NavLink>
+            <NavLink exact activeClassName="active" className="nav-link" to="/about">
+              About
+            </NavLink>
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+NOTA: en la v6, ya no es necesaria la palabra exact, ni establecer el atributo activeClassName. En su lugar, el enlace activo se renderiza según la lógica que condiciona la variable className:
+
+className={ ({isActive}) => "nav-item nav-link " + (isActive ? "active" : "") }
+
+Construcción de más un router
+-----------------------------
+
+Sea el siguiente flujo:
+
+Login --> Pantalla de control
+
+Se podrían definir los siguientes componentes:
+
+HeroesApp.js (principal):
+import React from 'react'
+import { AppRouter } from './routers/AppRouter'
+
+export const HeroesApp = () => {
+  return (
+    <AppRouter />
+  )
+}
+
+AppRouter.js (ruteador padre):
+
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { LoginScreen } from "../components/login/LoginScreen";
+import { DashboardRoutes } from "./DashboardRoutes";
+
+export const AppRouter = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/login" element={<LoginScreen />} />
+        <Route path="/*" element={<DashboardRoutes />} />
+      </Routes>
+    </Router>
+  );
+};
+
+Acceder a Login:
+
+LoginScreen.js:
+
+import React from "react";
+import { useNavigate } from "react-router-dom";
+
+export const LoginScreen = () => {
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    navigate("/marvel", {
+      replace: true,
+    });
+  };
+
+  return (
+    <div className="container">
+      <h1>Login</h1>
+      <hr />
+      <button className="btn btn-dark" onClick={handleLogin}>
+        Entrar
+      </button>
+    </div>
+  );
+};
+
+
+Si tiene éxito el login, sigue el panel de control del sitio.
+
+DashboardRoutes.js:
+
+import React from "react";
+import { Route, Routes } from "react-router-dom";
+import { DcScreen } from "../components/dc/DcScreen";
+import { NavBar } from "../components/ui/NavBar";
+import { MarvelScreen } from "../components/marvel/MarvelScreen";
+import { SearchScreen } from "../components/search/SearchScreen";
+import { HeroScreen } from "../components/hero/HeroScreen";
+
+export const DashboardRoutes = () => {
+  return (
+    <>
+      <NavBar />
+      <div className="container">
+        <Routes>
+          <Route path="marvel" element={<MarvelScreen />} />
+          <Route path="dc" element={<DcScreen />} />
+          <Route path="search" element={<SearchScreen />} />
+          <Route path="hero/:heroId" element={<HeroScreen />} />
+          <Route path="/" element={<MarvelScreen />} />
+        </Routes>
+      </div>
+    </>
+  );
+};
+
+El Navbar empleado aquí es:
+
+NavBar.js:
+
+import React from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+
+export const NavBar = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    navigate("/login", {
+      replace: true,
+    });
+  };
+
+  return (
+    <nav className="navbar navbar-expand-sm navbar-dark bg-dark">
+      <Link className="navbar-brand" to="/">
+        HeroesApp
+      </Link>
+
+      <div className="navbar-collapse">
+        <div className="navbar-nav">
+          <NavLink
+            className={({ isActive }) =>
+              "nav-item nav-link " + (isActive ? "active" : "")
+            }
+            to="/marvel"
+          >
+            Marvel
+          </NavLink>
+
+          <NavLink
+            className={({ isActive }) =>
+              "nav-item nav-link " + (isActive ? "active" : "")
+            }
+            to="/dc"
+          >
+            DC
+          </NavLink>
+
+          <NavLink
+            className={({ isActive }) =>
+              "nav-item nav-link " + (isActive ? "active" : "")
+            }
+            to="/search"
+          >
+            Search
+          </NavLink>
+        </div>
+      </div>
+
+      <div className="navbar-collapse collapse w-100 order-3 dual-collapse2 d-flex justify-content-end">
+        <ul className="navbar-nav ml-auto">
+          <span className="nav-item nav-link text-info">Tino</span>
+          <button className="nav-item nav-link btn" onClick={handleLogout}>
+            Logout
+          </button>
+        </ul>
+      </div>
+    </nav>
+  );
+};
+
+Si se accede al Logout, regresa a la pantalla de login.
+
+useNavigate y useLocation
+-------------------------
+
+Son hooks del paquete de React Router.
+
+useNavigate: permite ir hacia el sitio a ser redirigido. Ejemplo:
+
+function Redirect() {
+  let navigate = useNavigate();
+  function handleClick() {
+    navigate('/home')
+  }
+  return (
+    <div>
+      <button onClick={handleClick}>go home</button>
+    </div>
+  );
+}
+
+El argumento de navigate puede también conducirnos a la próxima página anterior o posterior:
+navigate(-1):  página anterior.
+navigate(1): página posterior.
+
+useLocation: obtiene un objeto con los valores de la ubicación actual.
+
+const location = useLocation();
+
+El contenido de location puede ser el que sigue:
+
+{
+  key: 'ac3df4', // not with HashHistory!
+  pathname: '/somewhere',
+  search: '?some=search-string',
+  hash: '#howdy',
+  state: {
+    [userDefined]: true
+  }
+}
+
+Ambos hooks pueden combinar bien para una búsqueda por formulario.
+
+SearchScreen.js:
+
+import React, { useMemo } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import queryString from "query-string";
+import { useForm } from "../../hooks/useForm";
+import getHeroesByName from "../../selectors/getHeroesByName";
+import { HeroCard } from "../hero/HeroCard";
+
+export const SearchScreen = () => {
+  /**
+   * Uso de hooks para generar la ruta de busqueda y efectuar
+   * la busqueda por termino clave
+   */
+  const navigate = useNavigate();
+  const location = useLocation();
+  const query = queryString.parse(location.search);
+  const { q = "" } = query;
+  const [formValues, handleInputChange] = useForm({
+    searchText: q,
+  });
+  const { searchText } = formValues;
+  // importante: useMemo hace eficiente el uso de la funcion para renderizar
+  // de forma controlada
+  const heroesFiltered = useMemo(() => getHeroesByName(q), [q]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    navigate(`?q=${searchText}`);
+  };
+
+  return (
+    <>
+      <h1>Search</h1>
+      <hr />
+      <div className="row">
+        <div className="col-5">
+          <form onSubmit={handleSearch}>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Enter your text for search"
+              autoComplete="off"
+              name="searchText"
+              onChange={handleInputChange}
+              value={searchText}
+            />
+            <button type="submit" className="btn btn-dark mt-3">
+              Search
+            </button>
+          </form>
+        </div>
+        <div className="col-7">
+          <h4>Results</h4>
+          <hr />
+          <div className="row">
+            {q === "" ? (
+              <div className="alert alert-info animate__animated animate__fadeIn">
+                Search for heroes.
+              </div>
+            ) : (
+              heroesFiltered.length === 0 && (
+                <div className="alert alert-dark animate__animated animate__fadeIn">
+                  No results.
+                </div>
+              )
+            )}
+            {heroesFiltered.map((hero) => (
+              <HeroCard key={hero.id} hero={hero} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+
+QueryString
+===========
+
+Utilitario para trabajar en las búsquedas por término clave.
+
+Instalación:
+
+npm i query-string
+
+Ejemplo en SearchScreen.js:
+
+  /**
+   * Uso de hooks para generar la ruta de busqueda y efectuar
+   * la busqueda por termino clave
+   */
+  const navigate = useNavigate();
+  const location = useLocation();
+  const query = queryString.parse(location.search);
+  const { q = "" } = query;
+  const [formValues, handleInputChange] = useForm({
+    searchText: q,
+  });
+  const { searchText } = formValues;
+  // importante: useMemo hace eficiente el uso de la funcion para renderizar
+  // de forma controlada
+  const heroesFiltered = useMemo(() => getHeroesByName(q), [q]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    navigate(`?q=${searchText}`);
+  };
 
 
 
