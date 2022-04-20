@@ -607,6 +607,13 @@ export const TodoApp = () => {
   );
 };
 
+Notar que la acción es siempre un objeto con dos propiedades: tipo y payload:
+
+const action = {
+    type: 'tipo',
+	payload: <objeto de cambio de estado>,
+}
+
 
 Manejo de contextos y su hook useContext
 ========================================
@@ -1227,6 +1234,10 @@ Ejemplo en SearchScreen.js:
     e.preventDefault();
     navigate(`?q=${searchText}`);
   };
+
+
+Enrutamiento protegido
+======================
 
 
 
