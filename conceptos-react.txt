@@ -770,6 +770,83 @@ export const AboutScreen = () => {
   );
 };
 
+Manejo dinámico de imágenes
+===========================
+
+Se emplea la función del contexto de Webpack de la siguiente forma:
+
+1. Importar las imágenes y guardarlas en una variable:
+
+const heroImages = require.context("../../assets/heroes", true);
+
+Nota: se puede guardar esta línea o similar en otro archivo, exportarla e importarla desde un componente.
+
+2. Establecer la ruta de la imagen con texto dinámico:
+
+const imagePath = heroImages(`./${heroId}.jpg`);
+
+3. Emplear la ruta generada en la propiedad src del elemento de imagen:
+
+<img className="img-thumbnail" src={imagePath} alt={id} />
+
+Ejemplo:
+
+HeroScreen.js:
+import React, { useMemo } from "react";
+import { useParams, Navigate, useNavigate } from "react-router-dom";
+import getHeroById from "../../selectors/getHeroById";
+
+/**
+ * Importo imagenes desde ruta dinamica:
+ */
+const heroImages = require.context("../../assets/heroes", true);
+
+export const HeroScreen = () => {
+  const { heroId } = useParams();
+
+  /**
+   * uso concreto de useMemo: debo llamarla una sola vez y mantener el retorno de dicha
+   * llamada de manera permanente hasta que haya un cambio en la condicion (el segundo parametro)
+   */
+  const hero = useMemo(() => getHeroById(heroId), [heroId]);
+
+  const navigate = useNavigate();
+
+  if (!hero) {
+    return <Navigate to="/" />;
+  }
+
+  const { id, superhero, publisher, alter_ego, first_appearance, characters } =
+    hero;
+
+  // obtengo la ruta dinamica de la imagen y lo paso por parametro
+  const imagePath = heroImages(`./${heroId}.jpg`);
+
+  const handleReturn = () => {
+    navigate(-1);
+  };
+
+  return (
+    <div className="row animate__animated animate__fadeIn">
+      <h1>{superhero}</h1>
+      <hr />
+      <div className="col animate__animated animate__fadeIn">
+        <img className="img-thumbnail" src={imagePath} alt={id} />
+      </div>
+      <div className="col animate__animated animate__fadeIn">
+        <p className="lead"> Publisher: {publisher} </p>
+        <p className="lead"> Alter ego: {alter_ego} </p>
+        <p className="lead"> Characters: {characters} </p>
+        <p className="lead"> First appearance: {first_appearance} </p>
+        <button type="button" className="btn btn-dark" onClick={handleReturn}>
+          Back to list
+        </button>
+      </div>
+    </div>
+  );
+};
+
+
 
 Uso de rutas a través de React Router
 =====================================
