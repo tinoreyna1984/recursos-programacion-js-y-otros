@@ -1316,6 +1316,418 @@ Ejemplo en SearchScreen.js:
 Enrutamiento protegido
 ======================
 
+I. Definir contexto y reducer para la aplicación
+------------------------------------------------
+
+Etapa previa: crear los tipos para la acción efectuada por el reducer.
+Supongamos que se quiera restringir con un login el acceso a las rutas privadas. Entonces, los dos tipos de acciones para llevar a cabo ese control serían:
+
+types.js:
+export const types = {
+    login:  '[auth] Login',
+    logout: '[auth] Logout',
+}
+
+Usando el concepto de reducer, se podría definir una función como:
+
+authReducer.js:
+
+import { types } from "../types/types";
+
+/**
+ * Reducer que controla las autorizaciones. Los cambios de estado via
+ * payload son de los tipos definidos en type.js
+ */
+export const authReducer = (state = {}, action) => {
+    switch (action.type) {
+        case types.login:
+            console.log("authReducer - Login");
+            return {
+                ...action.payload,
+                logged: true,
+            };
+        case types.logout:
+            console.log("authReducer - Logout");
+            return {
+                logged: false,
+            };
+        default:
+            return state;
+    }
+}
+
+En el caso del contexto, se definiría un contexto como el que sigue:
+
+authContext.js:
+
+import { createContext } from "react";
+
+export const AuthContext = createContext();
+
+
+II. Emplear el contexto creado previamente
+------------------------------------------
+
+El mismo debe afectar al punto más alto de la aplicación (el componente invocado por index.js).
+
+Ejemplo:
+
+import React, { useEffect, useReducer } from "react";
+import { AuthContext } from "./auth/authContext";
+import { authReducer } from "./auth/authReducer";
+import { AppRouter } from "./routers/AppRouter";
+
+// cargar desde localStorage
+const init = () => {
+  return JSON.parse(localStorage.getItem("user")) || { logged: false };
+};
+
+export const HeroesApp = () => {
+
+  const [user, dispatch] = useReducer(authReducer, {}, init);
+
+  // guardando en localStorage
+  useEffect(() => {
+      if(!user) return;
+      localStorage.setItem('user', JSON.stringify(user));
+    }, [user]
+  );
+
+  return (
+    <AuthContext.Provider value={{ user, dispatch }}>
+      <AppRouter />
+    </AuthContext.Provider>
+  );
+};
+
+El contexto debe propagar al resto de la aplicación al objeto value, dado que contiene a los elementos obtenidos a partir del reducer: el usuario logueado y el despachador (dispatch) de acciones que afectarán el estado de la sesión y las rutas a las que se tendrá acceso.
+
+III. Separar el ruteo público del privado
+-----------------------------------------
+
+En HeroesApp.js se observa que:
+
+    <AuthContext.Provider value={{ user, dispatch }}>
+      <AppRouter />
+    </AuthContext.Provider>
+
+el prop value pasa el objeto conformado por el usuario y el despachador al resto de la aplicación. El próximo componente es el AppRouter, el cual alberga dos conjuntos de rutas:
+
+Públicas: en este caso, sólo está la pantalla de login.
+Privadas: las rutas de la aplicación.
+
+En concreto, quedaría:
+
+AppRouter.js:
+
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { LoginScreen } from "../components/login/LoginScreen";
+import { DashboardRoutes } from "./DashboardRoutes";
+import { PrivateRoute } from "./PrivateRoute";
+import { PublicRoute } from "./PublicRoute";
+
+export const AppRouter = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <LoginScreen />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/*"
+          element={
+            <PrivateRoute>
+              <DashboardRoutes />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+    </Router>
+  );
+};
+
+
+IV. Proteger las rutas privadas con login e implementar el logout
+-----------------------------------------------------------------
+
+Considerar LoginScreen.js:
+
+import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../auth/authContext";
+import { types } from "../../types/types";
+import { useForm } from "../../hooks/useForm";
+import { ToastMessage } from "../ui/ToastMessage";
+
+export const LoginScreen = () => {
+  // cargo el usuario del login (via contexto)
+  const userContext = useContext(AuthContext);
+  const { dispatch } = userContext;
+
+  const navigate = useNavigate();
+
+  const [formValues, handleInputChange] = useForm({ name: "" });
+  const { name } = formValues;
+
+  const handleLogin = (e) => {
+    /**
+     * Nota: es conveniente poner e.preventDefault() para el submit de un formulario,
+     * ya que el browser arroja el error "Form submission canceled because the form is
+     * not connected"
+     */
+    e.preventDefault();
+    // dispatch envia un action
+    const action = {
+      type: types.login,
+      payload: { name: name },
+    };
+    dispatch(action);
+
+    navigate("/marvel", {
+      replace: true,
+    });
+  };
+
+  return (
+    <div className="container">
+      <h1>Login</h1>
+      <hr />
+      <div className="row">
+        <form onSubmit={handleLogin}>
+          <label className="form-label" htmlFor="name">
+            Enter name:{" "}
+          </label>
+          <input
+            className="form-control"
+            type="text"
+            name="name"
+            placeholder="Enter name"
+            onChange={handleInputChange}
+            value={name}
+            autoComplete="off"
+          />
+          <button className="btn btn-dark mt-2" type="submit">
+            Enter
+          </button>
+        </form>
+      </div>
+      <div className="toast-container mb-auto">
+        <ToastMessage message="Solo pon 'Tino' y clic en el botón o tecla Enter" />
+      </div>
+    </div>
+  );
+};
+
+Se implementa un formulario simple con un texto y un botón. Debe ingresarse "Tino" y enviar (para efectos de prueba). El handleLogin es quien efectúa la dinámica de logueo:
+
+  const handleLogin = (e) => {
+    /**
+     * Nota: es conveniente poner e.preventDefault() para el submit de un formulario,
+     * ya que el browser arroja el error "Form submission canceled because the form is
+     * not connected"
+     */
+    e.preventDefault();
+    // dispatch envia un action
+    const action = {
+      type: types.login,
+      payload: { name: name },
+    };
+    dispatch(action);
+
+    navigate("/marvel", {
+      replace: true,
+    });
+  };
+
+Notar que el payload es el nombre que queremos pasar como valor admitido junto con la acción login. Cuando esto es posible, se navega hacia el home del sitio con el comando navigate. Entra al componente DashboardRoutes, el cual afecta al NavBar:
+
+DashboardRoutes.js:
+
+import React from "react";
+import { Route, Routes } from "react-router-dom";
+import { DcScreen } from "../components/dc/DcScreen";
+import { NavBar } from "../components/ui/NavBar";
+import { MarvelScreen } from "../components/marvel/MarvelScreen";
+import { SearchScreen } from "../components/search/SearchScreen";
+import { HeroScreen } from "../components/hero/HeroScreen";
+
+export const DashboardRoutes = () => {
+  return (
+    <>
+      <NavBar />
+      <div className="container">
+        <Routes>
+          <Route path="marvel" element={<MarvelScreen />} />
+          <Route path="dc" element={<DcScreen />} />
+          <Route path="search" element={<SearchScreen />} />
+          <Route path="hero/:heroId" element={<HeroScreen />} />
+          <Route path="/" element={<MarvelScreen />} />
+        </Routes>
+      </div>
+    </>
+  );
+};
+
+De AppRouter.js se tiene:
+
+ <PrivateRoute>
+  <DashboardRoutes />
+ </PrivateRoute>
+
+Y el componente PrivateRoute se compone de:
+
+PrivateRoute.js:
+
+import React, { useContext } from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { AuthContext } from "../auth/authContext";
+
+/**
+ * PrivateRoute usa como props los componentes hijos
+ * que despues se renderizan
+ */
+export const PrivateRoute = ({ children }) => {
+  const { user } = useContext(AuthContext);
+  const {pathname, search} = useLocation();
+
+  localStorage.setItem('lastPath', pathname + search);
+
+  /**
+   * Lo que devuelve:
+   * - Si esta autenticado, muestra los hijos.
+   * - Caso contrario, se redirige a login.
+   */
+  return user.logged ? children : <Navigate to="/login" />;
+};
+
+Según la condición dada por la propiedad logged de user, se dará acceso a las rutas hijas (children) o se redirige al login.
+
+De forma análoga, se tiene las rutas públicas:
+
+ <PublicRoute>
+  <LoginScreen />
+ </PublicRoute>
+
+PublicRoute tiene lo siguiente:
+
+PublicRoute.js:
+
+import React, { useContext } from "react";
+import { Navigate } from "react-router-dom";
+import { AuthContext } from "../auth/authContext";
+
+export const PublicRoute = ({ children }) => {
+  const { user } = useContext(AuthContext);
+
+  return user.logged ? <Navigate to="/marvel" /> : children;
+};
+
+La diferencia con las rutas privadas está en que, en este caso, la única ruta hija es el login.
+
+Para el logout, se debe implementar el contexto en NavBar, ya que será quien tiene dicha funcionalidad de logout:
+
+import React, { useContext } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../auth/authContext";
+import { types } from "../../types/types";
+
+export const NavBar = () => {
+  // cargo el usuario del login (via contexto)
+  const userContext = useContext(AuthContext);
+  const { user, dispatch } = userContext;
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // dispatch envia un action
+    dispatch({ type: types.logout });
+
+    navigate("/login", {
+      replace: true,
+    });
+  };
+
+  //console.log("Usuario: ", user);
+
+  return (
+    <nav className="navbar navbar-expand-sm navbar-dark bg-dark">
+      <div className="container-fluid">
+        <Link className="navbar-brand" to="/">
+          HeroesApp
+        </Link>
+
+        <div className="navbar-collapse">
+          <div className="navbar-nav">
+            <NavLink
+              className={({ isActive }) =>
+                "nav-item nav-link " + (isActive ? "active" : "")
+              }
+              to="/marvel"
+            >
+              Marvel
+            </NavLink>
+
+            <NavLink
+              className={({ isActive }) =>
+                "nav-item nav-link " + (isActive ? "active" : "")
+              }
+              to="/dc"
+            >
+              DC
+            </NavLink>
+
+            <NavLink
+              className={({ isActive }) =>
+                "nav-item nav-link " + (isActive ? "active" : "")
+              }
+              to="/search"
+            >
+              Search
+            </NavLink>
+          </div>
+        </div>
+
+        <div className="navbar-collapse collapse w-100 order-3 dual-collapse2 d-flex justify-content-end">
+          <ul className="navbar-nav ml-auto">
+            <span className="nav-item nav-link text-info">{user.name}</span>
+            <button className="nav-item nav-link btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+El siguiente bloque:
+
+  // cargo el usuario del login (via contexto)
+  const userContext = useContext(AuthContext);
+  const { user, dispatch } = userContext;
+
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // dispatch envia un action
+    dispatch({ type: types.logout });
+
+    navigate("/login", {
+      replace: true,
+    });
+  };
+
+Es la parte más importante, dado que el nombre recibido por el contexto es aprovechado en el bloque <span> y el botón aprovecha la lógica del handleLogout.
+
+
+Redux para React
+================
 
 
 
