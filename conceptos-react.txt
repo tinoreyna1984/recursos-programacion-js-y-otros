@@ -1729,6 +1729,16 @@ Es la parte más importante, dado que el nombre recibido por el contexto es apro
 Redux para React
 ================
 
+Redux: es el contenedor predecible del estado de una aplicación React.
+
+Conceptos
+---------
+
+* Store: la "fuente única de la verdad". Es el concentrador de la información que los componentes consumirán.
+* El reducer es el concepto del cual se basa Redux.
+* La principal diferencia con el uso de reducers es que estos son controlados por uno o más middlewares. El paso por el middleware dependerá de la tarea (dispatch) que se ha de generar según la acción y la naturaleza de la misma según la respuesta: síncrona o asíncrona.
+* El middleware trabajará con tareas asíncronas.
+
 
 
 
