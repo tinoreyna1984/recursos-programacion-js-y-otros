@@ -7,7 +7,51 @@ npm i node-sass
 
 Partials
 --------
+Se refiere a la distribución de estilos CSS en diversos ficheros.
 
+Sea un archivo base de todos los estilos:
+
+styles.scss:
+
+@import './base/settings';
+@import './base/base';
+
+Los archivos tendrían la siguiente composición:
+
+_base.scss:
+
+* {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 0px;
+}
+
+html, body {
+    height: 100vh;
+    width: 100vw;
+}
+
+main {
+    width: 100%;
+}
+
+// entre otras definiciones
+
+NOTA: los archivos importados se definen con un nombre que comienza con el caracter '_'.
+
+_settings.scss:
+
+// Colors
+
+$primary : #5C62C5;
+$dark-grey : #363636;
+$light-grey : #d8d8d8;
+
+
+$white: #fff;
+$google-blue: #4285f4;
+$button-active-blue: #1669f2;
+
+NOTA: las variables son empleadas para definir valores numéricos literales o funciones que obtengan valores numéricos asociados a colores y medidas.
 
 
 
