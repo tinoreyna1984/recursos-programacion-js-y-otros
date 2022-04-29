@@ -1739,7 +1739,10 @@ Conceptos
 * La principal diferencia con el uso de reducers es que estos son controlados por uno o más middlewares. El paso por el middleware dependerá de la tarea (dispatch) que se ha de generar según la acción y la naturaleza de la misma según la respuesta: síncrona o asíncrona.
 * El middleware trabajará con tareas asíncronas.
 
+Instalación de Redux, React-Redux y Redux Thunk
+-----------------------------------------------
 
+npm i react-redux redux redux-thunk
 
 
 

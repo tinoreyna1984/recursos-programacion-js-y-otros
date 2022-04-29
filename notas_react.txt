@@ -273,8 +273,28 @@ Desinstalación de paquete
 
 npm uninstall <paquete>
 
+Firebase
+========
 
+En React:
 
+npm i firebase
+
+La última versión estable es la 8.10.0:
+
+npm i firebase@8.10.0
+
+Para los proyectos:
+
+Ir a: https://firebase.google.com/
+
+Ir a la consola.
+Crear proyecto.
+Continuar.
+
+Crear autenticación:
+Authentication
+Escoger Google y correo + contraseña
 
 
 
