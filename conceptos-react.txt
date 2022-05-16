@@ -1744,6 +1744,24 @@ Instalación de Redux, React-Redux y Redux Thunk
 
 npm i react-redux redux redux-thunk
 
+Uso básico
+----------
+
+Redux Toolkit (RTK)
+===================
+
+Es la versión simplificada del Redux conocido, lo cual permite un desarrollo y mantenimiento de código más óptimo.
+
+Instalación:
+
+npm install @reduxjs/toolkit
+
+
+
+
+
+
+
 
 
 

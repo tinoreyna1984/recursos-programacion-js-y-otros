@@ -1,0 +1,26 @@
+
+Material UI
+===========
+
+Instalación:
+
+npm install @mui/material @emotion/react @emotion/styled
+
+VS Code:
+
+Material-UI Snippets
+
+Configuración en index.html:
+
+<link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+/>
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/icon?family=Material+Icons"
+/>
+
+
+
+

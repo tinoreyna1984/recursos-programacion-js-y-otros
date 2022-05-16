@@ -1,3 +1,15 @@
+Primeras instalaciones
+======================
+
+* Google Chrome o similar
+* React Developer Tools
+* Redux Devtools
+* Visual Studio Code
+* Postman
+* Mongo Compass
+* Git
+* Node.js
+
 Preparación de VS Code
 ======================
 
@@ -89,6 +101,12 @@ npm ERR!     C:\Users\Tino\AppData\Local\npm-cache\_logs\2022-04-12T05_36_29_482
 Aplicar (de forma global):
 
 npm config set legacy-peer-deps true
+
+Crear una PWA con React
+-----------------------
+
+Emplear: npx create-react-app mi_proyecto --template cra-template-pwa
+
 
 Edición del sitio en ReactJS
 ============================
@@ -268,10 +286,34 @@ Uso:
 import { VerticalTimeline, VerticalTimelineElement }  from 'react-vertical-timeline-component';
 import 'react-vertical-timeline-component/style.min.css';
 
-Desinstalación de paquete
-=========================
+Material UI
+===========
 
-npm uninstall <paquete>
+Instalación:
+
+npm install @mui/material @emotion/react @emotion/styled
+
+VS Code:
+
+Material-UI Snippets
+
+Configuración en index.html:
+
+<link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+/>
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/icon?family=Material+Icons"
+/>
+
+React Modal
+===========
+
+Instalación:
+
+npm i react-modal
 
 Firebase
 ========
@@ -296,6 +338,11 @@ Crear autenticación:
 Authentication
 Escoger Google y correo + contraseña
 
+
+Desinstalación de paquete
+=========================
+
+npm uninstall <paquete>
 
 
 
