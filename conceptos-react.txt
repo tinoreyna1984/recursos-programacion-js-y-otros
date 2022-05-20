@@ -1739,28 +1739,90 @@ Conceptos
 * La principal diferencia con el uso de reducers es que estos son controlados por uno o más middlewares. El paso por el middleware dependerá de la tarea (dispatch) que se ha de generar según la acción y la naturaleza de la misma según la respuesta: síncrona o asíncrona.
 * El middleware trabajará con tareas asíncronas.
 
-Instalación de Redux, React-Redux y Redux Thunk
------------------------------------------------
-
-npm i react-redux redux redux-thunk
-
-Uso básico
-----------
-
-Redux Toolkit (RTK)
-===================
-
-Es la versión simplificada del Redux conocido, lo cual permite un desarrollo y mantenimiento de código más óptimo.
-
 Instalación:
 
-npm install @reduxjs/toolkit
+npm install @reduxjs/toolkit react-redux
 
+Construcción del Redux
+----------------------
 
+1. Crear dos archivos: uno del store y otro de los reducers:
 
+store.js:
 
+import { configureStore } from '@reduxjs/toolkit';
+import loginReducer from './loginSlice';
 
+// invocamos los reducers en el store
+export default configureStore({
+  reducer: {
+    login : loginReducer,
+  }
+})
 
+loginSlice.js:
+
+import { createSlice } from '@reduxjs/toolkit';
+
+export const loginSlice = createSlice({
+    name: 'login', // nombre de la variable que impacta globalmente el app
+    initialState: { // estado inicial de la variable de estado
+        logged: false,
+        modal: false,
+    },
+    reducers: {
+        // proceso de login
+        login: (state) => {
+            state.logged = true;
+        },
+        logout: (state) => {
+            state.logged = false;
+        },
+        // modal para login
+        openModal : (state) => {
+            state.modal = true;
+        },
+        closeModal : (state) => {
+            state.modal = false;
+        },
+    }
+});
+
+// exportamos acciones y reducers
+export const {login, logout, openModal, closeModal} = loginSlice.actions;
+export default loginSlice.reducer;
+
+Notar que están interrelacionados y el store puede combinar más de un reducer.
+
+2. Implementar la tienda en el app principal:
+
+index.js:
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+// Provider: empleo el contexto del Redux en la app principal
+root.render(
+  <Provider store={store}>
+    <App />
+  </Provider>
+);
+
+Esto es a través de Provider, de react-redux.
+
+3. Trabajar con el store configurado en cualquier punto de la aplicación que se requiera:
+
+Obtener acceso actual a través de useSelector:
+Ej.: const modal = useSelector((state) => state.login.modal);
+
+Invocar un reducer para despacharlo (dispatch):
+Ej.:
+
+  const dispatch = useDispatch();
+
+  function modalOff() {
+    dispatch(closeModal());
+  }
+
+Esto último es lo que produce los cambios de estado requeridos.
 
 
 

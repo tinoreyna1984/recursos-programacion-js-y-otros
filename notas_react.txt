@@ -107,6 +107,16 @@ Crear una PWA con React
 
 Emplear: npx create-react-app mi_proyecto --template cra-template-pwa
 
+Crear un proyecto React con Redux
+---------------------------------
+
+Emplear: npx create-react-app my-app --template redux
+
+Crear una PWA con React y Redux
+-------------------------------
+
+Emplear: npx create-react-app my-app --template redux-pwa
+
 
 Edición del sitio en ReactJS
 ============================
