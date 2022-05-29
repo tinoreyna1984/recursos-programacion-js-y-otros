@@ -138,7 +138,7 @@ Bootstrap + PopperJS (recomendado)
 
 Instalación:
 
-npm i bootstrap
+npm i bootstrap@5.2.0-beta1
 npm i @popperjs/core
 
 Configuración:
@@ -348,6 +348,19 @@ Crear autenticación:
 Authentication
 Escoger Google y correo + contraseña
 
+auth0
+=====
+
+Instalar:
+
+npm i @auth0/auth0-react
+
+react-responsive-carousel
+=========================
+
+Instalar:
+
+npm i react-responsive-carousel
 
 Desinstalación de paquete
 =========================

@@ -1825,6 +1825,57 @@ Ej.:
 Esto último es lo que produce los cambios de estado requeridos.
 
 
+React + auth0
+=============
+
+auth0
+-----
+
+Escoger: Applications -> Create application -> Single Page Application
+
+Luego, escoger React e ir a Settings.
+
+En Settings:
+
+Application URIs:
+- Allowed Callback URLs: http://localhost:3000/
+- Allowed Logout URLs: http://localhost:3000/
+- Allowed Web Origins: http://localhost:3000/
+
+Guardar los cambios.
+
+
+En React
+--------
+
+Instalar:
+
+npm i @auth0/auth0-react
+
+En la raíz del proyecto, crear un archivo .env con los parámetros:
+REACT_APP_AUTH0_DOMAIN=<valor provisto por el app en auth0>
+REACT_APP_AUTH0_CLIENT_ID=<valor provisto por el app en auth0>
+
+En index.js:
+
+import { Auth0Provider } from "@auth0/auth0-react";
+
+const domain = process.env.REACT_APP_AUTH0_DOMAIN;
+const clientId = process.env.REACT_APP_AUTH0_CLIENT_ID;
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
+  <Auth0Provider
+    domain={domain}
+    clientId={clientId}
+    redirectUri={window.location.origin}
+  >
+    <App />
+  </Auth0Provider>
+);
+
+
+
 
 
 
