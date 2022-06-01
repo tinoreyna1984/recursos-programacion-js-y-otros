@@ -362,6 +362,7 @@ Instalar:
 
 npm i react-responsive-carousel
 
+
 Desinstalación de paquete
 =========================
 
