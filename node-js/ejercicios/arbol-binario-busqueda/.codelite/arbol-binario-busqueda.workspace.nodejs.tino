@@ -1,0 +1,8 @@
+{
+ "m_debuggerPort": 5858,
+ "m_debuggerHost": "127.0.0.1",
+ "m_scriptToExecute": "E:\\react\\recursos-programacion-js-y-otros\\node-js\\ejercicios\\arbol-binario-busqueda\\index.js",
+ "m_commandLineArgs": [],
+ "m_workingDirectory": "E:\\react\\recursos-programacion-js-y-otros\\node-js\\ejercicios\\arbol-binario-busqueda",
+ "m_breakpoints": []
+}
