@@ -1882,6 +1882,257 @@ root.render(
 
 Notar que es una práctica necesaria el manejar onRedirectCallback para asegurar un buen enrutamiento junto con auth0.
 
+Issue con auth0: corregir problema de redirección después de login permanente.
+
+React + Firebase 9+
+===================
+
+El procedimiento es más complejo que con auth0, pero más seguro y flexible en uso.
+
+Instalación:
+
+npm i firebase
+
+Configuración en Firebase
+-------------------------
+
+1. En Firebase, abrir cuenta y crear proyecto.
+2. Configurarlo según el tutorial: https://www.youtube.com/watch?v=mhRbYJplmX0
+
+El resultado es un proyecto creado, por ejemplo: react-app-cursos-tino
+
+Configuración en React
+----------------------
+
+Crear un archivo de configuración de Firebase como sigue:
+
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
+
+const firebaseConfig = {
+  apiKey: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  authDomain: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  projectId: "XXXXXXXXXXXXXXXXXXXXX",
+  storageBucket: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  messagingSenderId: "XXXXXXXXXXXX",
+  appId: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+const provider = new GoogleAuthProvider();
+
+export {
+  db,
+  auth,
+  provider,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+};
+
+Esto permitirá usar tanto Firebase como Firestore en el proyecto.
+
+Usar Firebase para autenticación
+--------------------------------
+
+Aprovechando la configuración inicial:
+
+1. Controlar el renderizado con useEffect, asegurando si la sesión existente ya se ha dado:
+
+AppRouter.js:
+
+export const AppRouter = () => {
+  const [checking, setChecking] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const dispatch = useDispatch();
+  //const user = useSelector(selectUser);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, async (userAuth) => {
+      if (userAuth?.uid) {
+        // user is logged in
+        console.log("user is logged in");
+        dispatch(
+          login({
+            email: userAuth.email,
+            uid: userAuth.uid,
+            displayName: userAuth.displayName,
+          })
+        );
+        setIsLoggedIn(true);
+      } else {
+        console.log("user is logged out");
+        dispatch(logout());
+        setIsLoggedIn(false);
+      }
+    });
+    setChecking(false);
+    console.log("page loaded");
+  }, [dispatch, setChecking, setIsLoggedIn]);
+
+  if (checking) {
+    return <h1>Loading...</h1>;
+  }
+
+2. Emplear las funciones exportadas para login y registro de usuarios
+
+authHelpers.js:
+
+import {
+  auth,
+  provider,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signOut,
+} from "../../firebase/firebaseConfig";
+import { login, logout } from "../slices/authSlice";
+
+const emailPattern =
+  /[a-zA-Z0-9]+[.]?([a-zA-Z0-9]+)?[@][a-z]{3,9}[.][a-z]{2,5}/g;
+
+const validData = (name, email, password, password2) => {
+  if (name.trim().length === 0) {
+    alert("Name is required");
+    return false;
+  } else if (!emailPattern.test(email) || email.trim().length === 0) {
+    alert("Email is not valid");
+    return false;
+  } else if (password !== password2 || password.length < 6) {
+    alert("Password should be at least 6 characters and match each other");
+    return false;
+  }
+  return true;
+};
+
+const loginEmail = (dispatch, email, password) => {
+  signInWithEmailAndPassword(auth, email, password)
+    .then((userAuth) => {
+      dispatch(
+        login({
+          email: userAuth.user.email,
+          uid: userAuth.user.uid,
+          displayName: userAuth.user.displayName,
+        })
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+const loginGooglePopup = (dispatch) => {
+  signInWithPopup(auth, provider)
+    .then((userAuth) => {
+      dispatch(
+        login({
+          email: userAuth.user.email,
+          uid: userAuth.user.uid,
+          displayName: userAuth.user.displayName,
+        })
+      );
+    })
+    .catch((e) => {
+      console.log(`Popup closing - if this is an error: ${e}`);
+    });
+};
+
+const signUp = (dispatch, name, email, password) => {
+  createUserWithEmailAndPassword(auth, email, password)
+    .then((userAuth) => {
+      updateProfile(userAuth.user, { displayName: name })
+        .then(
+          dispatch(
+            login({
+              email: userAuth.user.email,
+              uid: userAuth.user.uid,
+              displayName: userAuth.user.displayName,
+            })
+          )
+        )
+        .catch((error) => console.log(error));
+    })
+    .catch((error) => console.log(error));
+};
+
+const logOut = async (dispatch) => {
+  try{
+    await signOut(auth);
+    dispatch( logout() );
+  }
+  catch(error) {
+    console.log(error)
+  }
+};
+
+export { loginEmail, loginGooglePopup, signUp, logOut, validData };
+
+Esto permite trabajar con funciones reutilizables para manejos de sesión con Firebase. Ejemplo:
+
+LoginScreen.js:
+
+const [formValues, handleInputChange] = useForm({
+    email: "",
+    password: "",
+  });
+
+const { email, password } = formValues;
+
+const dispatch = useDispatch();
+
+const handleLogin = (e) => {
+	e.preventDefault();
+	loginEmail(dispatch, email, password);
+};
+
+const handleGoogleLogin = () => {
+	loginGooglePopup(dispatch);
+};
+
+
+Configurar Firestore
+--------------------
+
+Usando el proyecto react-app-cursos-tino, proceder con lo siguiente:
+
+1. En la consola, escoger Firestore Database y la opción Crear bases de datos.
+
+2. Opciones:
+- Modo producción.
+- Ubicación nam5.
+- Habilitar.
+
+3. Modificar las reglas de acceso:
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true; // cambiar false por true
+    }
+  }
+}
+
+Gestionar Firestore
+-------------------
 
 
 

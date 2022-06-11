@@ -23,6 +23,19 @@ En VS Code, instalar las extensiones:
 * Path Intellisense
 * Lorem ipsum (textos de prueba)
 
+Configuración del Material Icon Theme
+-------------------------------------
+
+Menú Ver -> Paleta de comandos -> settings.json:
+
+Agregar o modificar:
+
+"material-icon-theme.activeIconPack": "react_redux",
+"material-icon-theme.folders.associations": {
+
+    "redux" : "redux-actions",
+    "slices" : "redux-reducer",
+},
 
 Instalación de React JS
 =======================
