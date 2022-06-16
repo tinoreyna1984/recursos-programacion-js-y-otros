@@ -64,8 +64,8 @@ NOTA: para actualizar React, usar el siguiente comando:
 
 npm i -g react react-dom
 
-Crear proyecto en React JS
-==========================
+Crear proyecto en React JS - CRA
+================================
 
 Para generar un nuevo proyecto de React.js y finalmente instalarlo, entraremos al directorio donde queramos generar el proyecto de reactjs y ejecutamos este comando:
 
@@ -130,6 +130,54 @@ Crear una PWA con React y Redux
 
 Emplear: npx create-react-app my-app --template redux-pwa
 
+Crear proyecto en React JS - Vite
+=================================
+
+Emplear: npm create vite
+
+Genera la siguiente salida verbosa:
+
+√ Project name: ... vite-prueba <- ingresar nombre de proyecto
+√ Select a framework: » react <- seleccionar React
+√ Select a variant: » react <- seleccionar react (la variante puede ser con Typescript)
+
+Scaffolding project in E:\JavaScript\react\vite-prueba...
+
+Done. Now run:
+
+  cd vite-prueba
+  npm install
+  npm run dev
+
+El proyecto queda listo. Ejecutar los comandos indicados en la salida.
+
+Las instalaciones de paquetes son iguales que en un proyecto creado con create-react-app.
+
+Diferencias con CRA
+-------------------
+
+- Los archivos de componentes deben tener la extensión .jsx o .tsx.
+- La carga es más rápida que en CRA, ya que no reconstruye todos los cambios del proyecto, sino solo adiciona los que se hayan creado o modificado progresivamente.
+
+Generar el build con Vite
+-------------------------
+
+npm run build
+
+Genera el build en una carpeta con nombre "dist".
+
+Crear proyecto React con Vite en una línea
+------------------------------------------
+
+Emplear:
+
+npm create vite mi-app-react --template react (React con JavaScript)
+npm create vite mi-app-react-ts --template react-ts (React con Typescript)
+
+Otras consideraciones de Vite
+-----------------------------
+
+No se recomienda quitar el StrictMode.
 
 Edición del sitio en ReactJS
 ============================
@@ -252,6 +300,24 @@ git remote set-url origin https://github.com/usuario/<nuevo-repo>.git
 
 Deshacer todos los cambios en un proyecto:
 git reset --hard
+
+Para proyectos en Vite
+----------------------
+
+Crear un archivo README.md en la raíz del proyecto.
+
+Crear repositorio en Github.
+
+Aplicar las siguientes líneas al proyecto:
+
+git init
+git add .
+git commit -m "first commit"
+git branch -M master
+git remote add origin https://github.com/tinoreyna1984/<repo-proyecto-vite>.git
+git push -u origin master
+
+El proyecto queda registrado en GitHub.
 
 Subir proyecto a Heroku (solo React JS)
 ======================================

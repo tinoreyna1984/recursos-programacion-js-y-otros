@@ -187,6 +187,12 @@ export default function Saludo(props) {
   );
 }
 
+Proptypes
+=========
+
+Instalación:
+npm i prop-types
+
 Manejo de eventos
 =================
 
@@ -468,6 +474,26 @@ export const CallbackHook = () => {
     </div>
   );
 };
+
+Archivos de barril
+==================
+
+Consiste en usar un index.js que exporte todos los componentes de una carpeta. Por ejemplo, si tenemos la carpeta components así:
+
+> components
+---- AddCategory
+---- GifGrid
+---- GifItem
+
+En esa carpeta se puede crear un index.js con el siguiente contenido:
+
+export * from './GifGrid';
+export * from './GifItem';
+export * from './AddCategory';
+
+Esto permite usar más de un componente de una carpeta específica:
+
+import { AddCategory, GifGrid} from "./components";
 
 
 React.memo
