@@ -68,6 +68,20 @@ import 'cross-fetch/polyfill';
 
 Esto es emplear un polyfill para usar el fetch API que no existe normalmente en Node.js.
 
+Para SVG
+--------
+
+Emplear:
+
+npm i --save-dev jest-svg-transformer
+
+Configurar en jest.config.js:
+
+    transform: {
+      '^.+\\.jsx?$': 'babel-jest',
+      '^.+\\.svg$': 'jest-svg-transformer',
+    },
+
 Procedimiento básico en el curso
 ================================
 
@@ -204,6 +218,7 @@ describe("Pruebas en CounterApp", () => {
 
 Si las pruebas pasan, se verá en la consola. En la ejecución de pruebas se genera el snapshot del componente, el cual es una cadena que representa al mismo con HTML puro. Este es guardado con la extensión .test.jsx.snap en el directorio test/__snapshots__ para su comparación.
 
+
 Evento click
 ------------
 
@@ -291,8 +306,27 @@ describe("Pruebas en getGifs", () => {
   });
 });
 
-Pruebas de hooks y custom hooks
--------------------------------
+Pruebas de hooks y custom hooks (mock completo)
+-----------------------------------------------
+
+import { useFetchGifs } from "../../src/hooks/useFetchGifs";
+import { renderHook, waitFor } from "@testing-library/react";
+
+describe("pruebas en useFetchGifs", () => {
+  test("debe de regresar el estado inicial", () => {
+    const { result } = renderHook(() => useFetchGifs("hide the pain harold"));
+    const { images, isLoading } = result.current;
+    expect(images.length).toBe(0);
+    expect(isLoading).toBe(true);
+  });
+  test("debe de regresar un arreglo de imagenes y el isLoading en false", async () => {
+    const { result } = renderHook(() => useFetchGifs("hide the pain harold"));
+    await waitFor(() => {
+      expect(result.current.images.length).toBeGreaterThan(0);
+      expect(result.current.isLoading).toBe(false);
+    });
+  });
+});
 
 
 

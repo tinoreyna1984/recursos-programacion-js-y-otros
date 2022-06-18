@@ -82,7 +82,7 @@ npm start
 
 Puedes comprobar la versión de React que tienes dentro del fichero package.json.
 
-Ahora tendremos disponible la webapp de React 16 en http://localhost:3000/ y veremos nuestro proyecto corriendo, con la página de bienvenida por defecto.
+Ahora tendremos disponible la webapp de React en http://localhost:3000/ y veremos nuestro proyecto corriendo, con la página de bienvenida por defecto.
 
 Con esto ya sabemos como instalar React desde cero y como generar un proyecto base.
 

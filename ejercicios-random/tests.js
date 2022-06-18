@@ -33,3 +33,54 @@ function TreeConstructor(strArr) {
 
 console.log(TreeConstructor(["(1,2)", "(2,4)", "(5,7)", "(7,2)", "(9,5)"]));
 console.log(TreeConstructor(["(1,2)", "(3,2)", "(2,12)", "(5,2)"]));
+
+
+//
+
+const arreglo = [2,4,9,20,42];
+
+// for tradicional
+for(let i = 0; i < arreglo.length; i++){
+  console.log(`Valor atual: ${arreglo[i]}`);
+}
+
+// for in
+for(let i in arreglo){
+  console.log(`Valor atual: ${arreglo[i]}`);
+}
+
+// for of
+for(let arr of arreglo){
+  console.log(`Valor atual: ${arr}`);
+}
+
+// forEach
+arreglo.forEach( arr => console.log(`Valor atual: ${arr}`))
+
+
+//-------------------
+
+const MODE_DATE_TIME = 0;
+const MODE_DATE_ONLY = 1;
+
+const currDate = new Date();
+
+const formatDateTime = (currDate, mode) => {
+  let date = currDate.getDate();
+  let month = currDate.getMonth() + 1;
+  let year = currDate.getFullYear();
+  let hours = currDate.getHours();
+  let minutes = currDate.getMinutes();
+  let seconds = currDate.getSeconds();
+  switch (mode) {
+    case MODE_DATE_TIME:
+      return `${date}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+    case MODE_DATE_ONLY:
+      return `${date}/${month}/${year}`;
+    default:
+      return `${date}/${month}/${year}`;
+  }
+}
+
+console.log(formatDateTime(currDate, 1));
+
