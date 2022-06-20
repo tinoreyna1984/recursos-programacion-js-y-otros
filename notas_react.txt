@@ -177,7 +177,11 @@ npm create vite mi-app-react-ts --template react-ts (React con Typescript)
 Otras consideraciones de Vite
 -----------------------------
 
-No se recomienda quitar el StrictMode.
+Configurar en vite.config.js:
+
+  esbuild: {
+    logOverride: { 'this-is-undefined-in-esm': 'silent' }
+  }
 
 Edición del sitio en ReactJS
 ============================
