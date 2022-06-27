@@ -35,6 +35,7 @@ Agregar o modificar:
 
     "redux" : "redux-actions",
     "slices" : "redux-reducer",
+    "react-ts" : "react-components",
 },
 
 Instalación de React JS
@@ -198,17 +199,21 @@ Instalación:
 
 npm install react-router-dom
 
-Bootstrap + PopperJS (recomendado)
-----------------------------------
+Bootstrap CDN
+-------------
+
+Ir a: https://getbootstrap.com/docs/5.2/getting-started/download/ y buscar CDN. Emplear los bloques link y script y pegarlos encima del título en index.html.
+
+Bootstrap + PopperJS
+--------------------
 
 Instalación:
 
-npm i bootstrap@5.2.0-beta1
-npm i @popperjs/core
+npm i bootstrap@5.2.0-beta1 @popperjs/core
 
 Configuración:
 
-* En index.js:
+* En index.js (o main.jsx):
 
 import * as bootstrap from 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -386,9 +391,9 @@ Instalación:
 
 npm install @mui/material @emotion/react @emotion/styled
 
-VS Code:
+Instalación de íconos (opcional):
 
-Material-UI Snippets
+npm install @mui/icons-material
 
 Configuración en index.html:
 
@@ -400,6 +405,10 @@ Configuración en index.html:
   rel="stylesheet"
   href="https://fonts.googleapis.com/icon?family=Material+Icons"
 />
+
+VS Code:
+
+Material-UI Snippets
 
 React Modal
 ===========
@@ -444,6 +453,13 @@ react-responsive-carousel
 Instalar:
 
 npm i react-responsive-carousel
+
+Axios
+=====
+
+Instalar:
+
+npm i axios
 
 
 Desinstalación de paquete

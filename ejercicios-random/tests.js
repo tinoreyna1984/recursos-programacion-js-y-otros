@@ -84,3 +84,13 @@ const formatDateTime = (currDate, mode) => {
 
 console.log(formatDateTime(currDate, 1));
 
+//--------------------
+
+const numeros = 10;
+
+const sumarDos = (numeros) => (numeros + 2);
+
+console.log(sumarDos(numeros)); //
+
+
+
