@@ -461,6 +461,19 @@ Instalar:
 
 npm i axios
 
+Redux Toolkit
+=============
+
+Instalar:
+
+npm install @reduxjs/toolkit react-redux
+
+React Big Calendar
+==================
+
+Instalar:
+
+npm i react-big-calendar
 
 Desinstalación de paquete
 =========================

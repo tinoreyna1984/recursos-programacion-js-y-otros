@@ -992,39 +992,69 @@ Es posible notar dos cosas:
 
 También existe un elemento NavLink, el cual funciona como Link pero tiene, en adición, las propiedades de ruta exacta y la clase que determina que el link activo actual. Ejemplo:
 
-NavBar.js:
+NavBar.jsx:
 
-import React from "react";
-import { Link, NavLink } from "react-router-dom";
+import { useContext } from "react";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { AuthContext } from "../../auth/context/AuthContext";
 
-export const NavBar = () => {
+export const Navbar = () => {
+
+  const navigate = useNavigate();
+
+  const context  = useContext(AuthContext);
+  const {logged, user, logout} = context;
+
+  //console.log(context)
+
+  const handleLogout = () => {
+    if(!logged) return;
+    logout();
+    navigate('/login', { replace: true });
+  }
+
   return (
-    <nav className="navbar navbar-expand-sm navbar-dark bg-dark">
-      <div className="container-fluid">
-        <Link className="navbar-brand" to="/">
-          useContext
-        </Link>
-        <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <div className="navbar-nav">
-            <NavLink exact activeClassName="active" className="nav-link" aria-current="page" to="/">
-              Home
-            </NavLink>
-            <NavLink exact activeClassName="active" className="nav-link" to="/login">
-              Login
-            </NavLink>
-            <NavLink exact activeClassName="active" className="nav-link" to="/about">
-              About
-            </NavLink>
-          </div>
+    <nav className="navbar navbar-expand-sm navbar-dark bg-dark p-2 sticky-top">
+      <Link className="navbar-brand" to="/">
+        HeroesSPA
+      </Link>
+      <div className="navbar-collapse">
+        <div className="navbar-nav">
+          <NavLink
+            className={({ isActive }) =>
+              `nav-item nav-link ${isActive ? "active" : ""}`
+            }
+            to="/marvel"
+          >
+            Marvel
+          </NavLink>
+          <NavLink
+            className={({ isActive }) =>
+              `nav-item nav-link ${isActive ? "active" : ""}`
+            }
+            to="/dc"
+          >
+            DC
+          </NavLink>
+          <NavLink
+            className={({ isActive }) =>
+              `nav-item nav-link ${isActive ? "active" : ""}`
+            }
+            to="/search"
+          >
+            Search
+          </NavLink>
         </div>
+      </div>
+      <div className="navbar-collapse collapse w-100 order-3 dual-collapse2 d-flex justify-content-end">
+        <ul className="navbar-nav ml-auto">
+          <span className="nav-item nav-link text-info">{user?.name}</span>
+          <button onClick={handleLogout} className="nav-item nav-link btn">Logout</button>
+        </ul>
       </div>
     </nav>
   );
 };
-
-NOTA: en la v6, ya no es necesaria la palabra exact, ni establecer el atributo activeClassName. En su lugar, el enlace activo se renderiza según la lógica que condiciona la variable className:
-
-className={ ({isActive}) => "nav-item nav-link " + (isActive ? "active" : "") }
 
 Construcción de más un router
 -----------------------------
@@ -1035,157 +1065,94 @@ Login --> Pantalla de control
 
 Se podrían definir los siguientes componentes:
 
-HeroesApp.js (principal):
+HeroesApp.jsx (principal):
+
 import React from 'react'
-import { AppRouter } from './routers/AppRouter'
+import { AuthProvider } from './auth/context/AuthContext'
+import { AppRouter } from './router'
 
 export const HeroesApp = () => {
   return (
-    <AppRouter />
+    <AuthProvider>
+      <AppRouter />
+    </AuthProvider>
   )
 }
 
-AppRouter.js (ruteador padre):
+AppRouter.jsx (ruteador padre):
 
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { LoginScreen } from "../components/login/LoginScreen";
-import { DashboardRoutes } from "./DashboardRoutes";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { LoginPage } from "../auth";
+import { DcPage, HeroesRoutes, MarvelPage } from "../heroes";
+import { Navbar } from "../ui";
+import { PrivateRoute } from "./PrivateRoute";
+import { PublicRoute } from "./PublicRoute";
 
 export const AppRouter = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<LoginScreen />} />
-        <Route path="/*" element={<DashboardRoutes />} />
-      </Routes>
-    </Router>
-  );
-};
-
-Acceder a Login:
-
-LoginScreen.js:
-
-import React from "react";
-import { useNavigate } from "react-router-dom";
-
-export const LoginScreen = () => {
-  const navigate = useNavigate();
-
-  const handleLogin = () => {
-    navigate("/marvel", {
-      replace: true,
-    });
-  };
-
-  return (
-    <div className="container">
-      <h1>Login</h1>
-      <hr />
-      <button className="btn btn-dark" onClick={handleLogin}>
-        Entrar
-      </button>
-    </div>
-  );
-};
-
-
-Si tiene éxito el login, sigue el panel de control del sitio.
-
-DashboardRoutes.js:
-
-import React from "react";
-import { Route, Routes } from "react-router-dom";
-import { DcScreen } from "../components/dc/DcScreen";
-import { NavBar } from "../components/ui/NavBar";
-import { MarvelScreen } from "../components/marvel/MarvelScreen";
-import { SearchScreen } from "../components/search/SearchScreen";
-import { HeroScreen } from "../components/hero/HeroScreen";
-
-export const DashboardRoutes = () => {
-  return (
     <>
-      <NavBar />
-      <div className="container">
-        <Routes>
-          <Route path="marvel" element={<MarvelScreen />} />
-          <Route path="dc" element={<DcScreen />} />
-          <Route path="search" element={<SearchScreen />} />
-          <Route path="hero/:heroId" element={<HeroScreen />} />
-          <Route path="/" element={<MarvelScreen />} />
-        </Routes>
-      </div>
+      <Routes>
+        <Route
+          path="/*"
+          element={
+            <PrivateRoute>
+              <HeroesRoutes />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="login/*"
+          element={
+            <PublicRoute>
+              <Routes>
+                <Route path="/*" element={<LoginPage />} />
+              </Routes>
+            </PublicRoute>
+          }
+        />
+      </Routes>
     </>
   );
 };
 
-El Navbar empleado aquí es:
 
-NavBar.js:
+Acceder a Login:
 
-import React from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+LoginPage.jsx:
 
-export const NavBar = () => {
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
+
+export const LoginPage = () => {
+
+  const {login} = useContext(AuthContext)
+
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    navigate("/login", {
-      replace: true,
-    });
-  };
+  const handleLogin = () => {
+    
+    // recordar última página visitada
+    const lastPath = localStorage.getItem('lastPath') || '/';
+
+    login('Tino');
+    navigate(lastPath, { replace: true }); // evita que tenga efecto del botón "atrás" del navegador
+  }
+
 
   return (
-    <nav className="navbar navbar-expand-sm navbar-dark bg-dark">
-      <Link className="navbar-brand" to="/">
-        HeroesApp
-      </Link>
+    <div className='container mt-5'>
+      <h1>Login</h1>
+      <hr/>
+      <button onClick={handleLogin} className='btn btn-primary'>Login</button>
+    </div>
+  )
+}
 
-      <div className="navbar-collapse">
-        <div className="navbar-nav">
-          <NavLink
-            className={({ isActive }) =>
-              "nav-item nav-link " + (isActive ? "active" : "")
-            }
-            to="/marvel"
-          >
-            Marvel
-          </NavLink>
 
-          <NavLink
-            className={({ isActive }) =>
-              "nav-item nav-link " + (isActive ? "active" : "")
-            }
-            to="/dc"
-          >
-            DC
-          </NavLink>
 
-          <NavLink
-            className={({ isActive }) =>
-              "nav-item nav-link " + (isActive ? "active" : "")
-            }
-            to="/search"
-          >
-            Search
-          </NavLink>
-        </div>
-      </div>
-
-      <div className="navbar-collapse collapse w-100 order-3 dual-collapse2 d-flex justify-content-end">
-        <ul className="navbar-nav ml-auto">
-          <span className="nav-item nav-link text-info">Tino</span>
-          <button className="nav-item nav-link btn" onClick={handleLogout}>
-            Logout
-          </button>
-        </ul>
-      </div>
-    </nav>
-  );
-};
-
-Si se accede al Logout, regresa a la pantalla de login.
+El contexto empleado determina el acceso a las rutas esperadas.
 
 useNavigate y useLocation
 -------------------------
@@ -1228,36 +1195,33 @@ El contenido de location puede ser el que sigue:
 
 Ambos hooks pueden combinar bien para una búsqueda por formulario.
 
-SearchScreen.js:
+SearchPage.jsx:
 
-import React, { useMemo } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import queryString from "query-string";
+import React from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useForm } from "../../hooks/useForm";
-import getHeroesByName from "../../selectors/getHeroesByName";
-import { HeroCard } from "../hero/HeroCard";
+import queryString from 'query-string';
+import { getHeroesByName } from "../helpers/getHeroesByName";
+import { HeroCard } from "../components/HeroCard";
 
-export const SearchScreen = () => {
-  /**
-   * Uso de hooks para generar la ruta de busqueda y efectuar
-   * la busqueda por termino clave
-   */
+export const SearchPage = () => {
+
   const navigate = useNavigate();
   const location = useLocation();
   const query = queryString.parse(location.search);
-  const { q = "" } = query;
-  const [formValues, handleInputChange] = useForm({
+  const {q = ''} = query;
+
+  const heroes = getHeroesByName(q);
+
+  const { searchText, onInputChange } = useForm({
     searchText: q,
   });
-  const { searchText } = formValues;
-  // importante: useMemo hace eficiente el uso de la funcion para renderizar
-  // de forma controlada
-  const heroesFiltered = useMemo(() => getHeroesByName(q), [q]);
 
-  const handleSearch = (e) => {
+  const onSearchSubmit = (e) => {
     e.preventDefault();
+    if(searchText.trim().length <= 1) return;
     navigate(`?q=${searchText}`);
-  };
+  }
 
   return (
     <>
@@ -1265,46 +1229,43 @@ export const SearchScreen = () => {
       <hr />
       <div className="row">
         <div className="col-5">
-          <form onSubmit={handleSearch}>
+          <h4>Enter text to search</h4>
+          <hr />
+          <form onSubmit={onSearchSubmit}>
             <input
               type="text"
-              className="form-control"
-              placeholder="Enter your text for search"
-              autoComplete="off"
               name="searchText"
-              onChange={handleInputChange}
               value={searchText}
+              className="form-control"
+              placeholder="Enter text"
+              onChange={onInputChange}
+              autoComplete="off"
             />
-            <button type="submit" className="btn btn-dark mt-3">
-              Search
-            </button>
+            <button className="btn btn-dark mt-2">Search</button>
           </form>
         </div>
         <div className="col-7">
           <h4>Results</h4>
           <hr />
-          <div className="row">
-            {q === "" ? (
-              <div className="alert alert-info animate__animated animate__fadeIn">
-                Search for heroes.
-              </div>
-            ) : (
-              heroesFiltered.length === 0 && (
-                <div className="alert alert-dark animate__animated animate__fadeIn">
-                  No results.
-                </div>
-              )
-            )}
-            {heroesFiltered.map((hero) => (
-              <HeroCard key={hero.id} hero={hero} />
-            ))}
-          </div>
+          {
+            (q === '')
+            ? <div className="alert alert-primary">Please search hero...</div>
+            : (heroes.length === 0)
+              ? <div className="alert alert-danger">No results for {q}. Try again</div>
+              : <div className="alert alert-success">{heroes.length} results for {q}</div>
+          }
+          
+          
         </div>
+      </div>
+      <div className="row mt-4 mb-4">
+        {heroes.map(hero => (
+          <HeroCard key={hero.id} {...hero} />
+        ))}
       </div>
     </>
   );
 };
-
 
 QueryString
 ===========
@@ -1315,7 +1276,7 @@ Instalación:
 
 npm i query-string
 
-Ejemplo en SearchScreen.js:
+Ejemplo en SearchPage.jsx:
 
   /**
    * Uso de hooks para generar la ruta de busqueda y efectuar
@@ -1324,19 +1285,19 @@ Ejemplo en SearchScreen.js:
   const navigate = useNavigate();
   const location = useLocation();
   const query = queryString.parse(location.search);
-  const { q = "" } = query;
-  const [formValues, handleInputChange] = useForm({
+  const {q = ''} = query;
+
+  const heroes = getHeroesByName(q);
+
+  const { searchText, onInputChange } = useForm({
     searchText: q,
   });
-  const { searchText } = formValues;
-  // importante: useMemo hace eficiente el uso de la funcion para renderizar
-  // de forma controlada
-  const heroesFiltered = useMemo(() => getHeroesByName(q), [q]);
 
-  const handleSearch = (e) => {
+  const onSearchSubmit = (e) => {
     e.preventDefault();
+    if(searchText.trim().length <= 1) return;
     navigate(`?q=${searchText}`);
-  };
+  }
 
 
 Enrutamiento protegido
@@ -1349,9 +1310,10 @@ Etapa previa: crear los tipos para la acción efectuada por el reducer.
 Supongamos que se quiera restringir con un login el acceso a las rutas privadas. Entonces, los dos tipos de acciones para llevar a cabo ese control serían:
 
 types.js:
+
 export const types = {
-    login:  '[auth] Login',
-    logout: '[auth] Logout',
+    login: "AUTH - login",
+    logout: "AUTH - logout",
 }
 
 Usando el concepto de reducer, se podría definir una función como:
@@ -1360,71 +1322,96 @@ authReducer.js:
 
 import { types } from "../types/types";
 
-/**
- * Reducer que controla las autorizaciones. Los cambios de estado via
- * payload son de los tipos definidos en type.js
- */
 export const authReducer = (state = {}, action) => {
-    switch (action.type) {
-        case types.login:
-            console.log("authReducer - Login");
-            return {
-                ...action.payload,
-                logged: true,
-            };
-        case types.logout:
-            console.log("authReducer - Logout");
-            return {
-                logged: false,
-            };
-        default:
-            return state;
-    }
-}
+  switch (action.type) {
+    case types.login:
+      return {
+        ...state,
+        logged: true,
+        user: action.payload,
+      };
+    case types.logout:
+      return {
+        logged: false,
+      };
+    default:
+      return state;
+  }
+};
+
 
 En el caso del contexto, se definiría un contexto como el que sigue:
 
-authContext.js:
+AuthContext.jsx:
 
 import { createContext } from "react";
 
 export const AuthContext = createContext();
 
+Crear, asimismo, su respectivo provider:
+
+
+// provider
+const initialState = { logged: false };
+
+const init = () => {
+  const user = JSON.parse(localStorage.getItem('user'));
+  return {
+    logged: !!user,
+    user: user,
+  }
+}
+
+export const AuthProvider = ({ children }) => {
+  const [authState, dispatch] = useReducer(authReducer, initialState, init);
+
+  const login = (name = '') => {
+    const user = {id: '123', name: name}
+    const action = {
+      type: types.login,
+      payload: user,
+    }
+    localStorage.setItem('user', JSON.stringify(user));
+    dispatch(action);
+  }
+
+  const logout = () => {
+    localStorage.removeItem('user');
+    const action = {type: types.logout}
+    dispatch(action);
+  }
+
+  return (
+    <AuthContext.Provider value={{
+      ...authState,
+      login: login,
+      logout: logout,
+    }}>
+        {children}
+    </AuthContext.Provider>
+  );
+};
+
 
 II. Emplear el contexto creado previamente
 ------------------------------------------
 
-El mismo debe afectar al punto más alto de la aplicación (el componente invocado por index.js).
+El mismo debe afectar al punto más alto de la aplicación, esto es, un high-order component.
 
 Ejemplo:
 
-import React, { useEffect, useReducer } from "react";
-import { AuthContext } from "./auth/authContext";
-import { authReducer } from "./auth/authReducer";
-import { AppRouter } from "./routers/AppRouter";
-
-// cargar desde localStorage
-const init = () => {
-  return JSON.parse(localStorage.getItem("user")) || { logged: false };
-};
+import React from 'react'
+import { AuthProvider } from './auth/context/AuthContext'
+import { AppRouter } from './router'
 
 export const HeroesApp = () => {
-
-  const [user, dispatch] = useReducer(authReducer, {}, init);
-
-  // guardando en localStorage
-  useEffect(() => {
-      if(!user) return;
-      localStorage.setItem('user', JSON.stringify(user));
-    }, [user]
-  );
-
   return (
-    <AuthContext.Provider value={{ user, dispatch }}>
+    <AuthProvider>
       <AppRouter />
-    </AuthContext.Provider>
-  );
-};
+    </AuthProvider>
+  )
+}
+
 
 El contexto debe propagar al resto de la aplicación al objeto value, dado que contiene a los elementos obtenidos a partir del reducer: el usuario logueado y el despachador (dispatch) de acciones que afectarán el estado de la sesión y las rutas a las que se tendrá acceso.
 
@@ -1433,9 +1420,9 @@ III. Separar el ruteo público del privado
 
 En HeroesApp.js se observa que:
 
-    <AuthContext.Provider value={{ user, dispatch }}>
+    <AuthProvider>
       <AppRouter />
-    </AuthContext.Provider>
+    </AuthProvider>
 
 el prop value pasa el objeto conformado por el usuario y el despachador al resto de la aplicación. El próximo componente es el AppRouter, el cual alberga dos conjuntos de rutas:
 
@@ -1444,312 +1431,111 @@ Privadas: las rutas de la aplicación.
 
 En concreto, quedaría:
 
-AppRouter.js:
+AppRouter.jsx:
 
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { LoginScreen } from "../components/login/LoginScreen";
-import { DashboardRoutes } from "./DashboardRoutes";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { LoginPage } from "../auth";
+import { DcPage, HeroesRoutes, MarvelPage } from "../heroes";
+import { Navbar } from "../ui";
 import { PrivateRoute } from "./PrivateRoute";
 import { PublicRoute } from "./PublicRoute";
 
 export const AppRouter = () => {
   return (
-    <Router>
+    <>
       <Routes>
-        <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <LoginScreen />
-            </PublicRoute>
-          }
-        />
         <Route
           path="/*"
           element={
             <PrivateRoute>
-              <DashboardRoutes />
+              <HeroesRoutes />
             </PrivateRoute>
           }
         />
+        <Route
+          path="login/*"
+          element={
+            <PublicRoute>
+              <Routes>
+                <Route path="/*" element={<LoginPage />} />
+              </Routes>
+            </PublicRoute>
+          }
+        />
       </Routes>
-    </Router>
+    </>
   );
 };
+
 
 
 IV. Proteger las rutas privadas con login e implementar el logout
 -----------------------------------------------------------------
 
-Considerar LoginScreen.js:
+Considerar LoginPage.jsx:
 
-import React, { useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../auth/authContext";
-import { types } from "../../types/types";
-import { useForm } from "../../hooks/useForm";
-import { ToastMessage } from "../ui/ToastMessage";
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
-export const LoginScreen = () => {
-  // cargo el usuario del login (via contexto)
-  const userContext = useContext(AuthContext);
-  const { dispatch } = userContext;
+export const LoginPage = () => {
+
+  const {login} = useContext(AuthContext)
 
   const navigate = useNavigate();
 
-  const [formValues, handleInputChange] = useForm({ name: "" });
-  const { name } = formValues;
+  const handleLogin = () => {
+    
+    // recordar última página visitada
+    const lastPath = localStorage.getItem('lastPath') || '/';
 
-  const handleLogin = (e) => {
-    /**
-     * Nota: es conveniente poner e.preventDefault() para el submit de un formulario,
-     * ya que el browser arroja el error "Form submission canceled because the form is
-     * not connected"
-     */
-    e.preventDefault();
-    // dispatch envia un action
-    const action = {
-      type: types.login,
-      payload: { name: name },
-    };
-    dispatch(action);
+    login('Tino');
+    navigate(lastPath, { replace: true }); // evita que tenga efecto del botón "atrás" del navegador
+  }
 
-    navigate("/marvel", {
-      replace: true,
-    });
-  };
 
   return (
-    <div className="container">
+    <div className='container mt-5'>
       <h1>Login</h1>
-      <hr />
-      <div className="row">
-        <form onSubmit={handleLogin}>
-          <label className="form-label" htmlFor="name">
-            Enter name:{" "}
-          </label>
-          <input
-            className="form-control"
-            type="text"
-            name="name"
-            placeholder="Enter name"
-            onChange={handleInputChange}
-            value={name}
-            autoComplete="off"
-          />
-          <button className="btn btn-dark mt-2" type="submit">
-            Enter
-          </button>
-        </form>
-      </div>
-      <div className="toast-container mb-auto">
-        <ToastMessage message="Solo pon 'Tino' y clic en el botón o tecla Enter" />
-      </div>
+      <hr/>
+      <button onClick={handleLogin} className='btn btn-primary'>Login</button>
     </div>
-  );
-};
+  )
+}
 
-Se implementa un formulario simple con un texto y un botón. Debe ingresarse "Tino" y enviar (para efectos de prueba). El handleLogin es quien efectúa la dinámica de logueo:
+Al aprovechar el logueo, entramos al conjunto de páginas públicas:
 
-  const handleLogin = (e) => {
-    /**
-     * Nota: es conveniente poner e.preventDefault() para el submit de un formulario,
-     * ya que el browser arroja el error "Form submission canceled because the form is
-     * not connected"
-     */
-    e.preventDefault();
-    // dispatch envia un action
-    const action = {
-      type: types.login,
-      payload: { name: name },
-    };
-    dispatch(action);
-
-    navigate("/marvel", {
-      replace: true,
-    });
-  };
-
-Notar que el payload es el nombre que queremos pasar como valor admitido junto con la acción login. Cuando esto es posible, se navega hacia el home del sitio con el comando navigate. Entra al componente DashboardRoutes, el cual afecta al NavBar:
-
-DashboardRoutes.js:
-
-import React from "react";
-import { Route, Routes } from "react-router-dom";
-import { DcScreen } from "../components/dc/DcScreen";
-import { NavBar } from "../components/ui/NavBar";
-import { MarvelScreen } from "../components/marvel/MarvelScreen";
-import { SearchScreen } from "../components/search/SearchScreen";
-import { HeroScreen } from "../components/hero/HeroScreen";
-
-export const DashboardRoutes = () => {
-  return (
-    <>
-      <NavBar />
-      <div className="container">
-        <Routes>
-          <Route path="marvel" element={<MarvelScreen />} />
-          <Route path="dc" element={<DcScreen />} />
-          <Route path="search" element={<SearchScreen />} />
-          <Route path="hero/:heroId" element={<HeroScreen />} />
-          <Route path="/" element={<MarvelScreen />} />
-        </Routes>
-      </div>
-    </>
-  );
-};
-
-De AppRouter.js se tiene:
-
- <PrivateRoute>
-  <DashboardRoutes />
- </PrivateRoute>
-
-Y el componente PrivateRoute se compone de:
-
-PrivateRoute.js:
+PrivateRoute.jsx:
 
 import React, { useContext } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { AuthContext } from "../auth/authContext";
+import { AuthContext } from "../auth/context/AuthContext";
 
-/**
- * PrivateRoute usa como props los componentes hijos
- * que despues se renderizan
- */
 export const PrivateRoute = ({ children }) => {
-  const { user } = useContext(AuthContext);
+  
+  const { logged } = useContext(AuthContext);
+
+  // última página visitada
   const {pathname, search} = useLocation();
+  const lastPath = pathname + search;
+  localStorage.setItem('lastPath', lastPath);
 
-  localStorage.setItem('lastPath', pathname + search);
-
-  /**
-   * Lo que devuelve:
-   * - Si esta autenticado, muestra los hijos.
-   * - Caso contrario, se redirige a login.
-   */
-  return user.logged ? children : <Navigate to="/login" />;
+  return logged ? children : <Navigate to="/login" />;
 };
 
-Según la condición dada por la propiedad logged de user, se dará acceso a las rutas hijas (children) o se redirige al login.
-
-De forma análoga, se tiene las rutas públicas:
-
- <PublicRoute>
-  <LoginScreen />
- </PublicRoute>
-
-PublicRoute tiene lo siguiente:
-
-PublicRoute.js:
+Si no accedemos allí, esto es si no hay login, quedamos en la zona de páginas públicas:
 
 import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
-import { AuthContext } from "../auth/authContext";
+import { AuthContext } from "../auth/context/AuthContext";
 
 export const PublicRoute = ({ children }) => {
-  const { user } = useContext(AuthContext);
+  
+  const { logged } = useContext(AuthContext);
 
-  return user.logged ? <Navigate to="/marvel" /> : children;
+  return !logged ? children : <Navigate to="/" />;
 };
-
-La diferencia con las rutas privadas está en que, en este caso, la única ruta hija es el login.
-
-Para el logout, se debe implementar el contexto en NavBar, ya que será quien tiene dicha funcionalidad de logout:
-
-import React, { useContext } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { AuthContext } from "../../auth/authContext";
-import { types } from "../../types/types";
-
-export const NavBar = () => {
-  // cargo el usuario del login (via contexto)
-  const userContext = useContext(AuthContext);
-  const { user, dispatch } = userContext;
-
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    // dispatch envia un action
-    dispatch({ type: types.logout });
-
-    navigate("/login", {
-      replace: true,
-    });
-  };
-
-  //console.log("Usuario: ", user);
-
-  return (
-    <nav className="navbar navbar-expand-sm navbar-dark bg-dark">
-      <div className="container-fluid">
-        <Link className="navbar-brand" to="/">
-          HeroesApp
-        </Link>
-
-        <div className="navbar-collapse">
-          <div className="navbar-nav">
-            <NavLink
-              className={({ isActive }) =>
-                "nav-item nav-link " + (isActive ? "active" : "")
-              }
-              to="/marvel"
-            >
-              Marvel
-            </NavLink>
-
-            <NavLink
-              className={({ isActive }) =>
-                "nav-item nav-link " + (isActive ? "active" : "")
-              }
-              to="/dc"
-            >
-              DC
-            </NavLink>
-
-            <NavLink
-              className={({ isActive }) =>
-                "nav-item nav-link " + (isActive ? "active" : "")
-              }
-              to="/search"
-            >
-              Search
-            </NavLink>
-          </div>
-        </div>
-
-        <div className="navbar-collapse collapse w-100 order-3 dual-collapse2 d-flex justify-content-end">
-          <ul className="navbar-nav ml-auto">
-            <span className="nav-item nav-link text-info">{user.name}</span>
-            <button className="nav-item nav-link btn" onClick={handleLogout}>
-              Logout
-            </button>
-          </ul>
-        </div>
-      </div>
-    </nav>
-  );
-};
-
-El siguiente bloque:
-
-  // cargo el usuario del login (via contexto)
-  const userContext = useContext(AuthContext);
-  const { user, dispatch } = userContext;
-
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    // dispatch envia un action
-    dispatch({ type: types.logout });
-
-    navigate("/login", {
-      replace: true,
-    });
-  };
-
-Es la parte más importante, dado que el nombre recibido por el contexto es aprovechado en el bloque <span> y el botón aprovecha la lógica del handleLogout.
 
 
 Redux para React
@@ -1776,77 +1562,168 @@ Construcción del Redux
 
 store.js:
 
-import { configureStore } from '@reduxjs/toolkit';
-import loginReducer from './loginSlice';
+/**
+ * La forma como el instructor llama a los reducers es diferente a la sugerida por los
+ * creadores de RTK. Normalmente, esperaríamos importar:
+ * 
+ * import authReducer from '../slices/auth/authSlices'
+ * 
+ * Y después invocarlo como:
+ * 
+ * auth: authReducer
+ * 
+ * La forma presentada aquí es más comprensible y trabaja de la forma esperada.
+ */
 
-// invocamos los reducers en el store
-export default configureStore({
-  reducer: {
-    login : loginReducer,
-  }
+import { configureStore } from '@reduxjs/toolkit'
+import { authSlice } from '../slices/auth/authSlice' // estilo Fernando Herrera
+import { journalSlice } from '../slices/journal/journalSlice'
+
+export const store = configureStore({
+    reducer: {
+      auth: authSlice.reducer, // estilo Fernando Herrera
+      journal: journalSlice.reducer, // estilo Fernando Herrera
+    },
+  })
+
+
+authSlice.js:
+
+import { createSlice } from '@reduxjs/toolkit'
+import { signInWithGoogle, registerWithEmailAndPassword, loginWithEmailAndPassword, logoutFirebase } from '../../../firebase/providers';
+import { clearNotesLogout } from '../journal/journalSlice';
+
+export const authSlice = createSlice({
+  name: 'auth',
+  initialState: {
+    status: 'checking', // 'not-authenticated', 'checking', 'authenticated'
+    uid: null,
+    email: null,
+    displayName: null,
+    photoURL: null,
+    errorMessage: null,
+  },
+  reducers: { // del action estoy sacando directamente el payload
+    login: (state, {payload}) => {
+      state.status = 'authenticated';
+      state.uid = payload.uid;
+      state.email = payload.email;
+      state.displayName = payload.displayName;
+      state.photoURL = payload.photoURL;
+      state.errorMessage = null;
+    },
+    logout: (state, {payload}) => {
+      state.status = 'not-authenticated';
+      state.uid = null;
+      state.email = null;
+      state.displayName = null;
+      state.photoURL = null;
+      state.errorMessage = payload?.errorMessage;
+    },
+    checkingCredentials: (state) => {
+      state.status = 'checking';
+    },
+  },
 })
 
-loginSlice.js:
+// thunks - ini
 
-import { createSlice } from '@reduxjs/toolkit';
+export const checkingAuthentication = (email, password) => {
+  return async (dispatch) => {
+    dispatch(checkingCredentials())
+  }
+}
 
-export const loginSlice = createSlice({
-    name: 'login', // nombre de la variable que impacta globalmente el app
-    initialState: { // estado inicial de la variable de estado
-        logged: false,
-        modal: false,
-    },
-    reducers: {
-        // proceso de login
-        login: (state) => {
-            state.logged = true;
-        },
-        logout: (state) => {
-            state.logged = false;
-        },
-        // modal para login
-        openModal : (state) => {
-            state.modal = true;
-        },
-        closeModal : (state) => {
-            state.modal = false;
-        },
-    }
-});
+export const startGoogleSignIn = () => {
+  return async (dispatch) => {
+    dispatch(checkingCredentials());
+    const result = await signInWithGoogle();
+    //console.log(result);
+    if(!result.ok) return dispatch(logout(result.errorMessage));
+    dispatch(login(result));
+  }
+}
 
-// exportamos acciones y reducers
-export const {login, logout, openModal, closeModal} = loginSlice.actions;
-export default loginSlice.reducer;
+export const startCreatingUserWithEmailPassword = ({email, password, displayName}) => {
+  return async (dispatch) => {
+    dispatch(checkingCredentials());
+
+    const {ok, uid, photoURL, errorMessage} = await registerWithEmailAndPassword({email, password, displayName});
+    if(!ok) return dispatch(logout({errorMessage}));
+    dispatch(login( {uid, displayName, email, photoURL} ));
+  }
+}
+
+export const startLoginWithEmailPassword = ({email, password}) => {
+  return async (dispatch) => {
+    dispatch(checkingCredentials());
+
+    const {ok, displayName, uid, photoURL, errorMessage} = await loginWithEmailAndPassword({email, password});
+    //console.log('result in slice: ', result);
+    if(!ok) return dispatch(logout({errorMessage}));
+    dispatch(login( {uid, displayName, email, photoURL} ));
+  }
+}
+
+export const startLogout = () => {
+  return async (dispatch) => {
+    await logoutFirebase();
+    dispatch(clearNotesLogout());
+    dispatch(logout({errorMessage: 'Logged out'}));
+  }
+}
+
+// thunks - fin
+
+// Action creators are generated for each case reducer function
+export const { login, logout, checkingCredentials } = authSlice.actions;
 
 Notar que están interrelacionados y el store puede combinar más de un reducer.
 
 2. Implementar la tienda en el app principal:
 
-index.js:
+main.jsx:
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-// Provider: empleo el contexto del Redux en la app principal
-root.render(
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import JournalApp from './JournalApp'
+import './styles.css'
+import { Provider } from 'react-redux'
+import { store } from './redux/store/store'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
   <Provider store={store}>
-    <App />
+    <JournalApp />
   </Provider>
-);
+  
+)
 
-Esto es a través de Provider, de react-redux.
+Esto es a través de Provider del react-redux.
 
 3. Trabajar con el store configurado en cualquier punto de la aplicación que se requiera:
 
 Obtener acceso actual a través de useSelector:
-Ej.: const modal = useSelector((state) => state.login.modal);
+Ej.:
+
+const {
+    active: note,
+    messageSaved,
+    isSaving,
+  } = useSelector((state) => state.journal);
 
 Invocar un reducer para despacharlo (dispatch):
 Ej.:
 
-  const dispatch = useDispatch();
+const dispatch = useDispatch();
 
-  function modalOff() {
-    dispatch(closeModal());
-  }
+useEffect(() => {
+	dispatch(setActiveNote(formState));
+}, [formState]);
+
+const handleSave = () => {
+	dispatch(startSavingNote());
+};
+
 
 Esto último es lo que produce los cambios de estado requeridos.
 
@@ -1930,208 +1807,217 @@ El resultado es un proyecto creado, por ejemplo: react-app-cursos-tino
 Configuración en React
 ----------------------
 
-Crear un archivo de configuración de Firebase como sigue:
+Se requiere una carpeta, en ella crear dos archivos: uno para configuración y otro para establecer los proveedores para sesión:
+
+Carpeta "firebase":
+
+config.js:
 
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  updateProfile,
-  onAuthStateChanged,
-  GoogleAuthProvider,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signOut,
-} from "firebase/auth";
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  authDomain: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  projectId: "XXXXXXXXXXXXXXXXXXXXX",
-  storageBucket: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  messagingSenderId: "XXXXXXXXXXXX",
-  appId: "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  apiKey: import.meta.env.VITE_APP_APIKEY,
+  authDomain: import.meta.env.VITE_APP_AUTHDOMAIN,
+  projectId: import.meta.env.VITE_APP_PROJECTID,
+  storageBucket: import.meta.env.VITE_APP_STORAGEBUCKET,
+  messagingSenderId: import.meta.env.VITE_APP_MESSAGINGSENDERID,
+  appId: import.meta.env.VITE_APP_APPID
 };
 
-const app = initializeApp(firebaseConfig);
+// Inicializar Firebase y autorizacion
+const FirebaseApp = initializeApp(firebaseConfig);
+const FirebaseAuth = getAuth(FirebaseApp);
+const FirebaseDB = getFirestore(FirebaseApp);
 
-const db = getFirestore(app);
-const auth = getAuth(app);
+export {FirebaseApp, FirebaseAuth, FirebaseDB}
 
-const provider = new GoogleAuthProvider();
+providers.js:
 
-export {
-  db,
-  auth,
-  provider,
+import {
   createUserWithEmailAndPassword,
-  updateProfile,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
+  GoogleAuthProvider,
   signInWithPopup,
-  signOut,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { FirebaseAuth } from "./config";
+
+/**
+ * - Creación de proveedores de backend (por ahora solo con Google y servicio de email)
+ * - Creación de métodos que usan los proveedores definidos previamente
+ */
+
+const googleProvider = new GoogleAuthProvider();
+
+export const signInWithGoogle = async () => {
+  try {
+    const result = await signInWithPopup(FirebaseAuth, googleProvider);
+    const { displayName, email, photoURL, uid } = result.user;
+
+    return {
+      ok: true,
+      displayName,
+      email,
+      photoURL,
+      uid, // user info
+    };
+  } catch (error) {
+    const errorMessage = error.message;
+    console.log(errorMessage);
+
+    return {
+      ok: false,
+      errorMessage,
+    };
+  }
 };
 
-Esto permitirá usar tanto Firebase como Firestore en el proyecto.
+export const registerWithEmailAndPassword = async ({
+  email,
+  password,
+  displayName,
+}) => {
+  try {
+    const result = await createUserWithEmailAndPassword(
+      FirebaseAuth,
+      email,
+      password
+    );
+    const { uid, photoURL } = result.user;
+    //console.log({uid, photoURL})
+    await updateProfile(FirebaseAuth.currentUser, { displayName });
+
+    return {
+      ok: true,
+      uid,
+      photoURL,
+      email,
+      displayName, // user info
+    };
+  } catch (error) {
+    const errorMessage = error.message;
+    console.log(errorMessage);
+
+    return {
+      ok: false,
+      errorMessage,
+    };
+  }
+};
+
+export const loginWithEmailAndPassword = async ({ email, password }) => {
+  try {
+    const result = await signInWithEmailAndPassword(
+      FirebaseAuth,
+      email,
+      password
+    );
+    
+    const { uid, photoURL, displayName } = result.user;
+    
+    return {
+      ok: true,
+      uid,
+      photoURL,
+      email,
+      displayName, // user info
+    };
+  } catch (error) {
+    const errorMessage = error.message;
+    console.log(errorMessage);
+
+    return {
+      ok: false,
+      errorMessage,
+    };
+  }
+};
+
+export const logoutFirebase = async () => {
+  return await FirebaseAuth.signOut();
+}
+
 
 Usar Firebase para autenticación
 --------------------------------
 
 Aprovechando la configuración inicial:
 
-1. Controlar el renderizado con useEffect, asegurando si la sesión existente ya se ha dado:
+1. Crear procesos asíncronos para establecer inicios de sesión al sistema. Si se aprovecha Redux (Toolkit), quedarían los siguientes procesos (thunks):
 
-AppRouter.js:
+authSlice.js:
 
-export const AppRouter = () => {
-  const [checking, setChecking] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const dispatch = useDispatch();
-  //const user = useSelector(selectUser);
-
-  useEffect(() => {
-    onAuthStateChanged(auth, async (userAuth) => {
-      if (userAuth?.uid) {
-        // user is logged in
-        console.log("user is logged in");
-        dispatch(
-          login({
-            email: userAuth.email,
-            uid: userAuth.uid,
-            displayName: userAuth.displayName,
-          })
-        );
-        setIsLoggedIn(true);
-      } else {
-        console.log("user is logged out");
-        dispatch(logout());
-        setIsLoggedIn(false);
-      }
-    });
-    setChecking(false);
-    console.log("page loaded");
-  }, [dispatch, setChecking, setIsLoggedIn]);
-
-  if (checking) {
-    return <h1>Loading...</h1>;
+export const checkingAuthentication = (email, password) => {
+  return async (dispatch) => {
+    dispatch(checkingCredentials())
   }
+}
 
-2. Emplear las funciones exportadas para login y registro de usuarios
-
-authHelpers.js:
-
-import {
-  auth,
-  provider,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  createUserWithEmailAndPassword,
-  updateProfile,
-  signOut,
-} from "../../firebase/firebaseConfig";
-import { login, logout } from "../slices/authSlice";
-
-const emailPattern =
-  /[a-zA-Z0-9]+[.]?([a-zA-Z0-9]+)?[@][a-z]{3,9}[.][a-z]{2,5}/g;
-
-const validData = (name, email, password, password2) => {
-  if (name.trim().length === 0) {
-    alert("Name is required");
-    return false;
-  } else if (!emailPattern.test(email) || email.trim().length === 0) {
-    alert("Email is not valid");
-    return false;
-  } else if (password !== password2 || password.length < 6) {
-    alert("Password should be at least 6 characters and match each other");
-    return false;
+export const startGoogleSignIn = () => {
+  return async (dispatch) => {
+    dispatch(checkingCredentials());
+    const result = await signInWithGoogle();
+    //console.log(result);
+    if(!result.ok) return dispatch(logout(result.errorMessage));
+    dispatch(login(result));
   }
-  return true;
-};
+}
 
-const loginEmail = (dispatch, email, password) => {
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userAuth) => {
-      dispatch(
-        login({
-          email: userAuth.user.email,
-          uid: userAuth.user.uid,
-          displayName: userAuth.user.displayName,
-        })
-      );
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
+export const startCreatingUserWithEmailPassword = ({email, password, displayName}) => {
+  return async (dispatch) => {
+    dispatch(checkingCredentials());
 
-const loginGooglePopup = (dispatch) => {
-  signInWithPopup(auth, provider)
-    .then((userAuth) => {
-      dispatch(
-        login({
-          email: userAuth.user.email,
-          uid: userAuth.user.uid,
-          displayName: userAuth.user.displayName,
-        })
-      );
-    })
-    .catch((e) => {
-      console.log(`Popup closing - if this is an error: ${e}`);
-    });
-};
-
-const signUp = (dispatch, name, email, password) => {
-  createUserWithEmailAndPassword(auth, email, password)
-    .then((userAuth) => {
-      updateProfile(userAuth.user, { displayName: name })
-        .then(
-          dispatch(
-            login({
-              email: userAuth.user.email,
-              uid: userAuth.user.uid,
-              displayName: userAuth.user.displayName,
-            })
-          )
-        )
-        .catch((error) => console.log(error));
-    })
-    .catch((error) => console.log(error));
-};
-
-const logOut = async (dispatch) => {
-  try{
-    await signOut(auth);
-    dispatch( logout() );
+    const {ok, uid, photoURL, errorMessage} = await registerWithEmailAndPassword({email, password, displayName});
+    if(!ok) return dispatch(logout({errorMessage}));
+    dispatch(login( {uid, displayName, email, photoURL} ));
   }
-  catch(error) {
-    console.log(error)
+}
+
+export const startLoginWithEmailPassword = ({email, password}) => {
+  return async (dispatch) => {
+    dispatch(checkingCredentials());
+
+    const {ok, displayName, uid, photoURL, errorMessage} = await loginWithEmailAndPassword({email, password});
+    //console.log('result in slice: ', result);
+    if(!ok) return dispatch(logout({errorMessage}));
+    dispatch(login( {uid, displayName, email, photoURL} ));
   }
-};
+}
 
-export { loginEmail, loginGooglePopup, signUp, logOut, validData };
+export const startLogout = () => {
+  return async (dispatch) => {
+    await logoutFirebase();
+    dispatch(clearNotesLogout());
+    dispatch(logout({errorMessage: 'Logged out'}));
+  }
+}
 
-Esto permite trabajar con funciones reutilizables para manejos de sesión con Firebase. Ejemplo:
+2. Para login y registro, invocar las funciones definidas previamente con dispatch (RTK):
 
-LoginScreen.js:
+LoginPage.jsx:
 
-const [formValues, handleInputChange] = useForm({
-    email: "",
-    password: "",
-  });
+  const onSubmit = (e) => {
+    e.preventDefault();
+    dispatch(startLoginWithEmailPassword({ email, password }));
+  };
 
-const { email, password } = formValues;
+  const onGoogleSignIn = () => {
+    dispatch(startGoogleSignIn());
+  };
 
-const dispatch = useDispatch();
 
-const handleLogin = (e) => {
-	e.preventDefault();
-	loginEmail(dispatch, email, password);
-};
+RegisterPage.jsx:
 
-const handleGoogleLogin = () => {
-	loginGooglePopup(dispatch);
-};
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    if (!isFormValid) return;
+    setFormSubmitted(true);
+    dispatch(startCreatingUserWithEmailPassword(formState));
+  };
+
 
 
 Configurar Firestore
@@ -2160,6 +2046,106 @@ service cloud.firestore {
 Gestionar Firestore
 -------------------
 
+Del mismo modo que en el caso de la autenticación, puede aprovecharse de forma directa despachando procesos tipo thunk:
+
+journalSlice.js:
+
+export const startNewNote = () => {
+  return async (dispatch, getState) => {
+    dispatch(savingNewNote());
+
+    const { uid } = getState().auth;
+
+    // la nueva nota
+    const newNote = {
+      title: "",
+      body: "",
+      date: new Date().getTime(),
+    };
+
+    // crear un documento (el cual contiene diversas colecciones)
+    const newDoc = doc(collection(FirebaseDB, `${uid}/journal/notes`));
+    await setDoc(newDoc, newNote);
+
+    newNote.id = newDoc.id; // crea ID de nota
+
+    dispatch(addNewEmptyNote(newNote));
+    dispatch(setActiveNote(newNote));
+  };
+};
+
+export const startLoadingNotes = () => {
+  return async (dispatch, getState) => {
+    const { uid } = getState().auth;
+    if (!uid) throw new Error("El uid es requerido");
+
+    const notes = await loadNotes(uid);
+    
+    dispatch(setNotes(notes));
+  };
+};
+
+export const startSavingNote = () => {
+  return async (dispatch, getState) => {
+    dispatch(setSaving());
+
+    const { uid } = getState().auth;
+    const { active: note } = getState().journal;
+
+    const noteToFirestore = { ...note };
+    delete noteToFirestore.id;
+
+    const docRef = doc(FirebaseDB, `${uid}/journal/notes/${note.id}`);
+    await setDoc(docRef, noteToFirestore, { merge: true });
+
+    dispatch(updateNote(note));
+  };
+};
+
+export const startUploadingFiles = (files = []) => {
+  return async (dispatch) => {
+    dispatch(setSaving());
+
+    // carga simultánea de archivos por promesas
+    const fileUploadPromises = [];
+    for (const file of files) {
+      fileUploadPromises.push(fileUpload(file));
+    }
+    const photoUrls = await Promise.all(fileUploadPromises);
+
+    dispatch(setPhotosToActiveNote(photoUrls));
+  };
+};
+
+export const startDeletingNote = () => {
+  return async (dispatch, getState) => {
+    const {uid} = getState().auth;
+    const {active: note} = getState().journal;
+
+    const docRef = doc(FirebaseDB, `${uid}/journal/notes/${note.id}`);
+    await deleteDoc(docRef);
+
+    dispatch(deleteNoteById(note.id));
+  }
+}
+
+Y también puede invocarse en los eventos requeridos para el CRUD sobre Firestore:
+
+NoteView.jsx:
+
+  const handleSave = () => {
+    dispatch(startSavingNote());
+  };
+
+  const onFileInputChange = ({ target }) => {
+    if (target.files === 0) return;
+    console.log("subiendo archivos...");
+    dispatch(startUploadingFiles(target.files));
+  };
+
+  const onDelete = () => {
+    dispatch(startDeletingNote());
+  }
 
 
 

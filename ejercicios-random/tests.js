@@ -92,5 +92,45 @@ const sumarDos = (numeros) => (numeros + 2);
 
 console.log(sumarDos(numeros)); //
 
+//--------------------------------
+
+var x = 23;
+( function(){
+  var x = 43;
+  (function random(){
+    x++;
+    console.log(x);
+    var x = 21;
+  })();
+})();
+
+//-------------------------------
+
+var obj1 = { name: 'Tinkin', color: 'blue', logo: 'logo.png' };
+
+/* var list = [];
+
+for(var prop in obj1){
+  list.push(obj1[prop]);
+}
+
+console.log(list); */ // [ 'Tinkin', 'blue', 'logo.png' ]
+
+var list = Object.keys(obj1).map(key => obj1[key]);
+console.log(list)
+
+//----------------------------------
+
+const numbers = [2, 4, 9, 12, 22];
+
+for(let i = 0; i <= 4; i++){
+  setTimeout(
+    () => {
+      console.log(++numbers[i]);
+    }
+    , 1000);
+}
+
+//--------------------------------
 
 

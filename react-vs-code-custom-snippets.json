@@ -1,0 +1,49 @@
+{
+	// Place your snippets for javascript here. Each snippet is defined under a snippet name and has a prefix, body and 
+	// description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. Placeholders with the 
+	// same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+	"Redux Toolkit Store": {
+		"prefix": "rtk-store",
+		"body": [
+            "import { configureStore } from '@reduxjs/toolkit'",
+            "",
+            "export const store = configureStore({",
+            "    reducer: {",
+            "        //anything: anythingSlice.reducer,",
+            "    },",
+            "})",
+		],
+		"description": "Creates RTK Store"
+	},
+	"Redux Toolkit Slice": {
+		"prefix": "rtk-slice",
+		"body": [
+            "import { createSlice } from '@reduxjs/toolkit';",
+            "",
+            "export const templateSlice = createSlice({",
+            "    name: 'template',",
+            "    initialState: {",
+            "        anything: 10",
+            "    },",
+            "    reducers: {",
+            "        changeValue: (state, /* action */ ) => {",
+            "            state.anything += 1;",
+            "        },",
+            "    }",
+            "});",
+            "",
+			"export const { changeValue } = templateSlice.actions;",
+		],
+		"description": "Creates RTK Slices"
+	}
+}
