@@ -1,0 +1,92 @@
+Stack MERN: backend con Node.js, Express y MongoDB
+**************************************************
+
+Instalaciones adicionales
+-------------------------
+
+Instalar Dotenv:
+
+npm i dotenv
+
+Crear el proyecto Node.js (con definiciones por defecto)
+--------------------------------------------------------
+
+npm init -y
+
+Ejecución en Node.js
+--------------------
+
+Básica:
+
+node index.js
+
+Recomendada: (nodemon, solo para desarrollo)
+
+Instalar: npm i -D nodemon
+
+Configurar en package.json (puede ser cualquier archivo alternativo a index.js):
+
+"scripts": {
+  "dev": "nodemon index.js",
+  "start": "node index.js"
+},
+
+Para ejecutar (desarrollo):
+
+npm run dev
+
+Para ejecutar en producción:
+
+npm start
+
+Express
+-------
+
+Instalación:
+
+npm i express
+
+Express Validator
+-----------------
+
+Instalación:
+
+npm i express-validator
+
+
+Configurar MongoDB Atlas
+------------------------
+
+Ir a: https://www.mongodb.com
+
+Registrarse e iniciar sesión.
+
+Crear un cluster gratuito y con un nombre adecuado. Luego, instalar MongoDB Compass en el equipo.
+
+Ejecutar el programa y copiar el enlace del cluster provisto por MongoDB
+
+Crear un usuario autenticado por contraseña. Emplear los valores en el enlace de conexión:
+
+mongodb+srv://mern-user:Tr20010878@calendardb.vo4hsbs.mongodb.net
+
+Usarlo en el Compass.
+
+Mongoose
+--------
+
+Instalar:
+
+npm i mongoose
+
+
+
+
+
+
+
+
+
+
+
+
+
