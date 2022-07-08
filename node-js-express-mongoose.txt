@@ -78,6 +78,35 @@ Instalar:
 
 npm i mongoose
 
+JSON Web Token
+--------------
+
+Instalar:
+
+npm i jsonwebtoken
+
+Moment
+------
+
+Instalar:
+
+npm i moment
+
+
+Subir a Heroku
+--------------
+
+1. Crear app.
+2. Escoger Heroku Git.
+3. Si no está instalado, instalar el CLI.
+4. Proceder con:
+
+heroku login
+heroku git:remote -a <nombre-app-heroku>
+git push heroku master
+
+
+Termina exitosamente cuando se puede acceder al link.
 
 
 
