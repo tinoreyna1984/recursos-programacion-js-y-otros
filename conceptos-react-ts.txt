@@ -353,8 +353,10 @@ export const Formulario = () => {
 
 
 
-Contextos: useContext, createContext, ContextProvider
------------------------------------------------------
+Uso de contextos: useContext, createContext, ContextProvider (ejemplo de ToDo App)
+----------------------------------------------------------------------------------
+
+
 
 
 

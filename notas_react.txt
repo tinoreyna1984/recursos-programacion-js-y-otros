@@ -65,6 +65,21 @@ NOTA: para actualizar React, usar el siguiente comando:
 
 npm i -g react react-dom
 
+NOTA: instalar NodeJS y npm en Linux (en este caso, Ubuntu)
+-----------------------------------------------------------
+
+Ejecutar los comandos:
+
+NodeJS (v18):
+
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+sudo npm install -g npm@latest # actualiza npm
+node -v
+npm -v
+
+
+
 Crear proyecto en React JS - CRA
 ================================
 

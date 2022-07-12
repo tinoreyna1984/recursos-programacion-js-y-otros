@@ -1,0 +1,39 @@
+Bun
+***
+
+Entorno de ejecución alternativo a Node.js y Deno para JavaScript y Typescript.
+
+De momento es experimental.
+
+React con Bun
+=============
+
+Crear app típica de React con create-react-app
+----------------------------------------------
+
+Ejecutar:
+
+bun create react ./<nombre del proyecto>
+cd app
+bun dev # arranca el servidor de aplicación
+
+Errores comunes
+---------------
+
+"Error de io_uring" (WSL):
+
+Actualizar versión del kernel de Linux en WSL:
+
+wsl --update
+wsl --shutdown
+
+Desinstalar bun
+---------------
+
+Ejecutar desde $HOME:
+
+sudo unlink /home/tinoreyna1984/.bun/bin/bun
+rm -rf ./.bun
+
+
+
