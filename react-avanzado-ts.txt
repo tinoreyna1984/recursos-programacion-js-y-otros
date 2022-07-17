@@ -1,0 +1,904 @@
+React avanzado (React + Typescript)
+***********************************
+
+Crear proyecto
+==============
+
+Con CRA:
+
+npx create-react-app my-app --template typescript
+
+Con Vite:
+
+Emplear: npm create vite
+
+Genera la siguiente salida verbosa:
+
+√ Project name: ... vite-prueba <- ingresar nombre de proyecto
+√ Select a framework: » react <- seleccionar React
+√ Select a variant: » react-ts <- seleccionar React con Typescript
+
+Scaffolding project in E:\JavaScript\react\vite-prueba...
+
+Done. Now run:
+
+  cd vite-prueba
+  npm install
+  npm run dev
+
+El proyecto queda listo. Ejecutar los comandos indicados en la salida.
+
+Adicionalmente, instalar tipos de datos para Node (solo para desarrollo):
+
+npm install @types/node --save-dev
+
+
+Uso de Typescript en React
+==========================
+
+Tipado estricto:
+
+Counter.tsx:
+
+import { useState } from "react";
+
+// interfaz que define el tipo de los props
+interface Props {
+  initialValue?: number;
+}
+
+export const Counter = ({ initialValue = 0 }: Props) => {
+  const [counter, setCounter] = useState(initialValue);
+
+  const handleClick = (increment: number = 1) => {
+    setCounter((prev) => prev + increment);
+  };
+
+  return (
+    <>
+      <h1>Counter: {counter}</h1>
+
+      <button onClick={() => handleClick()}>+1</button>
+    </>
+  );
+};
+
+App.tsx:
+
+import { Counter } from "./bases/Counter";
+
+
+export default function App() {
+  return (
+    <>
+      <h1>React</h1>
+      <Counter initialValue={15} />
+    </>
+  );
+}
+
+
+Hooks
+=====
+
+useState
+--------
+
+Notar que se considera el tipado estricto de TS:
+
+import { useState } from "react";
+
+export const Counter = () => {
+  const valorInicial = 0;
+  const [counter, setCounter] = useState(valorInicial);
+
+  // TS - tipado estricto. En este caso no devuelve nada, pero el ingreso es un numero
+  const incrementar = (numero: number = 1): void => {
+    setCounter(counter + numero);
+  };
+
+  return (
+    <div className="mt-5">
+      <h3>useState - React + TS</h3>
+      <span>Valor: {counter}</span>
+      <br />
+      <button
+        className="btn btn-outline-light mt-2"
+        onClick={() => incrementar()}
+      >
+        +1
+      </button>
+      <button
+        className="btn btn-outline-light mt-2 ms-2"
+        onClick={() => incrementar(2)}
+      >
+        +2
+      </button>
+      <button
+        className="btn btn-outline-light mt-2 ms-2"
+        onClick={() => setCounter(valorInicial)}
+      >
+        +Borrar
+      </button>
+    </div>
+  );
+};
+
+
+Usuario.tsx:
+
+import { useState } from "react";
+
+// Tipado abstracto de TS - interface
+interface User {
+  uid: string;
+  name: string;
+}
+
+export const Usuario = () => {
+  const [user, setUser] = useState<User>(); // la interfaz aplica aqui
+
+  const login = () => {
+    setUser({
+      uid: "123456",
+      name: "Tino",
+    });
+  };
+
+  return (
+    <div className="mt-3">
+      <h3>Usuario: useState</h3>
+      <button className="btn btn-outline-primary" onClick={login}>
+        Login
+      </button>
+      {
+        (!user)
+        ? <pre className="mt-1">Presione Login</pre>
+        : <pre className="mt-1">{JSON.stringify(user)}</pre>
+      }
+    </div>
+  );
+};
+
+
+useEffect + useRef + custom props
+---------------------------------
+
+TimerPadre.tsx:
+
+import React from "react";
+import { Timer } from "./Timer";
+import { useState } from "react";
+
+/**
+ * Uso del useEffect y useRef
+ */
+
+export const TimerPadre = () => {
+  const [milisegundos, setMilisegundos] = useState(1000);
+
+  return (
+    <>
+      <span>Milisegundos: {milisegundos}</span>
+      <br />
+      <button
+        className="btn btn-primary me-2 mt-1 mb-1"
+        onClick={() => setMilisegundos(1000)}
+      >
+        1000
+      </button>
+      <button
+        className="btn btn-success mt-1 mb-1"
+        onClick={() => setMilisegundos(2000)}
+      >
+        2000
+      </button>
+      <Timer milisegundos={milisegundos} />
+    </>
+  );
+};
+
+
+Timer.tsx:
+
+import { useState, useEffect, useRef } from "react";
+
+type TimerArgs = {
+  milisegundos: number;
+};
+
+export const Timer = ({ milisegundos }: TimerArgs) => {
+  const [segundos, setSegundos] = useState(0);
+  const ref = useRef<any>();
+
+  useEffect(() => {
+    ref.current && clearInterval(ref.current);
+    ref.current = setInterval(() => {
+      setSegundos((s) => s + 1);
+    }, milisegundos);
+  }, [milisegundos]);
+
+  return (
+    <>
+      <h4>
+        Timer: <small>{segundos}</small>
+      </h4>
+    </>
+  );
+};
+
+
+useReducer
+----------
+
+ContadorRed.tsx:
+
+import { useReducer } from "react";
+
+/**
+ * Uso del useReducer y todo lo referente a cambios de estado esenciales
+ */
+
+const initialState = {
+  contador: 10,
+};
+
+// tipo de acción que se puede emitir (action.type)
+// tipado obligatorio para el payload
+type ActionType =
+  | { type: "incrementar" }
+  | { type: "decrementar" }
+  | { type: "custom"; payload: number };
+
+// notar que se usa el tipado de acciones
+const contadorReducer = (state: typeof initialState, action: ActionType) => {
+  switch (action.type) {
+    case "incrementar":
+      return {
+        ...state,
+        contador: state.contador + 1,
+      };
+
+    case "decrementar":
+      return {
+        ...state,
+        contador: state.contador - 1,
+      };
+
+    case "custom":
+      return {
+        ...state,
+        contador: action.payload,
+      };
+
+    default:
+      return state;
+  }
+};
+
+export const ContadorRed = () => {
+
+  //const [ contadorState, dispatch] = useReducer(contadorReducer, initialState);
+  const [{ contador }, dispatch] = useReducer(contadorReducer, initialState);
+
+  return (
+    <>
+      <h2>Contador: {contador}</h2>
+      <button
+        className="btn btn-outline-primary mt-1 mb-4 me-2"
+        onClick={() => dispatch({ type: "incrementar" })}
+      >
+        +1
+      </button>
+      <button
+        className="btn btn-outline-primary mt-1 mb-4 me-2"
+        onClick={() => dispatch({ type: "decrementar" })}
+      >
+        -1
+      </button>
+
+      <button
+        className="btn btn-outline-danger mt-1 mb-4"
+        onClick={() => dispatch({ type: "custom", payload: 100 })}
+      >
+        100
+      </button>
+    </>
+  );
+};
+
+
+Custom hooks
+------------
+
+FormData.ts:
+
+/**
+ * Interfaz es un concepto de Typescript
+ */
+
+export interface FormData {
+  email: string;
+  nombre: string;
+  edad: number;
+}
+
+useForm.ts:
+
+import { ChangeEvent, useState } from "react";
+
+// T se emplea para referenciar una interfaz definida
+// en el tipo de dato del objeto JSX
+export const useForm = <T extends Object>(initState: T) => {
+  const [formulario, setFormulario] = useState(initState);
+
+  // siempre es recomendado desestructurar el evento
+  //const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = target;
+    setFormulario({
+      ...formulario,
+      [name]: value,
+    });
+  };
+
+  return { formulario, handleChange, ...formulario };
+};
+
+Formulario.tsx:
+
+import { useForm } from "../hooks/useForm";
+import { FormData } from "./FormData";
+
+export const Formulario = () => {
+  const {email, nombre, edad, formulario, handleChange} = useForm<FormData>({
+    email: '',
+    nombre: '',
+    edad: 0
+  });
+
+  return (
+    <form autoComplete="off">
+      <div className="mb-3">
+        <label className="form-label">Email: </label>
+        <input
+          type="email"
+          className="form-control"
+          name="email"
+          placeholder="Email"
+          value={email}
+          onChange={handleChange}
+        />
+      </div>
+      <div className="mb-3">
+        <label className="form-label">Nombre: </label>
+        <input
+          type="text"
+          className="form-control"
+          name="nombre"
+          placeholder="Nombre"
+          value={nombre}
+          onChange={handleChange}
+        />
+      </div>
+      <div className="mb-3">
+        <label className="form-label">Edad: </label>
+        <input
+          type="number"
+          className="form-control"
+          name="edad"
+          placeholder="Edad"
+          value={edad}
+          onChange={handleChange}
+        />
+      </div>
+      <pre>{JSON.stringify(formulario)}</pre>
+    </form>
+  );
+};
+
+
+
+Uso de contextos: useContext, createContext, ContextProvider (ejemplo de ToDo App)
+----------------------------------------------------------------------------------
+
+TodoContext.tsx:
+
+import { createContext, useReducer } from "react";
+import { TodoState } from '../interfaces/interfaces';
+import { todoReducer } from "./todoReducer";
+
+// este tipo es importante para la definición del contexto
+// y también para el uso del contexto en otros puntos del app
+export type TodoContextProps = {
+    todoState: TodoState;
+    toggleTodo: ( id: string ) => void;
+} 
+
+// el contexto requiere inicialización (al menos un objeto vacío y tipado)
+// también requiere tipar el resultado
+export const TodoContext = createContext<TodoContextProps>({} as TodoContextProps );
+
+// Provider
+
+// nota: definir siempre la interfaz para el tipado correcto de los props
+// debe especificarse si se recibirá un elemento o más
+interface props {
+  children: JSX.Element | JSX.Element[];
+}
+
+// estado inicial (es requerido)
+const INITIAL_STATE: TodoState = {
+    todoCount: 2,
+    todos: [
+        {
+            id: '1',
+            desc: 'Recolectar las piedras del infinito',
+            completed: false
+        },
+        {
+            id: '2',
+            desc: 'Piedra del alma',
+            completed: false
+        },
+    ],
+    completed: 0,
+    pending: 2
+}
+
+// tipar los props desestructurados
+export const TodoProvider = ({ children }: props) => {
+
+  const [todoState, dispatch] = useReducer(todoReducer, INITIAL_STATE);
+
+  const toggleTodo = ( id: string ) => {
+    dispatch({ type: 'toggleTodo', payload: { id } })
+  }
+
+  return (<TodoContext.Provider value={{ todoState, toggleTodo }}>
+    {children}
+  </TodoContext.Provider>);
+};
+
+
+Todo.tsx:
+
+import { Title } from "./components/Title";
+import { TodoList } from "./components/TodoList";
+import { TodoProvider } from "./context/TodoContext";
+
+export const Todo = () => {
+  return (
+    <TodoProvider>
+      <Title />
+      <TodoList />
+    </TodoProvider>
+  );
+};
+
+useTodos.ts:
+
+import { useContext } from 'react';
+import { TodoContext } from '../context/TodoContext';
+
+export const useTodos = () => {
+
+    const { todoState, toggleTodo } = useContext( TodoContext );
+    const { todos } = !!todoState && todoState;
+
+    return {
+        todos: todos,
+        pendingTodos: !!todos && todos.filter( todo => !todo.completed ).length,
+        toggleTodo
+    }
+}
+
+
+Manejo de estado con useReducer con tipado estricto y action creators
+---------------------------------------------------------------------
+
+CounterReducerComponent.tsx:
+
+import { useReducer } from "react";
+import { doDecreaseBy, doIncreaseBy, doReset } from "./actions/actions";
+import { CounterState } from "./interfaces/interfaces";
+import { counterReducer } from "./state/counterReducer";
+
+/**
+ * Se usa un tipo cuando queremos una definición fija de un objeto
+ * Se usa una interfaz si queremos agregar progresivamente alguna propiedad al objeto de turno
+ */
+
+// estado inicial (tipado)
+const INITIAL_STATE: CounterState = {
+  counter: 0,
+  previous: 0,
+  changes: 0,
+}
+
+export const CounterReducerComponent = () => {
+
+  // en este caso todo funciona como si fuese hecho en JavaScript
+  // los tipados están afectando a las definiciones previas
+  const [state, dispatch] = useReducer(counterReducer, INITIAL_STATE)
+
+  // recordar que se debe tipar el argumento de la función
+  const handleClick = (increment: number = 1) => {
+    dispatch(doIncreaseBy(increment)); // el dispatch usa un action creator (ver actions/actions.ts)
+  };
+
+  const handleReset = () => {
+    dispatch(doReset()) // el dispatch usa un action creator (ver actions/actions.ts)
+  }
+
+  const handleDecrement = (decrement: number = 1) => {
+    dispatch(doDecreaseBy(decrement)) // el dispatch usa un action creator (ver actions/actions.ts)
+  }
+
+  return (
+    <>
+      <h1>Counter Reducer Segmentado: {state.counter}</h1>
+      <pre>{JSON.stringify(state, null, 2)}</pre>
+
+      <button onClick={() => handleClick()}>+1</button>
+      <button onClick={() => handleClick(5)}>+5</button>
+      <button onClick={() => handleReset()}>Reset</button>
+      <button onClick={() => handleDecrement()}>-1</button>
+    </>
+  );
+};
+
+counterReducer.ts:
+
+// el state y el action deben estar tipados (notar las interfaces)
+
+import { CounterAction } from "../actions/actions";
+import { CounterState } from "../interfaces/interfaces";
+
+// lo demás es igual que siempre
+export const counterReducer = (state: CounterState, action: CounterAction): CounterState => {
+  switch(action.type) {
+    case 'increaseBy':
+      return {
+        ...state,
+        counter: state.counter + action.payload.value,
+        previous: state.counter,
+        changes: state.changes + 1,
+      }
+    case 'decreaseBy':
+      return {
+        ...state,
+        counter: state.counter - action.payload.value,
+        previous: state.counter,
+        changes: state.changes + 1,
+      }
+    case 'reset':
+      return {
+        ...state,
+        counter: 0,
+        previous: 0,
+        changes: 0,
+      }
+    default:
+      return state;
+  }
+}
+
+interfaces.ts:
+
+export  interface CounterState {
+  counter: number;
+  previous: number;
+  changes: number;
+}
+
+actions.ts:
+
+export type CounterAction =
+| {type: 'increaseBy', payload: { value: number } }
+| {type: 'decreaseBy', payload: { value: number } }
+| {type: 'reset'}
+
+// action creators - creadores de acciones
+// sirve para despachar las acciones a los reducers por medio de funciones
+// tiene una semejanza a lo que se usa en Redux, lo cual es más comprensible
+export const doReset = (): CounterAction => ({type: 'reset'});
+export const doIncreaseBy = (value: number): CounterAction => ({type: 'increaseBy', payload: {value}});
+export const doDecreaseBy = (value: number): CounterAction => ({type: 'decreaseBy', payload: {value}});
+
+Los action creators permiten un despacho de acciones más limpio. Por ejemplo, en lugar de:
+
+dispatch({type: 'increaseBy', payload: {value}});
+
+Usamos el action creator:
+
+export const doIncreaseBy = (value: number): CounterAction => ({type: 'increaseBy', payload: {value}});
+
+Así:
+
+dispatch(doIncreaseBy(increment));
+
+Esto tiene semejanza al despacho de acciones y thunks del Redux.
+
+Lazy Load
+=========
+
+Forma tradicional de cargar componentes
+---------------------------------------
+
+Navigation.tsx:
+
+import { BrowserRouter, Routes, Route, NavLink, Navigate } from "react-router-dom";
+import { LazyPage01 } from "../01-lazy-load/pages/LazyPage01";
+import { LazyPage02 } from "../01-lazy-load/pages/LazyPage02";
+import { LazyPage03 } from "../01-lazy-load/pages/LazyPage03";
+
+import logo from "../logo.svg";
+
+export const Navigation = () => {
+  return (
+    <BrowserRouter>
+      <div className="main-layout">
+        <nav>
+          <img src={logo} alt="logo" />
+          <ul>
+            <li>
+              <NavLink to="/lazy1" className={({isActive}) => isActive ? 'nav-active' : ''}>Home</NavLink>
+            </li>
+            <li>
+              <NavLink to="/lazy2" className={({isActive}) => isActive ? 'nav-active' : ''}>About</NavLink>
+            </li>
+            <li>
+              <NavLink to="/lazy3" className={({isActive}) => isActive ? 'nav-active' : ''}>Users</NavLink>
+            </li>
+          </ul>
+        </nav>
+        <Routes>
+            <Route path="lazy1" element={<LazyPage01 />} />
+            <Route path="lazy2" element={<LazyPage02 />} />
+            <Route path="lazy3" element={<LazyPage03 />} />
+            <Route path='/*' element={<Navigate to='lazy1' replace />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
+  );
+};
+
+App.tsx:
+
+import { Navigation } from "./routes/Navigation";
+
+export default function App() {
+  return (
+    <>
+     <Navigation />
+    </>
+  );
+}
+
+Ruteo tradcional reducido:
+
+routes.ts:
+
+import { LazyPage01 } from "../01-lazy-load/pages/LazyPage01";
+import { LazyPage02 } from "../01-lazy-load/pages/LazyPage02";
+import { LazyPage03 } from "../01-lazy-load/pages/LazyPage03";
+
+interface Route {
+    to: string;
+    path: string;
+    Component: () => JSX.Element;
+    name: string;
+}
+
+export const routes: Route[] = [
+  { to: "/lazy1", path: "lazy1", Component: LazyPage01, name: "Lazy-1" },
+  { to: "/lazy2", path: "lazy2", Component: LazyPage02, name: "Lazy-2" },
+  { to: "/lazy3", path: "lazy3", Component: LazyPage03, name: "Lazy-3" },
+];
+
+Navigation.tsx:
+
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  NavLink,
+  Navigate,
+} from "react-router-dom";
+import { routes } from "./routes";
+
+import logo from "../logo.svg";
+
+export const Navigation = () => {
+  return (
+    <BrowserRouter>
+      <div className="main-layout">
+        <nav>
+          <img src={logo} alt="logo" />
+          <ul>
+            {routes.map(({ to, name }) => (
+              <li key={to}>
+                <NavLink
+                  to={to}
+                  className={({ isActive }) => (isActive ? "nav-active" : "")}
+                >
+                  {name}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <Routes>
+          {routes.map(({ to, path, Component }) => (
+            <Route key={to} path={path} element={<Component />} />
+          ))}
+          <Route path="/*" element={<Navigate to={routes[0].to} replace />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
+  );
+};
+
+No supone ninguna novedad en el desarrollo del ruteo. Sin embargo, es más fácil de mantener.
+
+Lazy Load básico (React.lazy y Suspense)
+----------------------------------------
+
+routes.ts:
+
+import { lazy, LazyExoticComponent } from "react";
+
+type JSXComponent = () => JSX.Element;
+
+interface Route {
+    to: string;
+    path: string;
+    Component: LazyExoticComponent<JSXComponent> | JSXComponent;
+    name: string;
+}
+
+// lazy load con React.lazy()
+const Lazy01 = lazy(() => import(/* webpackChunkName: "LazyLoad01" */ "../01-lazy-load/pages/LazyPage01"));
+const Lazy02 = lazy(() => import(/* webpackChunkName: "LazyLoad02" */ "../01-lazy-load/pages/LazyPage02"));
+const Lazy03 = lazy(() => import(/* webpackChunkName: "LazyLoad03" */ "../01-lazy-load/pages/LazyPage03"));
+
+export const routes: Route[] = [
+  { to: "/lazy1", path: "lazy1", Component: Lazy01, name: "Lazy-1" },
+  { to: "/lazy2", path: "lazy2", Component: Lazy02, name: "Lazy-2" },
+  { to: "/lazy3", path: "lazy3", Component: Lazy03, name: "Lazy-3" },
+];
+
+Se usa React.lazy para hacer la carga perezosa con el fin de hacer más rápida la llamada al componente invocado. El requerimiento es que el componente funcional haya sido exportado por defecto (export default), como por ejemplo:
+
+import React from 'react'
+
+const LazyPage01 = () => {
+  return (
+    <div><h1>LazyPage01</h1></div>
+  )
+}
+
+export default LazyPage01;
+
+Para fines de métrica, se incluye al inicio de la invocación el nombramiento personalizado del chunk, por ejemplo:
+
+/* webpackChunkName: "" */
+
+En el navegador, se encontrará un componente como LazyLoad01.chunk para verificar su desempeño.
+
+Pero para que funcione el lazy load, en el archivo que llama a los componentes se debe emplear el componente Suspense:
+
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  NavLink,
+  Navigate,
+} from "react-router-dom";
+import { routes } from "./routes";
+import logo from "../logo.svg";
+import { Suspense } from "react";
+
+export const Navigation = () => {
+  return (
+    <Suspense fallback={<span>Loading</span>}>
+      <BrowserRouter>
+        <div className="main-layout">
+          <nav>
+            <img src={logo} alt="logo" />
+            <ul>
+              {routes.map(({ to, name }) => (
+                <li key={to}>
+                  <NavLink
+                    to={to}
+                    className={({ isActive }) => (isActive ? "nav-active" : "")}
+                  >
+                    {name}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <Routes>
+            {routes.map(({ to, path, Component }) => (
+              <Route key={to} path={path} element={<Component />} />
+            ))}
+            <Route path="/*" element={<Navigate to={routes[0].to} replace />} />
+          </Routes>
+        </div>
+      </BrowserRouter>
+    </Suspense>
+  );
+};
+
+La prop fallback incluye un componente de espera, esto es, lo que se visualizará en el navegador durante el proceso de carga.
+
+Rutas anidadas
+--------------
+
+routes.ts:
+
+import { lazy, LazyExoticComponent } from "react";
+//import LazyLayout from "../01-lazy-load/layout/LazyLayout";
+import { NoLazyComponent } from "../01-lazy-load/pages/NoLazyComponent";
+
+type JSXComponent = () => JSX.Element;
+
+interface Route {
+    to: string;
+    path: string;
+    Component: LazyExoticComponent<JSXComponent> | JSXComponent;
+    name: string;
+}
+
+// lazy load con React.lazy()
+const LazyLayout = lazy(() => import(/* webpackChunkName: "LazyLayout" */ "../01-lazy-load/layout/LazyLayout"));
+
+export const routes: Route[] = [
+  // se indica una ruta padre para las rutas que serán cargadas como lazy load
+  { to: "/lazyload/", path: "/lazyload/*", Component: LazyLayout, name: "Lazy Layout" },
+  { to: "/no-lazy", path: "no-lazy", Component: NoLazyComponent, name: "No Lazy" },
+];
+
+Se requiere de una ruta con lazy load como base y una nueva definición de sub-rutas como se indica en el primer elemento del arreglo.
+
+LazyLayout.tsx:
+
+import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
+import LazyPage01 from '../pages/LazyPage01';
+import LazyPage02 from '../pages/LazyPage02';
+import LazyPage03 from '../pages/LazyPage03';
+
+const LazyLayout = () => {
+  return (
+    <div>
+        <h1>Lazy Layout</h1>
+        {/* Diseño de las páginas con lazy load */}
+        <ul>
+            <li><NavLink to="lazy1">Lazy 01</NavLink></li>
+            <li><NavLink to="lazy2">Lazy 02</NavLink></li>
+            <li><NavLink to="lazy3">Lazy 03</NavLink></li>
+        </ul>
+        {/* Rutas de las páginas con lazy load */}
+        <Routes>
+          <Route path="lazy1" element={<LazyPage01 />} />
+          <Route path="lazy2" element={<LazyPage02 />} />
+          <Route path="lazy3" element={<LazyPage03 />} />
+
+          <Route path="*" element={<Navigate replace to='lazy1' />} />
+        </Routes>
+    </div>
+  )
+}
+
+export default LazyLayout;
+
+
+Patrones de desarrollo de componentes
+=====================================
+
+
+
+
+

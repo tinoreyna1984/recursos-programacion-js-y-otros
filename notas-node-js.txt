@@ -1,0 +1,24 @@
+Node.js
+*******
+
+Básico
+------
+
+Crear proyecto Node:
+
+npm init -y # forma directa (no interactiva)
+
+Usar paquetes importantes:
+
+npm i nodemon -D
+
+npm i express cors
+
+App en consola - Inquirer
+-------------------------
+
+Instalar Inquirer:
+
+npm i inquirer
+
+
