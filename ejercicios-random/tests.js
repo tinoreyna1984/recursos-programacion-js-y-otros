@@ -133,4 +133,34 @@ for(let i = 0; i <= 4; i++){
 
 //--------------------------------
 
+function find_max(nums) {
+	let max_num = Number.NEGATIVE_INFINITY; // smaller than all other numbers
+		for (let num of nums) {
+			if (num > max_num) {
+				max_num = num;
+			}
+		}
+	return max_num;
+}
+
+const nums = [5,4,10,2,6];
+console.log(find_max(nums));
+//--------------------------------
+
+console.log(
+  (()=> {
+  console.log(12)
+  return 5
+  })())
+
+//------------------------
+
+var text = 'outside';
+
+function logIt(){
+  console.log(text);
+  var text = 'inside';
+}
+logIt();
+
 

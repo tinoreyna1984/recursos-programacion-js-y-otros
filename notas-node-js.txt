@@ -1,8 +1,19 @@
 Node.js
 *******
 
+Instalación de React JS
+=======================
+
+Para hacer la instalación de ReactJS vamos a seguir estos sencillos pasos:
+
+Paso 1. Instalar NodeJS en su ultima versión, para eso entraremos a su web oficial y descargaremos el instalador más actualizado https://nodejs.org/es/
+
+Paso 2. Actualizar NPM, el gestor de paquetes de node, para bajarnos las dependencias más actuales:
+
+npm i -g npm@latest
+
 Básico
-------
+======
 
 Crear proyecto Node:
 
@@ -14,11 +25,1086 @@ npm i nodemon -D
 
 npm i express cors
 
+npm i colors # segun fernando herrera
+
 App en consola - Inquirer
--------------------------
+=========================
 
 Instalar Inquirer:
 
-npm i inquirer
+npm i inquirer@8.0.0
+
+Uso básico:
+
+inquirer.js:
+
+require("colors");
+const inquirer = require("inquirer");
+
+// arreglo de opciones a escoger en el menu inquirer
+const menuOpts = [
+  {
+    type: "list",
+    name: "opcion",
+    message: "Que desea hacer?",
+    choices: [
+      { value: "1", name: "1. Crear tarea".green },
+      { value: "2", name: "2. Listar tareas".blue },
+      { value: "3", name: "3. Listar tareas terminadas".blue },
+      { value: "4", name: "4. Listar tareas pendientes".blue },
+      { value: "5", name: "5. Completar tareas".green },
+      { value: "6", name: "6. Borrar tarea".red },
+      { value: "0", name: "0. Salir".bgYellow },
+    ],
+  },
+];
+
+const pausa = async (msg) => {
+  const question = [
+    {
+      type: "input",
+      name: "enter",
+      message: msg,
+    },
+  ];
+  await inquirer.prompt(question);
+};
+
+// menu de opciones con inquirer
+const inquirerMenu = async () => {
+  console.clear();
+  console.log("==========================".bgMagenta.bold);
+  console.log("  Seleccione una opción   ".bgMagenta);
+  console.log("==========================\n".bgMagenta.bold);
+
+  const { opcion } = await inquirer.prompt(menuOpts);
+
+  return opcion;
+};
+
+module.exports = {
+  inquirerMenu,
+  pausa,
+};
+
+index.js:
+
+require("colors");
+const {
+  inquirerMenu,
+  pausa,
+} = require("./helpers/inquirer");
+console.clear();
+
+
+// función principal
+const main = async () => {
+  let opt = "";
+  
+  do {
+    opt = await inquirerMenu();
+
+    switch (opt) {
+      case "1":
+	    // definir qué hacer
+        break;
+      case "2":
+	    // definir qué hacer
+        break;
+      case "3":
+	    // definir qué hacer
+        break;
+      case "4":
+	    // definir qué hacer
+        break;
+      case "5":
+	    // definir qué hacer
+        break;
+      case "6":
+	    // definir qué hacer
+        break;
+      case "0":
+	    // definir qué hacer
+        break;
+      default:
+        console.log("Opción no valida".red);
+        break;
+    }
+
+    await pausa("\nPresione tecla para continuar");
+  } while (opt !== "0");
+};
+
+main();
+
+Express
+=======
+
+Es el framework más usado para desarrollar aplicaciones web del lado del servidor.
+
+Ejemplo básico:
+
+index.js:
+
+const express = require("express");
+const cors = require("cors");
+
+const app = express();
+const port = 4000;
+
+// CORS
+app.use(cors());
+
+// Rutas
+
+// endpoint principal de prueba (ver en navegador)
+app.get("/", (req, res) => {
+  res.send("Habla, causa!");
+});
+
+// error 404
+app.use('*', (req, res) => {
+    res.status(404).send("404 not found");
+});
+
+// oyente de peticiones
+app.listen(port, () => {
+  console.log(`Estoy oyendo peticiones en el puerto ${port}`);
+});
+
+
+Servir contenido estático
+-------------------------
+
+1. Crear una carpeta pública y un archivo de inicio en HTML:
+
+public/index.html:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+</html>
+
+2. Configurar:
+
+// Servir contenido estático
+app.use(express.static("public"));
+
+Servir un sitio web completo
+----------------------------
+
+1. Considerando un conjunto de sitios previo, configurar:
+
+
+app.get('/generic', (req, res) => {
+    res.status(200).sendFile(__dirname + "/public/generic.html");
+});
+
+app.get('/elements', (req, res) => {
+    res.status(200).sendFile(__dirname + "/public/elements.html");
+});
+
+// error 404
+app.get('*', (req, res) => {
+    res.status(404).sendFile(__dirname + "/public/404notfound.html");
+});
+
+
+2. Configurar:
+
+// Servir contenido estático
+app.use(express.static("public"));
+
+
+Handlebars para Express
+-----------------------
+
+1. Instalar:
+
+npm install hbs
+
+2. Configurar:
+
+index.js:
+
+// hbs
+app.set('view engine', 'hbs');
+
+3. Crear vistas:
+
+En este caso, se aprovechará el conjunto de vistas creadas como archivos con extensión hbs. Deben estar en una carpeta llamada views (desde la raíz). Por ejemplo:
+
+views/home.hbs:
+
+<!DOCTYPE HTML>
+<!--
+	Road Trip by TEMPLATED
+	templated.co @templatedco
+	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+-->
+<html>
+	<head>
+		<title>Title</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+	</head>
+	<body>
+
+		<!-- Header -->
+			<header id="header">
+				<div class="logo"><a href="index.html">Road Trip <span>by TEMPLATED</span></a></div>
+				<a href="#menu"><span>Menu</span></a>
+			</header>
+
+		<!-- Nav -->
+			<nav id="menu">
+				<ul class="links">
+					<li><a href="index.html">Home</a></li>
+					<li><a href="generic.html">Generic</a></li>
+					<li><a href="elements.html">Elements</a></li>
+				</ul>
+			</nav>
+
+		<!-- Banner -->
+		<!--
+			Note: To show a background image, set the "data-bg" attribute below
+			to the full filename of your image. This is used in each section to set
+			the background image.
+		-->
+			<section id="banner" class="bg-img" data-bg="banner.jpg">
+				<div class="inner">
+					<header>
+						<h1>This is Road Trip</h1>
+					</header>
+				</div>
+				<a href="#one" class="more">Learn More</a>
+			</section>
+
+		<!-- One -->
+			<section id="one" class="wrapper post bg-img" data-bg="banner2.jpg">
+				<div class="inner">
+					<article class="box">
+						<header>
+							<h2>Nibh non lobortis mus nibh</h2>
+							<p>01.01.2017</p>
+						</header>
+						<div class="content">
+							<p>Scelerisque enim mi curae erat ultricies lobortis donec velit in per cum consectetur purus a enim platea vestibulum lacinia et elit ante scelerisque vestibulum. At urna condimentum sed vulputate a duis in senectus ullamcorper lacus cubilia consectetur odio proin sociosqu a parturient nam ac blandit praesent aptent. Eros dignissim mus mauris a natoque ad suspendisse nulla a urna in tincidunt tristique enim arcu litora scelerisque eros suspendisse.</p>
+						</div>
+						<footer>
+							<a href="generic.html" class="button alt">Learn More</a>
+						</footer>
+					</article>
+				</div>
+				<a href="#two" class="more">Learn More</a>
+			</section>
+
+		<!-- Two -->
+			<section id="two" class="wrapper post bg-img" data-bg="banner5.jpg">
+				<div class="inner">
+					<article class="box">
+						<header>
+							<h2>Mus elit a ultricies at</h2>
+							<p>12.21.2016</p>
+						</header>
+						<div class="content">
+							<p>Scelerisque enim mi curae erat ultricies lobortis donec velit in per cum consectetur purus a enim platea vestibulum lacinia et elit ante scelerisque vestibulum. At urna condimentum sed vulputate a duis in senectus ullamcorper lacus cubilia consectetur odio proin sociosqu a parturient nam ac blandit praesent aptent. Eros dignissim mus mauris a natoque ad suspendisse nulla a urna in tincidunt tristique enim arcu litora scelerisque eros suspendisse.</p>
+						</div>
+						<footer>
+							<a href="generic.html" class="button alt">Learn More</a>
+						</footer>
+					</article>
+				</div>
+				<a href="#three" class="more">Learn More</a>
+			</section>
+
+		<!-- Three -->
+			<section id="three" class="wrapper post bg-img" data-bg="banner4.jpg">
+				<div class="inner">
+					<article class="box">
+						<header>
+							<h2>Varius a cursus aliquet</h2>
+							<p>11.11.2016</p>
+						</header>
+						<div class="content">
+							<p>Scelerisque enim mi curae erat ultricies lobortis donec velit in per cum consectetur purus a enim platea vestibulum lacinia et elit ante scelerisque vestibulum. At urna condimentum sed vulputate a duis in senectus ullamcorper lacus cubilia consectetur odio proin sociosqu a parturient nam ac blandit praesent aptent. Eros dignissim mus mauris a natoque ad suspendisse nulla a urna in tincidunt tristique enim arcu litora scelerisque eros suspendisse.</p>
+						</div>
+						<footer>
+							<a href="generic.html" class="button alt">Learn More</a>
+						</footer>
+					</article>
+				</div>
+				<a href="#four" class="more">Learn More</a>
+			</section>
+
+		<!-- Four -->
+			<section id="four" class="wrapper post bg-img" data-bg="banner3.jpg">
+				<div class="inner">
+					<article class="box">
+						<header>
+							<h2>Luctus blandit mi lectus in nascetur</h2>
+							<p>10.30.2016</p>
+						</header>
+						<div class="content">
+							<p>Scelerisque enim mi curae erat ultricies lobortis donec velit in per cum consectetur purus a enim platea vestibulum lacinia et elit ante scelerisque vestibulum. At urna condimentum sed vulputate a duis in senectus ullamcorper lacus cubilia consectetur odio proin sociosqu a parturient nam ac blandit praesent aptent. Eros dignissim mus mauris a natoque ad suspendisse nulla a urna in tincidunt tristique enim arcu litora scelerisque eros suspendisse.</p>
+						</div>
+						<footer>
+							<a href="generic.html" class="button alt">Learn More</a>
+						</footer>
+					</article>
+				</div>
+			</section>
+
+		<!-- Footer -->
+			<footer id="footer">
+				<div class="inner">
+
+					<h2>Contact Me</h2>
+
+					<form action="#" method="post">
+
+						<div class="field half first">
+							<label for="name">Name</label>
+							<input name="name" id="name" type="text" placeholder="Name">
+						</div>
+						<div class="field half">
+							<label for="email">Email</label>
+							<input name="email" id="email" type="email" placeholder="Email">
+						</div>
+						<div class="field">
+							<label for="message">Message</label>
+							<textarea name="message" id="message" rows="6" placeholder="Message"></textarea>
+						</div>
+						<ul class="actions">
+							<li><input value="Send Message" class="button alt" type="submit"></li>
+						</ul>
+					</form>
+
+					<ul class="icons">
+						<li><a href="#" class="icon round fa-twitter"><span class="label">Twitter</span></a></li>
+						<li><a href="#" class="icon round fa-facebook"><span class="label">Facebook</span></a></li>
+						<li><a href="#" class="icon round fa-instagram"><span class="label">Instagram</span></a></li>
+					</ul>
+
+					<div class="copyright">
+						&copy; Untitled. Design: <a href="https://templated.co">TEMPLATED</a>. Images: <a href="https://unsplash.com">Unsplash</a>.
+					</div>
+
+				</div>
+			</footer>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/skel.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
+
+4. Pasar argumentos para renderización:
+
+index.js:
+
+// Rutas
+app.get('/', (req, res) => {
+    res.render('home', {titulo: "Principal"});
+});
+
+app.get('/generic', (req, res) => {
+    res.render('generic', {titulo: "Generic"});
+});
+
+app.get('/elements', (req, res) => {
+    res.render('elements', {titulo: "Elements"});
+});
+
+
+Usando partials con HBS
+-----------------------
+
+index.js:
+
+const hbs = require("hbs");
+
+// hbs
+app.set('view engine', 'hbs');
+hbs.registerPartials(__dirname + '/views/partials', e => console.log(e)); // registrar partials
+
+Distribuir porciones de código HTML:
+
+views/partials/header.hbs:
+
+<header id="header">
+  <div class="logo"><a href="index.html">Road Trip <span>by TEMPLATED</span></a></div>
+  <a href="#menu"><span>Menu</span></a>
+</header>
+
+
+home.hbs:
+
+<html>
+	<head>
+		<title>{{titulo}}</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+	</head>
+	<body>
+
+		<!-- Header -->
+		{{> header}}
+
+		<!-- ... -->
+
+	</body>
+</html>
+
+
+REST Server con Node.js y Express
+=================================
+
+Estructura recomendada (basada en MVC)
+--------------------------------------
+
+(Se excluye node_modules)
+
+> proyecto
+--> controllers
+--> database
+--> etc
+--> helpers
+--> middlewares
+--> models
+--> public
+--> routes
+--> server
+.env
+.gitignore
+index.js
+package.json
+package-lock.json
+README.md
+
+Express basado en clases
+------------------------
+
+server/server.js:
+
+const express = require("express");
+const cors = require("cors");
+const { dbConnection } = require("../database/config");
+
+class server {
+  constructor() {
+    this.app = express();
+    this.port = process.env.PORT || 4000;
+    this.usuariosPath = '/api/usuarios';
+
+    // conectar a bases de datos
+    this.conectarDB();
+
+    // middlewares
+    this.middlewares();
+
+    // rutas de mi aplicacion
+    this.routes();
+  }
+
+  // conexion a bases de datos
+  async conectarDB() {
+    await dbConnection();
+  }
+
+  middlewares() {
+    // CORS
+    this.app.use(cors());
+    // lectura y parseo del cuerpo
+    this.app.use(express.json());
+    // public
+    this.app.use(express.static("public"));
+  }
+
+  routes() {
+
+    this.app.use(this.usuariosPath, require('../routes/usuarios'));
+
+  }
+
+  listen() {
+    this.app.listen(this.port, () => {
+      console.log(`Servidor ejecutandose en el puerto ${this.port}`);
+    });
+  }
+}
+
+module.exports = server;
+
+Consideraciones:
+
+- El API REST debe iniciar donde está especificado en la clase: <dirección del host>/api/usuarios
+- Las claves deben encriptarse.
+
+index.js:
+
+require('dotenv').config();
+const Server = require('./server/server');
+
+const server = new Server();
+
+server.listen();
+
+
+Página de inicio referencial
+----------------------------
+
+public/index.html:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Denegado</title>
+</head>
+<body>
+    <h1>Acceso denegado</h1>
+</body>
+</html>
+
+
+Conexión con el esquema MongoDB
+-------------------------------
+
+Primeramente, crear el esquema remotamente en railway.app:
+
+Dashboard -> New Project -> Provision MongoDB
+
+Nota: se debe crear un esquema MongoDB por proyecto. En el mismo solo se puede crear un esquema, debido al uso del cluster gratuito basado en Mongo Atlas.
+
+Luego, en el esquema creado, acceder al esquema creado e ir a la ventana Settings. En ella, ir a la sección Variables.
+Copiar todas las variables de entorno y emplearlas en un archivo de configuración (.env):
+
+# REST API server
+PORT=8080
+
+# MongoDB
+MONGO_CNN=mongodb://mongo:34rvHUg30XkDoXC1D0ME@containers-us-west-84.railway.app:6634
+MONGOHOST=containers-us-west-84.railway.app
+MONGOPASSWORD=34rvHUg30XkDoXC1D0ME
+MONGOUSER=mongo
+MONGOPORT=6634
+
+Instalar dotenv: npm i dotenv
+
+Crear un archivo de configuración:
+
+database/config.js:
+
+const mongoose = require('mongoose');
+
+const dbConnection = async () => {
+    try {
+        await mongoose.connect(process.env.MONGO_CNN, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            //useCreateIndex: true,
+            //useFindAndModify: false,
+        });
+        console.log('Conectado a la base de datos');
+    } catch (error) {
+        console.log('Connection error: ', error.message);
+    }
+}
+
+module.exports = {
+    dbConnection,
+};
+
+Orden de desarrollo
+-------------------
+
+1. Definición de variables de entorno y conexión a BD.
+2. Creación del servidor y archivo principal de ejecución.
+3. Configuración de modelos y rutas.
+4. Controladores.
+
+Rutas y validaciones
+--------------------
+
+routes/usuarios.js:
+
+const { Router } = require("express");
+const { check } = require("express-validator");
+const {
+  usuariosGet,
+  usuariosPut,
+  usuariosPost,
+  usuariosPatch,
+  usuariosDelete,
+} = require("../controllers/usuarios");
+const {
+  esRoleValido,
+  emailExiste,
+  existeUsuarioPorId,
+} = require("../helpers/db-validators");
+const { validarCampos } = require("../middlewares/validar-campos");
+
+const router = Router();
+
+// el segundo argumento en las rutas es el uso del middleware
+// a partir de express-validator
+
+router.get("/", usuariosGet);
+
+router.put("/:id",
+  [
+    check("id", "El ID no es válido").isMongoId(),
+    check("id").custom(existeUsuarioPorId),
+    check("rol").custom(esRoleValido),
+    validarCampos
+  ],
+  usuariosPut
+);
+
+router.post("/",
+  [
+    check("nombre", "El nombre es obligatorio").not().isEmpty(),
+    check("password","El password es obligatorio, 6 caracteres mínimo").isLength({ min: 6 }),
+    check("correo", "El correo no es válido").isEmail(),
+    check("correo").custom(emailExiste),
+    check("rol").custom(esRoleValido),
+    validarCampos,
+  ],
+  usuariosPost
+);
+
+router.patch("/", usuariosPatch);
+
+router.delete("/:id",
+  [
+    check("id", "El ID no es válido").isMongoId(),
+    check("id").custom(existeUsuarioPorId),
+    validarCampos,
+  ],
+  usuariosDelete
+);
+
+module.exports = router;
+
+middlewares/validar-campos.js:
+
+const { validationResult } = require("express-validator");
+
+const validarCampos = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json(errors);
+  }
+
+  next();
+};
+
+module.exports = {
+  validarCampos,
+};
+
+helpers/db-validators.js:
+
+const mongoose = require("mongoose");
+const Role = require("../models/role");
+const Usuario = require("../models/usuario");
+
+const esRoleValido = async (rol = "") => {
+  const existeRol = await Role.findOne({ rol });
+  if (!existeRol) {
+    throw new Error(`El rol ${rol} no es válido`);
+  }
+};
+
+const emailExiste = async (correo = "") => {
+  // verificar si el correo existe
+  const existeEmail = await Usuario.findOne({ correo });
+  if (existeEmail) {
+    throw new Error(`El correo ${correo} ya existe`);
+  }
+};
+
+const existeUsuarioPorId = async (id) => {
+  // verificar si el ID existe
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new Error(`El ID no es válido en Mongoose`);
+  }
+
+  const existeUsuario = await Usuario.findById(id);
+
+  if (!existeUsuario) {
+    throw new Error(`El usuario con ID '${id}' no existe`);
+  }
+};
+
+module.exports = {
+  esRoleValido,
+  emailExiste,
+  existeUsuarioPorId,
+};
+
+
+Modelos
+-------
+
+models/usuario.js:
+
+const { Schema, model } = require('mongoose');
+
+const UsuarioSchema = Schema({
+    nombre: {
+        type: String,
+        required: [true, 'El nombre es obligatorio']
+    },
+    correo: {
+        type: String,
+        required: [true, 'El correo es obligatorio'],
+        unique: true
+    },
+    password: {
+        type: String,
+        required: [true, 'La contraseña es obligatoria'],
+        unique: true
+    },
+    img: {
+        type: String,
+    },
+    rol: {
+        type: String,
+        required: true,
+        enum: ['ADMIN_ROLE', 'USER_ROLE'],
+    },
+    estado: {
+        type: Boolean,
+        default: true
+    },
+    google: {
+        type: Boolean,
+        default: false
+    }
+});
+
+// remover version del documento y password
+UsuarioSchema.methods.toJSON = function() {
+    const {__v, password, _id, ...usuario } = this.toObject();
+    usuario.uid = _id; // es solo un cambio de nombre
+    return usuario;
+}
+
+module.exports = model('Usuario', UsuarioSchema);
+
+
+models/role.js:
+
+const { Schema, model } = require('mongoose');
+
+const RoleSchema = Schema({
+    rol: {
+        type: String,
+        required: [true, 'El rol es obligatorio'],
+    }
+});
+
+module.exports = model('Role', RoleSchema);
+
+
+Autenticación de usuario y JWT
+------------------------------
+
+Instalar:
+
+npm i jsonwebtoken
+
+Preparar el login:
+
+server/server.js:
+
+constructor() {
+  // ...
+
+  this.usuariosPath = '/api/usuarios';
+  this.authPath = '/api/auth'; // <--- agregar
+
+  // ...
+}
+
+routes() {
+
+  this.app.use(this.authPath, require('../routes/auth')); // <--- agregar
+  this.app.use(this.usuariosPath, require('../routes/usuarios'));
+
+}
+
+controllers/auth.js:
+
+const { request, response } = require("express");
+const bcryptjs = require('bcryptjs');
+
+const Usuario = require("../models/usuario");
+const { generarJWT } = require("../helpers/generarJWT");
+
+const login = async (req = request, res = response) => {
+  const { correo, password } = req.body;
+
+  try {
+
+    // verificar si el email existe
+    const usuario = await Usuario.findOne({ correo });
+
+    if (!usuario) {
+        return res.status(400).json({
+            msg: 'Usuario / Password no son correctos - correo'
+        });
+    }
+
+    // verificar si el usuario está activo
+
+    if (!usuario.estado) {
+        return res.status(400).json({
+            msg: 'Usuario / Password no son correctos - estado: false'
+        });
+    }
+
+    // verificar la contraseña
+    const validPassword = bcryptjs.compareSync(password, usuario.password);
+    if(!validPassword) {
+        return res.status(400).json({
+            msg: 'Usuario / Password no son correctos - password'
+        });
+    }
+
+    // generar el JWT
+    const token = await generarJWT(usuario.id);
+
+    res.json({
+      usuario,
+      token
+    });
+  } catch (error) {
+
+    console.log(error);
+    
+    res.status(500).json({
+      msg: "Hable con el administrador",
+    });
+  }
+};
+
+module.exports = {
+  login,
+};
+
+
+routes/auth.js:
+
+const { Router } = require("express");
+const { check } = require("express-validator");
+const { login } = require("../controllers/auth");
+const { validarCampos } = require("../middlewares/validar-campos");
+
+const router = Router();
+
+router.post(
+  "/login",
+  [
+    check("correo", "El correo es obligatorio").isEmail(),
+    check("password", "El password es obligatorio").not().isEmpty(),
+    validarCampos,
+  ],
+  login
+);
+
+module.exports = router;
+
+
+Crear JWT:
+
+helpers/generarJWT.js:
+
+const jwt = require("jsonwebtoken");
+
+const generarJWT = (uid = "") => {
+  return new Promise((resolve, reject) => {
+    const payload = { uid };
+
+    jwt.sign(
+      payload,
+      process.env.SECRETORPRIVATEKEY,
+      {
+        expiresIn: "4h",
+      },
+      (err, token) => {
+        if (err) {
+          console.log(err);
+          reject("No se pudo generar el JWT");
+        } else {
+          resolve(token);
+        }
+      }
+    );
+  });
+};
+
+module.exports = {
+  generarJWT,
+};
+
+Agregar en .env:
+
+# JWT
+SECRETORPRIVATEKEY=Tfrc2022@Pvbl1cK3y
+
+Validar JWT:
+
+middlewares/validar-jwt.js:
+
+const {request, response} = require('express');
+const jwt = require("jsonwebtoken");
+const Usuario = require("../models/usuario");
+
+
+const validarJWT = async (req = request, res = response, next) => {
+    const token = req.header('x-token');
+
+    if(!token){
+        return res.status(401).json({
+            msg: 'No hay token en la petición'
+        });
+    }
+
+    try {
+        const {uid} = jwt.verify(token, process.env.SECRETORPRIVATEKEY);
+
+        // leer el usuario que corresponde al uid
+        const usuario = await Usuario.findById(uid);
+
+        if(!usuario){
+            return res.status(401).json({
+                msg: 'Token no válido - usuario no existe en DB'
+            });
+        }
+
+        // verificar si el uid tiene estado true
+        if(!usuario.estado){
+            return res.status(401).json({
+                msg: 'Token no válido - usuario con estado: false'
+            });
+        }
+
+        req.usuario = usuario;
+
+        next();
+    } catch (error) {
+        console.log(error);
+        res.status(401).json({
+            msg: 'Token no válido'
+        });        
+    }
+
+    
+}
+
+module.exports = {
+    validarJWT,
+}
+
+
+Validar roles:
+
+middlewares/validar-roles.js:
+
+const {request, response} = require('express');
+
+const esAdminRole = (req, res = response, next) => {
+    if(!req.usuario){
+        return res.status(500).json({
+            msg: 'Se quiere verificar el role sin validar el token primero'
+        });
+    }
+
+    const {rol, nombre} = req.usuario;
+
+    if(rol !== 'ADMIN_ROLE'){
+        return res.status(401).json({
+            msg: `${nombre} no es administrador - No puede hacer esto`
+        });
+    }
+
+    next();
+}
+
+const tieneRole = (...roles) => {
+    return (req, res = response, next) => {
+
+        if(!req.usuario){
+            return res.status(500).json({
+                msg: 'Se quiere verificar el role sin validar el token primero'
+            });
+        }
+    
+        if(!roles.includes(req.usuario.rol)){
+            return res.status(401).json({
+                msg: `El servicio requiere uno de estos roles: ${roles}`
+            });
+        }
+    
+        next();
+    }
+}
+
+module.exports = {
+    esAdminRole,
+    tieneRole,
+}
+
+
+Emplear la validación en las rutas:
+
+routes/auth.js:
+
+// ...
+
+router.delete("/:id",
+  [
+    validarJWT,
+    //esAdminRole,
+    tieneRole("ADMIN_ROLE", "VENTAS_ROLE", "OTRO_ROLE"),
+    check("id", "El ID no es válido").isMongoId(),
+    check("id").custom(existeUsuarioPorId),
+    validarCampos,
+  ],
+  usuariosDelete
+);
+
+module.exports = router;
+
+
+
+
+
+
+
+
+
+
+
 
 

@@ -1,0 +1,143 @@
+Git:
+
+git config --global user.name "Tino Reyna"
+git config --global user.email "tinoreyna1984@gmail.com"
+
+Angular:
+
+Instalar los node modules (de ser necesario):
+
+npm install
+
+Esta instalacion es local en la carpeta de trabajo, ya que no tiene que ser portable. Son componentes de apoyo al desarrollo.
+
+Instalación forzada sin componentes opcionales (en caso no corra npm install):
+
+npm install --no-optional
+
+Instalación de Bootstrap:
+
+Ejecutar los siguientes comandos en el orden indicado:
+
+npm install jquery --save
+npm install popper.js --save
+npm install bootstrap --save
+
+Crear proyecto nuevo:
+
+ng new nombreProyecto
+
+Si al crear sale la pregunta en el prompt: Would you like to add Angular routing? (y/N):
+- Si decimos sí (y), crea el sistema de rutas.
+
+Ejecutar proyecto creado:
+
+./nombreProyecto > ng serve
+
+(por defecto lo levantará en localhost, puerto 4200)
+
+Acceder al sitio (navegador): localhost:4200
+
+El comando de ejecución del proyecto levantará el servicio, pero para refrescar los cambios del sitio hay que pararlo y levantarlo de nuevo.
+Repetir el mismo comando de ejecución de proyecto.
+
+Crear componentes en línea de comando CLI:
+
+ng g c <ruta relativa carpeta/nombre de proyecto>
+
+Sin archivo CSS:
+
+ng g c <ruta relativa carpeta/nombre de proyecto> -is
+
+Con uso de estilos en el HTML del componente:
+
+ng g c <ruta relativa carpeta/nombre de proyecto> -it
+
+Sin archivo de especificación de pruebas (spec.ts):
+
+ng g c <ruta relativa carpeta/nombre de proyecto> --skipTests=true
+
+Componente sin carpeta:
+
+ng g c <nombre componente> --flat
+
+Ej: ng g c components/footer
+
+Crear servicio:
+
+ng g s <ruta relativa carpeta/nombre de servicio>
+
+Crear nueva SPA (aplicación de una sola página):
+
+ng new nombreSPA
+
+*SpotiApp*
+
+Servicios de Spotify:
+
+https://beta.developer.spotify.com/console/
+
+SpotiApp
+Del tutorial de Udemy.
+Client ID b96ee3ce4f124ef2802d71a097f51321 
+Client Secret f82ed64b6b444dff897d23eca66ea801
+
+
+https://accounts.spotify.com/api/token
+
+Usar el archivo guardado en servicios rest.
+
+*Formularios*
+
+Endpoint de países:
+
+https://restcountries.eu/rest/v2/lang/es
+
+
+*Pase a producción*
+
+- Instalar http-server:
+
+npm install http-server -g
+
+- Dist para pre-producción:
+
+cd nombreProyecto (ir a la carpeta del proyecto creado y desarrollado)
+ng build
+
+Genera, dentro del proyecto, la carpeta "dist" para pre-producción, la cual contiene archivos map y js, principalmente.
+
+- Ejecutar el proyecto en pre-producción:
+
+cd nombreProyecto/dist
+
+Dentro de dist:
+
+http-server -o (para desplegar en el navegador).
+
+- Para producción: preparación:
+
+cd nombreProyecto/src
+Editar environment.ts -> cambiar production a true
+
+Después:
+
+cd nombreProyecto
+ng build --prod
+
+- Ejecutar el proyecto en producción:
+
+cd nombreProyecto/dist
+http-server -o
+
+Para desplegar la aplicación en la raíz del dominio, hay que asegurar en index.html que en el tag base, el link href esté correctamente definido (sea en el dominio o en la subcarpeta a colocar).
+
+Para prevenir errores de navegación, se puede también usar en el NgModule, en el segundo argumento de la función forRoot de los imports: {useHash: true}
+Genera un caracter # para flexibilizar la navegación (es opcional, lo mejor es tener una carpeta definida).
+
+Luego generar el proyecto para producción y copiar todos los componentes allí.
+
+
+
+
+

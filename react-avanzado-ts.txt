@@ -898,6 +898,388 @@ export default LazyLayout;
 Patrones de desarrollo de componentes
 =====================================
 
+Crear componentes tradicionalmente
+----------------------------------
+
+Creación habitual:
+
+ProductCard.tsx:
+
+import styles from "../styles/styles.module.css";
+import { useProduct } from '../hooks/useProduct';
+import noImage from "../assets/no-image.jpg";
+
+interface Props {
+  product: Product;
+}
+
+interface Product {
+  id: string;
+  title: string;
+  img?: string; // es opcional
+}
+
+export const ProductCard = ({product}: Props) => {
+  
+  const {counter, increaseBy} = useProduct({initialValue: 0});
+
+  const {id, title, img} = product;
+
+  return (
+    <div className={styles.productCard}>
+      <img className={styles.productImg} src={img ? img : noImage} alt="coffee-mug" />
+      <span className={styles.productDescription}>{title}</span>
+      <div className={styles.buttonsContainer}>
+        <button className={styles.buttonMinus} onClick={() => increaseBy( -1)}>-</button>
+        <div className={styles.countLabel}>{counter}</div>
+        <button className={styles.buttonAdd} onClick={() => increaseBy()}>+</button>
+      </div>
+    </div>
+  );
+};
+
+Esta sería una forma "acostumbrada" de procesar las props que vienen del componente padre, que es el siguiente:
+
+ShoppingPage.tsx:
+
+import { ProductCard } from "../components/ProductCard";
+
+const product = {
+  id: '1',
+  title: 'Coffee Mug - card',
+  img: './coffee-mug.png',
+}
+
+export const ShoppingPage = () => {
+  return (
+    <div>
+      <h1>Shopping Store</h1>
+      <hr />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+        }}
+      >
+        <ProductCard product={product} />
+      </div>
+    </div>
+  );
+};
+
+
+Compound Component Pattern
+--------------------------
+
+Primer paso: separación de elementos del componente ProductCard:
+
+import styles from "../styles/styles.module.css";
+import { useProduct } from "../hooks/useProduct";
+import noImage from "../assets/no-image.jpg";
+
+interface Props {
+  product: Product;
+}
+
+interface Product {
+  id: string;
+  title: string;
+  img?: string; // es opcional
+}
+
+interface ProductButtonsProps {
+  counter: number;
+  increaseBy: (value: number) => void;
+}
+
+// el tipado por el lado derecho significa extraer
+// una propiedad de la interfaz para poder lograr
+// una definición correcta de la prop que debe pasarse
+export const ProductImage = ({ img = "" }: { img?: string }) => {
+  return (
+    <img
+      className={styles.productImg}
+      src={img ? img : noImage}
+      alt="Product"
+    />
+  );
+};
+
+export const ProductTitle = ({ title }: { title: string }) => {
+  return <span className={styles.productDescription}>{title}</span>;
+};
+
+export const ProductButtons = ({ counter, increaseBy }: ProductButtonsProps) => {
+  return (
+    <div className={styles.buttonsContainer}>
+      <button className={styles.buttonMinus} onClick={() => increaseBy(-1)}>
+        -
+      </button>
+      <div className={styles.countLabel}>{counter}</div>
+      <button className={styles.buttonAdd} onClick={() => increaseBy(1)}>
+        +
+      </button>
+    </div>
+  );
+};
+
+export const ProductCard = ({ product }: Props) => {
+  const { counter, increaseBy } = useProduct({ initialValue: 0 });
+
+  const { id, title, img } = product;
+
+  return (
+    <div className={styles.productCard}>
+      <ProductImage img={img} />
+      <ProductTitle title={title} />
+      <ProductButtons counter={counter} increaseBy={increaseBy} />
+    </div>
+  );
+};
+
+Segundo paso: crear una propiedad para componentes hijos del componente principal:
+
+ProductCard.tsx:
+
+//...
+
+interface Props {
+  product: Product;
+  children?: ReactElement | ReactElement[];
+}
+
+//... 
+
+export const ProductCard = ({ children, product }: Props) => {
+  return (
+    <div className={styles.productCard}>
+      {children}
+    </div>
+  );
+};
+
+// subcomponentes de ProductCard como propiedades
+ProductCard.Image = ProductImage;
+ProductCard.Title = ProductTitle;
+ProductCard.Buttons = ProductButtons;
+
+Sobre la base de esto se puede ir armando el componente de manera unificada:
+
+ShoppingPage.tsx:
+
+<ProductCard product={product}>
+  <ProductCard.Image img={product.img} />
+  <ProductCard.Title title={product.title} />
+  <ProductCard.Buttons /> // pendiente definir las propiedades, en el tercer paso se verá
+</ProductCard>
+
+Tercer paso: crear el contexto que afectará el high order component:
+
+ProductCard.tsx:
+
+//...
+
+interface ProductContextProps {
+  counter: number;
+  increaseBy: (value: number) => void;
+  product: Product;
+}
+
+const ProductContext = createContext({} as ProductContextProps);
+const { Provider } = ProductContext;
+
+// el tipado por el lado derecho significa extraer
+// una propiedad de la interfaz para poder lograr
+// una definición correcta de la prop que debe pasarse
+export const ProductImage = ({ img = "" }: { img?: string }) => {
+  const { product } = useContext(ProductContext);
+  let imgToShow: string;
+
+  if (img) {
+    imgToShow = img;
+  } else if (product.img) {
+    imgToShow = product.img;
+  } else {
+    imgToShow = noImage;
+  }
+
+  return (
+    <img
+      className={styles.productImg}
+      src={imgToShow}
+      alt="Product"
+    />
+  );
+};
+
+export const ProductTitle = ({ title }: { title?: string }) => {
+
+  const { product } = useContext(ProductContext);
+
+  return <span className={styles.productDescription}>{title ? title : product.title}</span>;
+};
+
+export const ProductButtons = () => {
+  const { counter, increaseBy, } = useContext(ProductContext);
+  return (
+    <div className={styles.buttonsContainer}>
+      <button className={styles.buttonMinus} onClick={() => increaseBy(-1)}>
+        -
+      </button>
+      <div className={styles.countLabel}>{counter}</div>
+      <button className={styles.buttonAdd} onClick={() => increaseBy(1)}>
+        +
+      </button>
+    </div>
+  );
+};
+
+export const ProductCard = ({ children, product }: Props) => {
+  return (
+    <Provider value={{product, counter, increaseBy}}>
+      <div className={styles.productCard}>{children}</div>
+    </Provider>
+  );
+};
+
+Refactorización final:
+
+index.ts:
+
+import { ProductButtons } from "./ProductButtons";
+import { ProductCard as PCComponent } from "./ProductCard";
+import { ProductImage } from "./ProductImage";
+import { ProductTitle } from './ProductTitle';
+
+export const ProductCard = Object.assign(PCComponent, {
+    Title: ProductTitle,
+    Image: ProductImage,
+    Buttons: ProductButtons,
+});
+
+export default ProductCard;
+export { ProductButtons } from "./ProductButtons";
+export { ProductImage } from "./ProductImage";
+export { ProductTitle } from './ProductTitle';
+
+ProductCard.tsx:
+
+import styles from "../styles/styles.module.css";
+import { useProduct } from "../hooks/useProduct";
+
+import { createContext } from "react";
+import { ProductContextProps, ProductCardProps } from "../interfaces/interfaces";
+
+export const ProductContext = createContext({} as ProductContextProps);
+const { Provider } = ProductContext;
+
+export const ProductCard = ({ children, product }: ProductCardProps) => {
+  const { counter, increaseBy } = useProduct({ initialValue: 0 });
+  return (
+    <Provider value={{product, counter, increaseBy}}>
+      <div className={styles.productCard}>{children}</div>
+    </Provider>
+  );
+};
+
+ProductTitle.tsx:
+
+import { useContext } from "react";
+import { ProductContext } from "./ProductCard";
+import styles from "../styles/styles.module.css";
+
+export const ProductTitle = ({ title }: { title?: string }) => {
+  const { product } = useContext(ProductContext);
+
+  return (
+    <span className={styles.productDescription}>
+      {title ? title : product.title}
+    </span>
+  );
+};
+
+ProductImage.tsx:
+
+import noImage from "../assets/no-image.jpg";
+import styles from "../styles/styles.module.css";
+
+import { useContext } from "react";
+import { ProductContext } from "./ProductCard";
+
+// el tipado por el lado derecho significa extraer
+// una propiedad de la interfaz para poder lograr
+// una definición correcta de la prop que debe pasarse
+export const ProductImage = ({ img = "" }: { img?: string }) => {
+  const { product } = useContext(ProductContext);
+  let imgToShow: string;
+
+  if (img) {
+    imgToShow = img;
+  } else if (product.img) {
+    imgToShow = product.img;
+  } else {
+    imgToShow = noImage;
+  }
+
+  return <img className={styles.productImg} src={imgToShow} alt="Product" />;
+};
+
+
+ProductButtons.tsx:
+
+import { useContext } from "react";
+import { ProductContext } from "./ProductCard";
+import styles from "../styles/styles.module.css";
+
+export const ProductButtons = () => {
+  const { counter, increaseBy } = useContext(ProductContext);
+  return (
+    <div className={styles.buttonsContainer}>
+      <button className={styles.buttonMinus} onClick={() => increaseBy(-1)}>
+        -
+      </button>
+      <div className={styles.countLabel}>{counter}</div>
+      <button className={styles.buttonAdd} onClick={() => increaseBy(1)}>
+        +
+      </button>
+    </div>
+  );
+};
+
+ShoppingPage.tsx:
+
+import { ProductCard } from "../components";
+
+const product = {
+  id: '1',
+  title: 'Coffee Mug - card',
+  img: './coffee-mug.png',
+}
+
+export const ShoppingPage = () => {
+  return (
+    <div>
+      <h1>Shopping Store</h1>
+      <hr />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+        }}
+      >
+        <ProductCard product={product}>
+          <ProductCard.Image />
+          <ProductCard.Title />
+          <ProductCard.Buttons />
+        </ProductCard>
+      </div>
+    </div>
+  );
+};
+
+
 
 
 
