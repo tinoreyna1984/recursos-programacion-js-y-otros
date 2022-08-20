@@ -1,0 +1,11 @@
+Docker
+******
+
+Preparación e instalación de Docker
+===================================
+
+Windows: descargar e instalar Docker Desktop Installer.
+
+
+
+

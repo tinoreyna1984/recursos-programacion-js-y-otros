@@ -224,14 +224,13 @@ Bootstrap + PopperJS
 
 Instalación:
 
-npm i bootstrap@5.2.0-beta1 @popperjs/core
+npm i bootstrap@5.2.0 @popperjs/core
 
 Configuración:
 
 * En index.js (o main.jsx):
 
-import * as bootstrap from 'bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 * En App.js:
 

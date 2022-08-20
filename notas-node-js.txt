@@ -506,11 +506,20 @@ const express = require("express");
 const cors = require("cors");
 const { dbConnection } = require("../database/config");
 
+const express = require("express");
+const cors = require("cors");
+const { dbConnection } = require("../database/config");
+
 class server {
   constructor() {
     this.app = express();
     this.port = process.env.PORT || 4000;
-    this.usuariosPath = '/api/usuarios';
+
+    // Rutas
+    this.paths = {
+      auth: '/api/auth',
+      usuarios: '/api/usuarios',
+    }
 
     // conectar a bases de datos
     this.conectarDB();
@@ -536,10 +545,10 @@ class server {
     this.app.use(express.static("public"));
   }
 
+  // usar rutas definidas en el constructor
   routes() {
-
-    this.app.use(this.usuariosPath, require('../routes/usuarios'));
-
+    this.app.use(this.paths.auth, require('../routes/auth'));
+    this.app.use(this.paths.usuarios, require('../routes/usuarios'));
   }
 
   listen() {
@@ -550,6 +559,7 @@ class server {
 }
 
 module.exports = server;
+
 
 Consideraciones:
 
@@ -1096,6 +1106,276 @@ router.delete("/:id",
 
 module.exports = router;
 
+
+Gestión de accesos con proveedores (Google Sign-in)
+---------------------------------------------------
+
+1. Configuración:
+
+Ir a: https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid
+
+En las instrucciones indicadas: Abre la página Credenciales de la consola de las API de Google
+
+Seguir los demás pasos.
+
+En la consola de las API de Google, click en el desplegable que dice "My First Project" u otro nombre en la parte superior izquierda. Luego escoger nuevo proyecto.
+
+Ej: nodejs-tino-curso-udemy
+
+Click en crear. En las notificaciones, ver que el proyecto ha sido creado y hacer clic en "Seleccionar proyecto".
+
+En la consola, ir a página de consentimiento para su creación.
+
+Escoger tipo de usuario externo. Click en crear.
+
+Llenar el formulario que se genera:
+- Nombre de la aplicación.
+- Correo electrónico de asistencia del usuario.
+- Información de contacto del desarrollador.
+
+Click en guardar y continuar hasta volver al panel.
+
+Ir a Credenciales -> Crear Credenciales -> ID de cliente de OAuth
+
+Tipo de aplicación: Aplicación Web
+
+Nombre: cualquier nombre.
+
+Orígenes autorizados:
+
+http://localhost y http://localhost:8080
+
+Click en Crear.
+
+Se generan dos códigos: Client ID y Secret ID.
+
+2. Desarrollar el formulario de acceso (frontend):
+
+Ir a: https://developers.google.com/identity/gsi/web/guides/display-button
+
+Usar el bloque:
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<div id="g_id_onload"
+ data-client_id="YOUR_GOOGLE_CLIENT_ID"
+ data-auto_prompt="false">
+</div>
+<div class="g_id_signin"
+ data-type="standard"
+ data-size="large"
+ data-theme="outline"
+ data-text="sign_in_with"
+ data-shape="rectangular"
+ data-logo_alignment="left">
+</div>
+
+en el cuerpo del index.html. Quitar el data-login_uri.
+
+Luego, ir a: https://developers.google.com/identity/gsi/web/guides/handle-credential-responses-js-functions
+
+Modificar el div con id "g_id_onload" agregando el atributo:
+
+data-callback="handleCredentialResponse"
+
+Agregar:
+
+<script>
+  function handleCredentialResponse(response) {
+	console.log(response.credential);
+  }
+</script>
+
+En el cuerpo de la función.
+
+Modificar data-client_id="YOUR_GOOGLE_CLIENT_ID" usando el ID generado previamente.
+
+
+3. Pasar el token al backend:
+
+Agregar en routes/auth.js:
+
+
+router.post(
+  "/google",
+  [
+    check("id_token", "id_token de Google es necesario").not().isEmpty(),
+    validarCampos,
+  ],
+  googleSignIn
+);
+
+
+Agregar en controllers/auth.js:
+
+
+const googleSignIn = async (req = request, res = response) => {
+
+  const { id_token } = req.body;
+
+  try {
+
+    const {nombre, img, correo} = await googleVerify(id_token);
+    
+    res.json({
+      id_token,
+    });
+
+  } catch (error) {
+    res.status(400).json({
+      msg: "Token de Google no es válido",
+    });    
+  }
+
+}
+
+Modificar en public/index.html:
+
+function handleCredentialResponse(response) {
+	//console.log('ID_TOKEN: ', response.credential);
+
+	const body = {
+	  id_token: response.credential,
+	};
+
+	fetch('http://localhost:3000/google', {
+	  method: 'POST',
+	  headers: {
+		'Content-Type': 'application/json',
+	  },
+	  body: JSON.stringify(body),
+	})
+	  .then((resp) => resp.json())
+	  .then(({ msg }) => {
+		console.log(msg);
+	  })
+	  .catch(console.log);
+}
+
+
+4. Ir a: https://developers.google.com/identity/gsi/web/guides/verify-google-id-token
+
+Instalar: npm install google-auth-library --save
+
+Crear en helpers el archivo google-verify.js:
+
+const {OAuth2Client} = require('google-auth-library');
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+async function googleVerify(idToken = '') {
+
+  const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+  });
+  
+    const { name: nombre, picture: img, email: correo } = ticket.getPayload();
+
+    return { nombre, img, correo };
+}
+
+module.exports = {
+    googleVerify
+}
+
+Modificar googleSignIn:
+
+const googleSignIn = async (req, res = response) => {
+
+  const { id_token } = req.body;
+
+  try {
+
+    const {correo, nombre, img} = await googleVerify(id_token);
+
+    //console.log({correo, nombre, img})
+
+    let usuario = await Usuario.findOne({correo});
+
+    if(!usuario) {
+        // crear usuario
+        const data = {
+
+            nombre,
+            correo,
+            password: ';P',
+            img,
+            google: true,
+            rol: 'USER_ROLE'
+        };
+
+        usuario = new Usuario(data);
+        await usuario.save();
+
+    }
+
+    // si el usuario en DB
+    if(!usuario.estado) {
+        return res.status(401).json({
+            msg: 'Hable con el administrador, usuario bloqueado'
+        });
+    }
+
+    // generar el JWT
+    const token = await generarJWT(usuario.id);
+    
+    res.json({
+      usuario,
+      token
+    });
+
+  } catch (error) {
+    res.status(400).json({
+      msg: "Token de Google no es válido",
+    });    
+  }
+
+}
+
+En public/index.html, modificar:
+
+<script>
+  function handleCredentialResponse(response) {
+    const body = { id_token: response.credential };
+
+    console.log("host: ", window.location.hostname.includes('localhost') ? 'local' : 'remote');
+
+    const url = ( window.location.hostname.includes('localhost') )
+                ? 'http://localhost:8080'
+                : 'https://zero7-restserver-tr.onrender.com';
+
+    fetch(url + "/api/auth/google", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    })
+      .then((r) => r.json())
+      .then((resp) => {
+        console.log(resp);
+        localStorage.setItem("email", resp.usuario.correo);
+      })
+      .catch(console.warn);
+  }
+
+  const button = document.getElementById("signOut");
+  button.onclick = async () => {
+    console.log(google.accounts.id);
+    google.accounts.id.disableAutoSelect();
+
+    google.accounts.id.revoke(localStorage.getItem("email"), (done) => {
+      localStorage.removeItem("email");
+      location.reload();
+    });
+  };
+</script>
+
+Modificar en la consola de Google para credenciales agregando una nueva ruta autorizada.
+
+
+CRUD extendido en restserver
+----------------------------
 
 
 

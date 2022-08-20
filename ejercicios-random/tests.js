@@ -163,4 +163,18 @@ function logIt(){
 }
 logIt();
 
+//----------------------------------
+
+const arr = ['one', 'two', 'three'];
+//const withCommaAndSpace = arr.join(', ');
+//console.log(withCommaAndSpace);
+
+const arrayToStringTags = (arr) => {
+  let withCommaAndSpace = arr.join(', ');
+  return withCommaAndSpace;
+}
+
+console.log(arrayToStringTags(arr));
+
+
 

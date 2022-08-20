@@ -1,0 +1,501 @@
+Next.js
+*******
+
+Crear con create-next-app
+=========================
+
+npx create-next-app mi-app
+
+Ejecutar en desarrollo:
+npm run dev
+
+Crear el build para despliegue en producción:
+npm run build
+
+Ejecutar en producción:
+npm start
+
+NOTA
+----
+
+Si ocurre el error:
+
+"Parsing error: Cannot find module 'next/babel' Require stack..."
+
+Proceder con lo siguiente:
+
+1. Crear un archivo .babelrc en la raíz del proyecto con lo siguiente:
+
+{
+  "presets": ["next/babel"],
+  "plugins": []
+}
+
+2. En la raíz del proyecto, editar .eslintrc.json con lo siguiente:
+
+{
+  "extends": ["next/babel","next/core-web-vitals"]
+}
+
+Bootstrap 5
+===========
+
+Instalar:
+
+npm i bootstrap @popperjs/core
+
+Llamarlo en _app.js (dentro de MyApp):
+
+import "bootstrap/dist/css/bootstrap.min.css"; // llama a Bootstrap aquí
+import '../styles/globals.css'
+import { useEffect } from "react";
+
+function MyApp({ Component, pageProps }) {
+
+  // importación de Bootstrap en Next.js
+  useEffect(() => {
+    require("bootstrap/dist/js/bootstrap.bundle.min.js");
+  }, []);
+
+  return <Component {...pageProps} />
+}
+
+export default MyApp
+
+
+Uso
+===
+
+Todo lo conocido de React aplica para Next.js. No requiere librerías de terceros para algunos aspectos avanzados tales como enrutamiento.
+Cambios en el sitio: pages/index.js
+Creación de nuevas páginas: dentro de pages
+
+Bloques particulares
+====================
+
+Head:
+
+import Head from 'next/head';
+
+export default function Home() {
+  return (
+    <div className="container">
+      <Head>
+        <link rel="icon" href="/favicon.ico" />
+        <meta
+          name="description"
+          content="Learn how to build a personal website using Next.js"
+        />
+        <meta
+          property="og:image"
+          content={`https://og-image.vercel.app/${encodeURI(
+            siteTitle
+          )}.png?theme=light&md=0&fontSize=75px&images=https%3A%2F%2Fassets.vercel.com%2Fimage%2Fupload%2Ffront%2Fassets%2Fdesign%2Fnextjs-black-logo.svg`}
+        />
+        <meta name="og:title" content={siteTitle} />
+        <meta name="twitter:card" content="summary_large_image" />
+      </Head>
+	  ...
+	</div>
+   );
+}
+
+Permite el encabezamiento del sitio, esto es, para definir el título en el browser y los elementos de visualización para el documento HTML, así como también ayudar al SEO.
+
+Link:
+
+<Link href="/posts/first-post">this page!</Link>
+
+Reemplaza a <a> para creación de enlaces orientados al cliente.
+
+Definiciones globales
+---------------------
+
+Crear en pages el archivo _app.js:
+
+// `pages/_app.js`
+import '../styles/global.css';
+
+export default function App({ Component, pageProps }) {
+  return <Component {...pageProps} />;
+}
+
+Estilizar: crear un directorio al nivel más alto llamado styles y crear un archivo global.css:
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  line-height: 1.6;
+  font-size: 18px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: #0070f3;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+Se emplean los estilos como un módulo CSS:
+
+layout.module.css:
+
+.container {
+  max-width: 36rem;
+  padding: 0 1rem;
+  margin: 3rem auto 6rem;
+}
+
+layout.js:
+
+import Head from "next/head";
+import Image from "next/image";
+import styles from "./layout.module.css";
+import utilStyles from "../styles/utils.module.css";
+import Link from "next/link";
+
+const name = "Tino";
+export const siteTitle = "Next.js Sample Website";
+
+export default function Layout({ children, home }) {
+  return (
+    <div className={styles.container}>
+	...
+	</div>
+  );
+}
+
+Pre-renderizado
+===============
+
+Es la acción de precarga de páginas de un sitio hecho con Next.js. Next genera código HTML para cada página, lo que significa que el requerimiento de JavaScript sería mínimo. Esto ocurre por defecto en sitios con Next.
+Existen dos principales formas de pre-renderizado: generación estática y server-side rendering (renderizado del lado del servidor) o SSR.
+El pre-renderizado beneficia al sitio con mejor performance y SEO.
+
+Generación Estática
+-------------------
+
+Next genera páginas una vez para ser reutilizadas en cada sesión del usuario.
+Es la forma por defecto con la que Next genera las páginas para el sitio una vez desplegado a producción.
+
+SSR
+---
+
+Next permite que se cree cada página del sitio por cada request del usuario.
+Es la forma más adecuada cuando hay mucha interacción de parte del usuario, lo que obliga al app web a actualizar su contenido.
+
+getStaticProps()
+----------------
+
+Esta función debe definirse antes de invocar el componente de página:
+
+export async function getServerSideProps(context) {
+  return {
+    props: {
+      // props for your component
+    },
+  };
+}
+
+CSR
+---
+Client-side rendering. En Next es posible desarrollar una página que renderice solo desde el cliente como pasa en React. Es válido si la página no tiene necesidad de SEO, sea preferentemente privada y se enfoque solo en presentar datos.
+
+En estos casos, Next recomienda usar el hook de React useSWR. Ejemplo:
+
+import useSWR from 'swr';
+
+function Profile() {
+  const { data, error } = useSWR('/api/user', fetch);
+
+  if (error) return <div>failed to load</div>;
+  if (!data) return <div>loading...</div>;
+  return <div>hello {data.name}!</div>;
+}
+
+Enrutamiento dinámico
+=====================
+
+Generación estática
+-------------------
+
+Si se tiene una página que se identifique por un parámetro, tal como:
+
+/conjunto/id
+
+Debe de crearse, dentro de /conjunto, un archivo llamado [id].js, el cual debe tener:
+* Un componente React.
+* La función getStaticPaths, la cual debe devolver un array de valores según el id.
+* La función getStaticProps, la cual busca la data de renderización según el id.
+
+Acceder a un API REST o a una base de datos
+-------------------------------------------
+
+export async function getAllPostIds() {
+  // Instead of the file system,
+  // fetch post data from an external API endpoint
+  const res = await fetch('..');
+  const posts = await res.json();
+  return posts.map((post) => {
+    return {
+      params: {
+        id: post.id,
+      },
+    };
+  });
+}
+
+Desarrollo vs producción
+------------------------
+
+* En desarrollo, getStaticPaths se ejecuta en cada request.
+* En producción, getStaticPaths se ejecuta durante el build.
+
+Fallback
+--------
+
+La respuesta de getStaticPaths es la siguiente:
+
+{
+  paths,
+  fallback: false,
+}
+
+Entonces, el flag "fallback" indica lo siguiente:
+* fallback === false: si no se regresa ninguna de las rutas de getStaticPaths, se genera una página que informa un error 404.
+* fallback === true: 
+  - Las rutas devueltas por getStaticPaths serán renderizadas en HTML en el build.
+  - No se generará una página de error 404, sino que Next.js generará una página de versión fallback para el primer request del enlace en cuestión.
+  - Se generará una página estática de la ruta solicitada para todo request que apunte a dicha ruta.
+* fallback === blocking: las nuevas rutas serán servidas con getStaticProps y cacheadas para requests sucesivos a la misma dirección.
+
+
+Rutas API
+=========
+
+* Crear un directorio api en pages (pages/api):
+* Crear un archivo de endpoints en esa ruta, por ejemplo hello.js:
+
+export default function handler(req, res) {
+  res.status(200).json({ text: 'Hello' });
+}
+
+El objeto de respuesta se verá en http://localhost:3000/api/hello
+
+Consideraciones
+---------------
+
+* No buscar (fetch) una ruta API desde getStaticPaths o getStaticProps. Ambos métodos operan desde el servidor para el pre-renderizado, de modo que el browser no dependa mucho de JavaScript.
+* Las rutas API pueden ser dinámicas.
+* El enrutamiento API permite un uso de vista previa. 
+
+
+Sitio multi-idioma
+==================
+
+1. Editar el archivo next.config.js en la raíz:
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  i18n: {
+    locales: ["en", "es"],
+    defaultLocale: "en",
+  },
+}
+
+module.exports = nextConfig
+
+2. Definir los archivos de mensajes por idioma en public.
+
+Ejemplo:
+
+.
+└── public
+    └── locales
+        ├── en
+        |   └── common.json
+        └── es
+            └── common.json
+
+La estructura debería ser más o menos así (en):
+
+common.json:
+
+{
+  "Home": {
+    "title": "Home",
+    "message": "Hello world!"
+  },
+  "About": {
+    "title": "About"
+  },
+  "Services": {
+    "title": "Services"
+  },
+  "Contact": {
+    "title": "Contact"
+  }
+}
+
+navbar.json:
+
+{
+  "Navbar": {
+    "about": "ABOUT",
+    "services": "SERVICES",
+    "contact": "CONTACT",
+    "switchLanguage": "ESPAÑOL (EC)"
+  }
+}
+
+
+
+3. Instalar: npm i next-intl
+
+4. Configurar _app.js:
+
+import "bootstrap/dist/css/bootstrap.min.css"; // llama a Bootstrap aquí
+import { useEffect } from "react";
+import Navbar from "../components/navbar";
+import { NextIntlProvider } from "next-intl";
+
+function MyApp({ Component, pageProps }) {
+  // importación de Bootstrap en Next.js
+  useEffect(() => {
+    require("bootstrap/dist/js/bootstrap.bundle.min.js");
+  }, []);
+
+  //console.log(pageProps)
+
+  return (
+    <NextIntlProvider messages={pageProps.messages}>
+      <Navbar />
+      <Component {...pageProps} />
+    </NextIntlProvider>
+  );
+}
+
+export default MyApp;
+
+5. Configurar cada página:
+
+index.js:
+
+import Head from "next/head";
+import { useTranslations } from "next-intl";
+
+export async function getStaticProps({locale}) {
+  return {
+    props: {
+      messages: {
+        ...require(`../public/locales/${locale}/common.json`),
+        ...require(`../public/locales/${locale}/navbar.json`)
+      }
+    },
+  };
+}
+
+export default function Home() {
+  const t = useTranslations("Home");
+  return (
+    <div className="container">
+      <Head>
+        <title>{t("title")}</title>
+        <meta name="description" content="Homepage" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <div className="row mt-3">
+        <h1>{t("message")}</h1>
+      </div>
+    </div>
+  );
+}
+
+about.js:
+
+import Head from "next/head";
+import { useTranslations } from "next-intl";
+
+export async function getStaticProps({locale}) {
+  return {
+    props: {
+      messages: {
+        ...require(`../public/locales/${locale}/common.json`),
+        ...require(`../public/locales/${locale}/navbar.json`)
+      }
+    },
+  };
+}
+
+export default function About() {
+  const t = useTranslations("About");
+  return (
+    <div className="container">
+      <Head>
+        <title>{t("title")}</title>
+        <meta name="description" content="Generated by create next app" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <div className="row mt-3">
+        <h1>{t("title")}</h1>
+      </div>
+    </div>
+  );
+}
+
+6. Implementar un switcher:
+
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useTranslations } from "next-intl";
+
+export default function LocaleSwitcher() {
+ const { locales, locale, pathname, query, asPath } = useRouter();
+ const otherLocales = locales.filter((l) => l !== locale); // Find all the locales apart from the current locale.
+ const t = useTranslations("Navbar");
+
+ return (
+   <>
+     {otherLocales.map((locale) => {
+       return (
+         <Link
+           key={locale}
+           href={{ pathname, query }}
+           as={asPath}
+           locale={locale}
+         >
+           <a className="nav-link">{t("switchLanguage", { locale })}</a>
+         </Link>
+       );
+     })}
+   </>
+ );
+}
+
+
+SEO
+===
+
+
+
+
+
+
+
+
