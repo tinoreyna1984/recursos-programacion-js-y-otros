@@ -1,0 +1,19 @@
+Strapi
+******
+
+Crear proyecto Strapi:
+
+npx create-strapi-app@latest mi-proyecto
+
+Ingresar al CMS:
+
+cd ruta-del-proyecto
+npm run develop
+
+Crear build:
+
+npm run build
+
+
+
+

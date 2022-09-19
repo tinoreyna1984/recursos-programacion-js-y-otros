@@ -1,6 +1,10 @@
 /* media queries como pa bruto */
 
-@media (min-width: 0rem) and (max-width: 43rem) {
+@media (min-width: 0rem) and (max-width: 36rem) {
+  /* pon los elementos a transformar */
+}
+
+@media (min-width: 36rem) and (max-width: 43rem) {
   /* pon los elementos a transformar */
 }
 
@@ -12,6 +16,14 @@
   /* pon los elementos a transformar */
 }
 
-@media (min-width: 82rem) {
+@media (min-width: 82rem) and (max-width: 120rem) {
+  /* pon los elementos a transformar */
+}
+
+@media (min-width: 120rem) and (max-width: 240rem) {
+  /* pon los elementos a transformar */
+}
+
+@media (min-width: 240rem) {
   /* pon los elementos a transformar */
 }

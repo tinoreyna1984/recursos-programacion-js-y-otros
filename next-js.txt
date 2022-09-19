@@ -203,13 +203,14 @@ getStaticProps()
 
 Esta función debe definirse antes de invocar el componente de página:
 
-export async function getServerSideProps(context) {
+export async function getStaticProps(context) {
   return {
     props: {
       // props for your component
     },
   };
 }
+
 
 CSR
 ---
@@ -226,6 +227,34 @@ function Profile() {
   if (!data) return <div>loading...</div>;
   return <div>hello {data.name}!</div>;
 }
+
+Otro ejemplo:
+
+export default function JobsList() {
+  // ...
+  const [data, setData] = useState(dummyWorksList);
+  const [dept, setDept] = useState("all");
+
+  let filterData = []; // eventually replaced with a useEffect snippet with a fetch
+
+  //console.log(dept)
+
+  const filterWorkHandler = (dept) => {
+    setDept(dept);
+    if (dept !== 'all') {
+      filterData = dummyWorksList.filter((work) => work.dept === dept);
+      setData(filterData);
+    } else {
+      filterData = dummyWorksList;
+      setData(dummyWorksList);
+    }
+  };
+
+  //console.log("data: ", data);
+  
+  // ...
+}
+
 
 Enrutamiento dinámico
 =====================
@@ -304,189 +333,92 @@ Consideraciones
 * El enrutamiento API permite un uso de vista previa. 
 
 
-Sitio multi-idioma
-==================
+Sitio multi-idioma (estático)
+=============================
 
-1. Editar el archivo next.config.js en la raíz:
+1. Instalar next-export-i18n
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
-  i18n: {
-    locales: ["en", "es"],
-    defaultLocale: "en",
+npm i next-export-i18n
+
+2. Asegurarse de tener configurado el export en package.json (scripts):
+
+"build": "next build && next export"
+
+3. Crear, en la raíz del proyecto, la carpeta i18n. Esta debe contener:
+
+* un archivo index.js, el cual contiene lo siguiente:
+
+var en = require("./translations.en.json");
+/* Los demás idiomas, por ejemplo: var es = require("./translations.es.json") */
+
+const i18n = {
+  translations: {
+    en: en.i18n,
+    /* los demás idiomas, por ejemplo: es: es.i18n */
   },
-}
+  defaultLang: "en",
+  useBrowserDefault: false,
+};
 
-module.exports = nextConfig
+module.exports = i18n;
 
-2. Definir los archivos de mensajes por idioma en public.
+* los archivos importados en index.js, por ejemplo:
 
-Ejemplo:
-
-.
-└── public
-    └── locales
-        ├── en
-        |   └── common.json
-        └── es
-            └── common.json
-
-La estructura debería ser más o menos así (en):
-
-common.json:
+translations.en.json:
 
 {
-  "Home": {
-    "title": "Home",
-    "message": "Hello world!"
-  },
-  "About": {
-    "title": "About"
-  },
-  "Services": {
-    "title": "Services"
-  },
-  "Contact": {
-    "title": "Contact"
+  "i18n": {
+    "ui": {
+      "languageSwitcher": "ESPAÑOL"
+    },
+    "navbar": {
+      "index": {
+        "text": "ABOUT",
+        "route": "/"
+      }
+	  /* cualquier otro elemento del navbar */
+	/* cualquier otra sección */
   }
 }
 
-navbar.json:
+translations.es.json:
 
 {
-  "Navbar": {
-    "about": "ABOUT",
-    "services": "SERVICES",
-    "contact": "CONTACT",
-    "switchLanguage": "ESPAÑOL (EC)"
+  "i18n": {
+    "ui": {
+      "languageSwitcher": "ENGLISH"
+    },
+    "navbar": {
+      "index": {
+        "text": "ACERCA",
+        "route": "/"
+      }
+	  /* cualquier otro elemento del navbar */
+	/* cualquier otra sección */
   }
 }
 
+4. En los archivos a ser versionados por idioma, importar:
+
+import { useTranslation, useLanguageQuery,  LanguageSwitcher } from "next-export-i18n";
+
+* LanguageSwitcher es opcional. Es un enlace de cambio de idiomas, muy útil, pero no requerido para la versión si se cuenta con switcher propio.
+
+5. En el componente a traducir, usar:
+
+const { t } = useTranslation();
+const [query] = useLanguageQuery();
+
+t: es el traductor
+query: es el objeto de los idiomas que se pueden consultar. A través del atributo "lang", se puede ver en qué idioma se está renderizando el sitio, por ejemplo: query.lang === 'es' (español)
+
+6. Si verificamos la traducción para, por ejemplo, {t("navbar.index.text")}, en español saldría "ACERCA" y en inglés "ABOUT".
 
 
-3. Instalar: npm i next-intl
+Prevenir el error "Error: Text content does not match server-rendered HTML"
+===========================================================================
 
-4. Configurar _app.js:
-
-import "bootstrap/dist/css/bootstrap.min.css"; // llama a Bootstrap aquí
-import { useEffect } from "react";
-import Navbar from "../components/navbar";
-import { NextIntlProvider } from "next-intl";
-
-function MyApp({ Component, pageProps }) {
-  // importación de Bootstrap en Next.js
-  useEffect(() => {
-    require("bootstrap/dist/js/bootstrap.bundle.min.js");
-  }, []);
-
-  //console.log(pageProps)
-
-  return (
-    <NextIntlProvider messages={pageProps.messages}>
-      <Navbar />
-      <Component {...pageProps} />
-    </NextIntlProvider>
-  );
-}
-
-export default MyApp;
-
-5. Configurar cada página:
-
-index.js:
-
-import Head from "next/head";
-import { useTranslations } from "next-intl";
-
-export async function getStaticProps({locale}) {
-  return {
-    props: {
-      messages: {
-        ...require(`../public/locales/${locale}/common.json`),
-        ...require(`../public/locales/${locale}/navbar.json`)
-      }
-    },
-  };
-}
-
-export default function Home() {
-  const t = useTranslations("Home");
-  return (
-    <div className="container">
-      <Head>
-        <title>{t("title")}</title>
-        <meta name="description" content="Homepage" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <div className="row mt-3">
-        <h1>{t("message")}</h1>
-      </div>
-    </div>
-  );
-}
-
-about.js:
-
-import Head from "next/head";
-import { useTranslations } from "next-intl";
-
-export async function getStaticProps({locale}) {
-  return {
-    props: {
-      messages: {
-        ...require(`../public/locales/${locale}/common.json`),
-        ...require(`../public/locales/${locale}/navbar.json`)
-      }
-    },
-  };
-}
-
-export default function About() {
-  const t = useTranslations("About");
-  return (
-    <div className="container">
-      <Head>
-        <title>{t("title")}</title>
-        <meta name="description" content="Generated by create next app" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <div className="row mt-3">
-        <h1>{t("title")}</h1>
-      </div>
-    </div>
-  );
-}
-
-6. Implementar un switcher:
-
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { useTranslations } from "next-intl";
-
-export default function LocaleSwitcher() {
- const { locales, locale, pathname, query, asPath } = useRouter();
- const otherLocales = locales.filter((l) => l !== locale); // Find all the locales apart from the current locale.
- const t = useTranslations("Navbar");
-
- return (
-   <>
-     {otherLocales.map((locale) => {
-       return (
-         <Link
-           key={locale}
-           href={{ pathname, query }}
-           as={asPath}
-           locale={locale}
-         >
-           <a className="nav-link">{t("switchLanguage", { locale })}</a>
-         </Link>
-       );
-     })}
-   </>
- );
-}
+Agregar "suppressHydrationWarning" como atributo al elemento que genera el error.
 
 
 SEO
