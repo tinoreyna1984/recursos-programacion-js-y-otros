@@ -186,8 +186,8 @@ Es la acción de precarga de páginas de un sitio hecho con Next.js. Next genera
 Existen dos principales formas de pre-renderizado: generación estática y server-side rendering (renderizado del lado del servidor) o SSR.
 El pre-renderizado beneficia al sitio con mejor performance y SEO.
 
-Generación Estática
--------------------
+Generación Estática (SSG)
+-------------------------
 
 Next genera páginas una vez para ser reutilizadas en cada sesión del usuario.
 Es la forma por defecto con la que Next genera las páginas para el sitio una vez desplegado a producción.
@@ -418,13 +418,19 @@ query: es el objeto de los idiomas que se pueden consultar. A través del atribu
 Prevenir el error "Error: Text content does not match server-rendered HTML"
 ===========================================================================
 
-Agregar "suppressHydrationWarning" como atributo al elemento que genera el error.
+Agregar "suppressHydrationWarning" como atributo al elemento que genera el error (no abusar de esta técnica).
 
 
 SEO
 ===
 
+En Next.js es posible adecuar el SEO con:
 
+- Uso de tags meta (metadata), robots y mapas de sitio XML.
+- Estrategias de renderizado, comentadas en secciones anteriores: SSG, SSR, ISG (generación incremental del sitio) y CSR. Solo las tres primeras ayudan al SEO.
+- Todos los conceptos del Marketing Digital referidos al SEO, tales como los headings (h1, h2,..., h6), links internos, etcétera.
+
+Analíticas de sitios en Vercel: https://nextjs.org/analytics
 
 
 

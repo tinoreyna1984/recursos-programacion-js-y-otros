@@ -1377,6 +1377,8 @@ Modificar en la consola de Google para credenciales agregando una nueva ruta aut
 CRUD extendido en restserver
 ----------------------------
 
+Uso del JWT:
+
 
 
 
