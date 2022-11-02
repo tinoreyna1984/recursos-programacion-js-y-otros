@@ -14,6 +14,210 @@ Crear build:
 
 npm run build
 
+Definir los modelos
+===================
+
+Content-Type
+Cada uno de ellos incluye generación de campos basados en tipos primitivos y de componentes
+
+Componentes
+Son campos que incluyen submodelos que pueden repetirse o ser únicos.
+
+Single-Type
+Son modelos de un único registro. Se utilizan para, por ejemplo, descripciones de páginas de un sitio web.
+
+
+Generación y consumo del API
+============================
+
+1. Crear un usuario autenticado (recomendable).
+2. Ir a Roles -> Authenticated -> Habilitar todos los métodos disponibles para usuarios autenticados.
+3. Para emplear los métodos del CRUD:
+
+- Crear un JWT a partir de una sesión con request POST. El resultado incluye el JWT que debe ser empleado en los métodos del CRUD.
+- En la cabecera, agregar: Authorization: "bearer <cadena JWT>"
+
+4. Para los métodos GET y POST con componentes, agregar al endpoint: ?populate=* (llena todos los campos)
+
+
+Deploy en fly.io
+================
+
+1. Crear un Dockerfile en la raíz del proyecto:
+
+npm:
+
+# Dockerfile
+FROM node:16
+# Installing libvips-dev for sharp Compatability
+RUN apt-get update && apt-get install libvips-dev -y
+ARG NODE_ENV=development
+ENV NODE_ENV=${NODE_ENV}
+WORKDIR /opt/
+COPY ./package.json ./package-lock.json ./
+ENV PATH /opt/node_modules/.bin:$PATH
+RUN npm install
+WORKDIR /opt/app
+COPY ./ .
+RUN npm run build
+EXPOSE 1337
+CMD ["npm", "run", "develop"]
+
+Yarn:
+
+FROM node:16
+# Installing libvips-dev for sharp Compatability
+RUN apt-get update && apt-get install libvips-dev -y
+# Set environment to production
+ENV NODE_ENV=production
+# Copy the configuration files
+WORKDIR /opt/
+COPY ./package.json ./yarn.lock ./
+ENV PATH /opt/node_modules/.bin:$PATH
+# Install dependencies
+RUN yarn install
+# Copy the application files
+WORKDIR /opt/app
+COPY ./ .
+# Build the Strapi application
+RUN yarn build
+# Expose the Strapi port
+EXPOSE 1337
+# Start the Strapi application 
+CMD ["yarn", "develop"]
+
+2. Crear el archivo .dockerignore:
+
+# .dockerignore
+.tmp/
+.cache/
+.git/
+build/
+node_modules/
+data/
+
+3. Instalar el CLI de fly.io:
+
+MacOS:
+brew install flyctl
+
+Linux:
+curl -L https://fly.io/install.sh | sh
+
+Windows:
+iwr https://fly.io/install.ps1 -useb | iex
+
+4. Acceder a la cuenta de fly.io
+
+flyctl auth login
+
+5. Crear un proyecto fly.io en la raíz:
+
+flyctl launch
+
+En el archivo fly.toml creado, actualizar este valor:
+
+internal_port = 1337
+
+6. Escribir el nombre del app y crear su base de datos PostgreSQL (BBDD de desarrollo)
+
+7. Deployar el app.
+
+8. Para cada redeploy, emplear el comando: flyctl deploy -a <nombre-proyecto>
+
+
+Deploy en Render
+================
+
+1. Instalar: npm i pg-connection-string pg crypto
+
+2. Crear un archivo render.yaml:
+
+services:
+  - type: web
+    name: crm-tino-backend
+    env: node
+    plan: starter
+    buildCommand: yarn install && yarn build
+    startCommand: yarn develop
+    healthCheckPath: /_health
+    autoDeploy: false
+    disk:
+      name: strapi-uploads
+      mountPath: /opt/render/project/src/public/uploads
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: ~16.16.0
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: crm-tino-backend-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_JWT_SECRET
+        generateValue: true
+      - key: APP_KEYS
+        generateValue: true
+
+databases:
+  - name: crm-tino-backend-db
+    plan: starter
+
+En este caso, se crea para integrar con una BBDD PostgreSQL.
+
+3. Crear un directorio config/env/production y agregar en el mismo los ficheros database.js y server.js:
+
+database.js:
+
+const { parse } = require("pg-connection-string");
+
+module.exports = ({ env }) => {
+  const { host, port, database, user, password } = parse(env("DATABASE_URL"));
+
+  return {
+    connection: {
+      client: "postgres",
+      connection: {
+        host,
+        port,
+        database,
+        user,
+        password
+      },
+      debug: false,
+    },
+  };
+};
+
+server.js:
+
+module.exports = ({ env }) => ({
+  url: env("RENDER_EXTERNAL_URL"),
+});
+
+4. Crear en Render el web service con el repositorio del proyecto y en la ejecución cambiar a yarn develop.
+
+5. Crear en src el archivo generateCode.js y ejecutarlo: node src/generateCode.js:
+
+const crypto = require('crypto')
+console.log(crypto.randomBytes(16).toString('base64'))
+
+6. En Render, crear las variables de entorno:
+
+APP_KEYS=valor1,valor2
+API_TOKEN_SALT=valor3
+ADMIN_JWT_SECRET=valor4
+JWT_SECRET=valor5
+
+Usar el programa del paso 5 para generar las claves.
+
+7. Deployar con los pasos anteriores.
+
+
+
 
 
 
