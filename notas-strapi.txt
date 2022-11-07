@@ -86,6 +86,8 @@ EXPOSE 1337
 # Start the Strapi application 
 CMD ["yarn", "develop"]
 
+(cambiar de "develop" a "start" después de asegurar la configuración de los campos)
+
 2. Crear el archivo .dockerignore:
 
 # .dockerignore
@@ -215,6 +217,41 @@ JWT_SECRET=valor5
 Usar el programa del paso 5 para generar las claves.
 
 7. Deployar con los pasos anteriores.
+
+8. Cambiar de "develop" a "start" después de asegurar la configuración de los campos.
+
+
+Migrar contenido a producción
+=============================
+
+1. Instalar el plugin strapi-plugin-import-export-entries: npm i strapi-plugin-import-export-entries
+
+2. Crear y/o configurar el archivo config/plugins.js con el siguiente contenido:
+
+module.exports = ({ env }) => ({
+  //...
+  'import-export-entries': {
+    enabled: true,
+  },
+  //...
+});
+
+3. Crear el archivo src/admin/webpack.config.js con el siguiente contenido:
+
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+
+module.exports = (config) => {
+  config.plugins.push(new MonacoWebpackPlugin());
+
+  return config;
+};
+
+4. Generar el build del proyecto:
+
+npm run build --clean
+
+5. Acceder al panel de administración. En el content manager debe estar las entidades con las opciones de exportar e importar contenido.
+
 
 
 

@@ -1,0 +1,89 @@
+Medusa
+******
+
+Crear proyecto fullstack de Medusa
+==================================
+
+Ejecutar: npx create-medusa-app
+
+Crea un superproyecto fullstack de Medusa.
+
+
+Construir el superproyecto de Medusa manualmente
+================================================
+
+General
+-------
+
+Instalar el CLI de Medusa: npm install @medusajs/medusa-cli -g
+
+Servidor - Medusa Server
+------------------------
+
+1. Ejecutar:
+
+medusa new mi-tienda-medusa-server --seed
+cd mi-tienda-medusa-server
+medusa develop
+
+Admininstración - Medusa Admin
+------------------------------
+
+1. Clonar desde repositorio GitHub:
+
+git clone https://github.com/medusajs/admin mi-tienda-medusa-admin
+cd mi-tienda-medusa-admin
+
+2. Instalar las dependencias: npm i
+
+3. Ejecutar el Servidor de Medusa (ver procedimiento del Servidor)
+
+4. Crear usuario de acceso: medusa user -e some@email.com -p some-password (las credenciales por defecto son correo: admin@medusa-test.com y clave: supersecret)
+
+5. Ejecutar: npm run start
+
+6. Acceder al panel de administración en localhost:7000 y entrar con el usuario y clave creados
+
+
+Storefront
+----------
+
+1. Instalar con starter: npx create-next-app -e https://github.com/medusajs/nextjs-starter-medusa mi-tienda-medusa-storefront
+
+2. Entrar al proyecto creado y crear el archivo .env.local a partir de .env.template (copiar).
+
+3. Ejecutar: npm run dev
+
+
+Rutas de los despliegues locales de Medusa
+==========================================
+
+Server: <servidor>:9000
+Admin: <servidor>:7000
+Storefront:  <servidor>:8000
+
+
+Algunas rutas del API del servidor Medusa
+=========================================
+
+Productos: http://localhost:9000/store/products
+Colecciones: http://localhost:9000/store/collections
+Regiones: http://localhost:9000/store/regions
+
+Todas las rutas: https://docs.medusajs.com/api/store/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
