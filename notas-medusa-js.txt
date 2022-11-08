@@ -73,11 +73,47 @@ Regiones: http://localhost:9000/store/regions
 Todas las rutas: https://docs.medusajs.com/api/store/
 
 
+Despliegue de la solución - Server
+==================================
+
+Railway (solo PostgreSQL + Redis)
+---------------------------------
+
+https://medusajs.com/blog/deplot-medusa-server-railway
 
 
+Render - PostgreSQL + Redis
+---------------------------
+
+Próximamente.
+
+Render - SQLite
+---------------
+
+1. Dashboard -> New -> Web service
+2. Escoger repositorio de GitHub.
+3. Agregar variables de entorno:
+
+PORT=9000
+JWT_SECRET=generarclave
+COOKIE_SECRET=generarclave 
+
+Reemplazar "generarclave" por una clave generada.
+
+4. Configurar arranque (Start command): medusa migrations run && medusa develop
+
+5. Para trabajar con un sitio de administración, agregar: ADMIN_CORS=<ADMIN_URL>
+
+Listo. El esquema trabaja con SQLite y un falso Redis que viene por default.
 
 
+Despliegue de la solución - Admin
+=================================
 
+Netlify
+-------
+
+https://docs.medusajs.com/deployments/admin/deploying-on-netlify
 
 
 
