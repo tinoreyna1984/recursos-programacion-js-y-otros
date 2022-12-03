@@ -1,0 +1,80 @@
+React Native (RN)
+*****************
+
+Con expo
+========
+
+Instalación y configuración del expo-cli
+----------------------------------------
+
+Instalar: npm i -g expo-cli
+
+Crear app de RN con expo: npx create-expo-app <mi-app>
+
+Para renderizar en web, instalar:
+npx expo install react-native-web@~0.18.9 react-dom@18.1.0 @expo/webpack-config@^0.17.2
+
+Ejecutar:
+
+Expo: npx expo start
+Otras formas:
+npm run android # android
+npm run ios # requiere macOS para generar el build del proyecto, caso contrario usar Expo
+npm run web # web
+
+Con RN CLI
+==========
+
+Próximamente.
+
+Redux Toolkit (RTK)
+===================
+
+Instalar: npm i @reduxjs/toolkit react-redux
+
+El uso es el mismo que en React.
+
+Componentes
+===========
+
+A diferencia de HTML (que usa React), en React Native se tienen principalmente los siguientes componentes:
+
+* View
+* Text
+* ScrollView
+* FlatList
+* TextInput
+* StyleSheet
+* Image
+* Button
+* TouchableOpacity (alternativa a Button)
+* Switch (botón de interrupción)
+* ActivityIndicator
+* StatusBar
+* Modal
+
+Todos los componentes están en su documentación: https://reactnative.dev/docs/components-and-apis
+
+Ruteo
+=====
+
+Ver React Navigation.
+
+
+Generar el build
+================
+
+Instalar Expo Application Services (EAS) CLI: npm install -g eas-cli
+
+Login a la cuenta de Expo: eas login
+
+Configuración del build: eas build:configure
+
+Proceder: eas build
+
+Enviar a las app stores: eas submit
+
+
+
+
+

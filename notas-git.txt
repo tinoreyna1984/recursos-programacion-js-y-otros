@@ -1,0 +1,40 @@
+Uso de Git
+==========
+
+Comandos:
+
+Config. de usuario:
+git config --global user.name "Tino Reyna"
+git config --global user.email "tinoreyna1984@gmail.com"
+
+Verificar estado de archivos:
+git status
+
+Agregar archivos:
+git add <archivo o archivos específicos>
+git add . # agrega todos
+
+Guardar en branch local:
+git commit -m "Mensaje de cambio"
+
+Crear repositorio en Github.
+
+Enviar al repositorio creado en Github:
+git remote add origin https://github.com/usuario/<nuevo-repo>.git
+Y después:
+git push origin master
+
+Para cambios desde PC, actualizar rama remota:
+git push origin master
+
+Para actualizar desde repositorio (traer cambios a escritorio):
+git pull origin master
+
+Para verificar origen del repositorio:
+git remote -v
+
+Para cambiar de repositorio remoto:
+git remote set-url origin https://github.com/usuario/<nuevo-repo>.git
+
+Deshacer todos los cambios en un proyecto:
+git reset --hard

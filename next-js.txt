@@ -62,6 +62,65 @@ function MyApp({ Component, pageProps }) {
 
 export default MyApp
 
+TailwindCSS
+===========
+
+Crear proyecto de Next.js (con Typescript) con TailwindCSS
+----------------------------------------------------------
+
+Ejecutar:
+
+npx create-next-app --example with-tailwindcss mi-proyecto
+o: yarn create next-app --example with-tailwindcss mi-proyecto
+o: pnpm create next-app --example with-tailwindcss mi-proyecto
+
+
+Crear proyecto de Next.js y configurar TailwindCSS manualmente
+--------------------------------------------------------------
+
+1. Crear proyecto y acceder al mismo:
+
+npx create-next-app my-project
+cd my-project
+
+2. Instalar TailwindCSS y sus componentes asociados en modo desarrollo. Luego, crear los archivos de configuración:
+
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+
+3. Configurar las rutas de template para TailwindCSS editando tailwind.config.js:
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./app/**/*.{js,ts,jsx,tsx}",
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+
+4. Aprovechando styles/globals.css de Next, agregar las directivas en ese archivo reemplazando el contenido por:
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+5. Ejecutar el proyecto:
+
+npm run dev
+
+6. El proyecto ya está listo para ser desarrollado.
+
+Nota para VS Code
+-----------------
+
+Si ocurre el mensaje "CSS > Lint: Unknown At Rules" en el paso 4, buscar en Preferencias, filtrar la expresión del error y cambiar la configuración a "ignore".
+
+
 
 Uso
 ===
@@ -432,6 +491,13 @@ En Next.js es posible adecuar el SEO con:
 
 Analíticas de sitios en Vercel: https://nextjs.org/analytics
 
+
+Redux Toolkit en Next.js
+========================
+
+Se aplican los mismos conceptos que en React puro, solo que se tiene especial atención a la característica del SSR.
+
+Instalar: npm i @reduxjs/toolkit react-redux next-redux-wrapper
 
 
 

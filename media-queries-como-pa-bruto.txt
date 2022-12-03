@@ -1,26 +1,34 @@
 /* media queries como pa bruto */
 
-@media (min-width: 0rem) and (max-width: 36rem) {
+/* hack de ajuste de dimensiones en rem con html y body (para lograr: 1rem = 10px) */
+html {
+    font-size: 62.5%; /* font-size base a nivel de html */
+}
+body {
+    font-size: 16px; /* font-size base a nivel del documento */
+}
+
+@media (min-width: 0rem) {
   /* pon los elementos a transformar */
 }
 
-@media (min-width: 36rem) and (max-width: 43rem) {
+@media (min-width: 36rem) {
   /* pon los elementos a transformar */
 }
 
-@media (min-width: 43rem) and (max-width: 62rem) {
+@media (min-width: 43rem) {
   /* pon los elementos a transformar */
 }
 
-@media (min-width: 62rem) and (max-width: 82rem) {
+@media (min-width: 62rem) {
   /* pon los elementos a transformar */
 }
 
-@media (min-width: 82rem) and (max-width: 120rem) {
+@media (min-width: 82rem) {
   /* pon los elementos a transformar */
 }
 
-@media (min-width: 120rem) and (max-width: 240rem) {
+@media (min-width: 120rem) {
   /* pon los elementos a transformar */
 }
 

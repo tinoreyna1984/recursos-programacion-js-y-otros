@@ -1,0 +1,316 @@
+HTML
+****
+
+Estructuración con HTML
+=======================
+
+Uso de section: agrupa headings como el <h1>
+Uso del main: es la sección más importante de la página. Puede agrupar otros <section>
+
+Formularios
+===========
+
+
+<form action="">
+  <fieldset>
+    <legend>Título</legend>
+    <div>
+      <label for="campo01">Etiqueta01: </label>
+      <input type="text|email|number|..." name="campo01" id="campo01" placeholder="campo01" />
+    </div>
+    <div>
+      <label for="campo02">Etiqueta02: </label>
+      <input type="text|email|number|..." name="campo02" id="campo02" placeholder="campo02" />
+    </div>
+    ...
+    <div>
+      <label for="campoN">EtiquetaN: </label>
+      <input type="text|email|number|..." name="campoN" id="campoN" placeholder="campoN" />
+    </div>
+    <div>
+      <button type="submit">Enviar</button>
+    </div>
+  </fieldset>
+</form>
+
+
+CSS
+***
+
+Hack de ajuste de dimensiones en rem con html y body
+====================================================
+
+/* hack de ajuste de dimensiones en rem con html y body (para lograr: 1rem = 10px) */
+html {
+    font-size: 62.5%; /* font-size base a nivel de html */
+}
+body {
+    font-size: 16px; /* font-size base a nivel del documento */
+}
+
+Esto asegura una relación práctica: 1rem = 10px (sobre la base de 16px en el documento como se indica).
+Las demás medidas de los elementos en pantalla será en rem.
+
+Selectores
+==========
+
+Elemento
+--------
+
+p {
+  color: blue;
+}
+
+Clase
+-----
+
+.cliente {
+  color: blue;
+}
+
+ID
+--
+
+#cliente {
+  color: blue;
+}
+
+Atributo
+--------
+
+[src="logo.jpg"]{
+  color: blue;
+}
+
+Combinación de descendiente
+---------------------------
+
+.cliente .nombre{
+  color: blue;
+}
+
+Aplica para elementos, clases y ID donde todo elemento hijo (y sus descendientes) serán afectados por los atributos definidos.
+En este caso, todos los elementos de la clase nombre (y sus descendientes) tendrán el color de letra azul.
+
+Todos los hijos
+---------------
+
+.cliente > p{
+  color: blue;
+}
+
+Aplica para elementos, clases y ID donde todo elemento hijo (excepto sus descendientes) serán afectados por los atributos definidos.
+En este caso, todos los elementos p (excepto sus descendientes) tendrán el color de letra azul.
+
+
+Especificidad en CSS
+====================
+
+Es la característica por la cual CSS define los atributos de un elemento o clase.
+Hay varios tipos:
+
+Por orden de definición
+-----------------------
+
+p {
+ color: red;
+}
+
+p {
+ color: green; /* el navegador usará este atributo e ignorará el anterior */
+}
+
+Por caso particular
+-------------------
+
+p {
+ color: red; /* todos los párrafos tendrán este color */
+}
+
+p.cliente {
+ color: green; /* los párrafos de la clase cliente tendrán este color */
+}
+
+p#parrafo {
+ color: blue; /* solo el párrafo con el ID "parrafo" tendrá este color */
+}
+
+A la fuerza
+-----------
+
+p#parrafo {
+ color: blue; /* solo el párrafo con el ID "parrafo" tendrá este color */
+}
+
+p {
+ color: red!important; /* todos los párrafos tendrán este color y anulará la especificidad del párrafo con ID "parrafo" */
+}
+
+Pseudoclase
+===========
+
+:pseudoclase{
+  /* lista de atributos */
+}
+
+Ej:
+
+a:hover{ /* hover es la pseudoclase */
+  color: yellow;
+}
+
+:root{
+  --blanco: #ffffff;
+  --oscuro: #212121;
+  --primario: #ffc107;
+  --secundario: #0097a7;
+  --gris: #757575;
+}
+
+/* Uso la instancia de la clase */
+.campo:nth-child(3){
+  grid-column: 1 / 3;
+}
+
+Atributos personalizados
+========================
+
+--nombre-atributo: valor
+
+Estos se usan con la función var:
+
+.navegacion-principal{
+    background-color: var(--secundario);
+}
+
+Formas de display
+=================
+
+display: block
+--------------
+
+Es el default que usan los elementos al llenar el documento web. Posiciona los elementos uno bajo el otro conforme van siendo añadidos.
+
+display: inline
+---------------
+
+Es el que ocurre en bloques tales como la barra de navegación. Posiciona los elementos uno a la derecha del otro a medida que van siendo añadidos.
+
+
+display: flex (Flexbox)
+-----------------------
+
+Es el display unidimensional que puede trabajarse a nivel de fila o columna.
+La orientación por default es fila (row).
+
+
+display: grid (CSS Grid)
+------------------------
+
+Es el display de las dos dimensiones en simultáneo que permite a los elementos ocupar un área definida.
+
+
+Responsive web design
+=====================
+
+Media queries
+-------------
+
+.navegacion-principal{
+    display: flex;
+    flex-direction: column;
+}
+
+@media(min-width: 768px){
+    .navegacion-principal{
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+CSS Box-model
+=============
+
+Es una cualidad de los elementos que siguen la directiva:
+
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+Posicionamiento de elementos
+============================
+
+Por default, la posición es estática, o sea: position: static.
+
+Si se desea cambiar la posición sin afectar el layout que lo contiene, se aplica position: relative
+En caso contrario, se aplica position: absolute
+
+
+Alineamiento
+============
+
+flex-direction: row
+-------------------
+
+display: flex;
+align-items: center;     /* alínea verticalmente */
+justify-content: center; /* alínea horizontalmente */
+
+flex-direction: column
+----------------------
+
+display: flex;
+flex-direction: column;
+align-items: center;      /* alínea horizontalmente */
+justify-content: center;  /* alínea verticalmente */
+
+
+Gradientes en CSS
+=================
+
+background-image: linear-gradient(to top, #dfe9e3 0%, var(--blanco) 100%);
+
+Scroll Snap
+===========
+
+Genera paradas en la navegación scroll hacia cierto elemento.
+
+html {
+  scroll-snap-type: y proximity; /* ajuste del scroll vertical */
+}
+
+/* scroll-snap - secciones donde se detiene el scroll */
+.servicios, .navegacion-principal, .formulario, .footer {
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+}
+
+
+Metodología BEM (Block-Element-Modifier)
+========================================
+
+Es una metodología para crear CSS reutilizable y ordenado que evita colisión entre nombres (de clases, ids, etcétera).
+
+
+Reglas del BEM
+--------------
+
+Bloques: son contenedores de elementos. Se nombran como clases.
+Elementos: son ítems pertenecientes al bloque, nombrados así: .bloque__elemento
+Modificadores: son los indicadores de variante de un elemento, nombrados así: .bloque__elemento--modificador
+
+
+
+
+
+
+
+
+
+
+
+
