@@ -304,6 +304,438 @@ Elementos: son ítems pertenecientes al bloque, nombrados así: .bloque__element
 Modificadores: son los indicadores de variante de un elemento, nombrados así: .bloque__elemento--modificador
 
 
+Patrones de diseño web responsivo
+=================================
+
+1. 2 columnas iguales con CSS Grid
+----------------------------------
+
+Aplicar desde el elemento padre:
+
+@media (min-width: 768px){
+    .dos-columnas{
+        display: grid;
+        /* grid-template-columns: 50% 50%;
+        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, 50%); */
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 5rem;
+    }
+}
+
+2. 2 columnas iguales con Flexbox
+---------------------------------
+
+Aplicar:
+
+@media(min-width: 768px){
+    .dos-columnas{
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .entrada-blog{
+	    /* flex-basis: calc(50% - 1rem); */
+        flex: 0 0 calc(50% - 1rem);
+    }
+}
+
+O:
+
+@media(min-width: 768px){
+    .dos-columnas{
+        display: flex;
+        justify-content: space-between;
+		gap: 2rem; /* no está aún soportada en Safari */
+    }
+}
+
+3. 3 columnas iguales con CSS Grid
+----------------------------------
+
+Aplicar en la clase padre:
+
+@media(min-width: 768px){
+    .tres-columnas{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        column-gap: 2rem;
+    }
+}
+
+4. 3 columnas iguales con Flexbox
+---------------------------------
+
+Aplicar en la clase padre:
+
+@media(min-width: 768px){
+    .tres-columnas{
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .entrada-blog{
+        flex: 0 0 calc(33.3% - 1rem);
+    }
+}
+
+O:
+
+@media(min-width: 768px){
+    .tres-columnas{
+        display: flex;
+        justify-content: space-between;
+		gap: 2rem; /* no está aún soportada en Safari */
+    }
+}
+
+5. Tres columnas (1 más grande que las otras dos) con CSS Grid
+--------------------------------------------------------------
+
+Primer paso: definir las clases:
+* contenedor-grid: para el uso de grid
+* contenedor-principal: para la columna más grande
+* dos columnas aside
+
+Luego, aplicar:
+
+@media(min-width: 768px){
+    .contenedor-grid{
+        display: grid;
+        grid-template-areas: "izquierda contenido derecha";
+        grid-template-columns: 1fr 3fr 1fr;
+        grid-auto-flow: column;
+        column-gap: 2rem;
+    }
+
+    .contenido-principal {
+        grid-area: contenido;
+    }
+
+    .sidebar-1 {
+        grid-area: izquierda;
+    }
+	
+	/* sidebar-2 automáticamente va a la derecha */
+}
+
+
+6. Tres columnas (1 más grande que las otras dos) con Flexbox
+-------------------------------------------------------------
+
+Primer paso: definir las clases:
+* contenedor-grid: para el uso de grid
+* contenedor-principal: para la columna más grande
+* clase sidebar para las columnas de menor tamaño
+
+Luego, aplicar:
+
+@media (min-width: 768px) {
+    .contenedor-flex{
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .contenido-principal {
+        flex-basis: calc(60% - 1rem);
+    }
+
+    .sidebar {
+        flex-basis: calc(20% - 1rem);
+    }
+
+    .sidebar-1 {
+        order: -1; /* la posición de uno de los sidebars, invertido */
+    }
+}
+
+7. Column drop (CSS Grid)
+-------------------------
+
+Aplicar:
+
+
+@media (min-width: 480px) {
+    .column-drop-css { /* contenedor principal */
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+    .primera {
+        grid-column: 1 / 3;
+        grid-row: 2 / 3;
+    }
+    .segunda {
+        grid-column: 2 / 3;
+        grid-row: 1 / 3;
+    }
+}
+
+@media (min-width: 768px) {
+    
+    .column-drop-css {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .primera {
+        grid-column: 2 / 3;
+        grid-row: unset;
+    }
+    .segunda {
+        grid-column: 3 / 4;
+        grid-row: unset;
+    }
+}
+
+
+8. Column drop (Flexbox)
+------------------------
+
+@media(min-width: 480px){
+    .column-drop-flex {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    .contenido-principal, .primera {
+        flex-basis: calc(50% - 1rem);
+    }
+}
+
+@media(min-width: 768px){
+    .contenido-principal, .primera, .segunda {
+        flex: 0 0 calc(33.3% - 2rem);
+    }
+}
+
+
+9. Con sidebar (CSS Grid)
+-------------------------
+
+Aplicar:
+
+
+@media (min-width: 768px){
+    .con-sidebar {
+        display: grid;
+        grid-template-columns: 3fr 1fr;
+        column-gap: 4rem;
+        grid-auto-flow: column;
+    }
+
+    aside {
+        grid-column: 2 / 3;
+    }
+}
+
+
+10. Con sidebar (Flexbox)
+-------------------------
+
+Aplicar:
+
+@media(min-width: 768px){
+    .con-sidebar {
+        display: flex;
+        gap: 2rem;
+    }
+    aside {
+        flex: 1;
+    }
+    article {
+        flex: 3;
+    }
+}
+
+11. Layout shifter (CSS Grid)
+-----------------------------
+
+Aplicar:
+
+
+@media(min-width: 768px){
+    .layout-shifter {
+        display: grid;
+        grid-template-areas: "contenido"
+                             "inferior";
+    }
+    .sidebar {
+        grid-area: inferior;
+    }
+    .contenido-principal {
+        grid-area: contenido;
+        display: grid;
+        grid-template-areas: "entrada1 entrada2";
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 3rem;
+    }
+}
+
+@media(min-width: 992px){
+    .layout-shifter {
+        grid-template-areas: "contenido sidebar";
+        column-gap: 2rem;
+    }
+    .sidebar{
+        grid-area: sidebar;
+    }
+    .contenido-principal {
+        grid-area: contenido;
+        grid-template-areas: "entrada1"
+                             "entrada2";
+        grid-template-columns: unset;
+    }
+}
+
+12. Layout shifter (Flexbox)
+-----------------------------
+
+Aplicar:
+
+@media (min-width: 768px) {
+    .layout-shifter{
+        display: flex;
+        flex-direction: column-reverse;
+    }
+    .contenido-principal {
+        display: flex;
+        justify-content: space-between;
+    }
+    .entrada-blog {
+        flex: 0 0 calc(50% - 2rem);
+    }
+}
+
+@media (min-width: 992px) {
+    .layout-shifter{
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .contenido-principal {
+        flex: 0 0 calc(66.6% - 2rem);
+        flex-wrap: wrap;
+    }
+    .sidebar {
+        order: 2;
+        flex: 0 0 calc(33.3% - 2rem);
+    }
+    .entrada-blog {
+        flex: 0 0 100%;
+    }
+}
+
+13. Mostly fluid
+----------------
+
+.contenedor {
+    width: 95%;
+    max-width: 120rem;
+    margin: 0 auto;
+}
+
+@media(min-width: 768px){
+    .contenedor {
+        width: 80%;
+    }
+}
+
+@media(min-width: 992px){
+    .contenedor {
+        width: 60%;
+    }
+}
+img {
+    max-width: 100%;
+}
+
+
+14. Tiny tweaks
+---------------
+
+Consiste en ajustes en tamaños de texto en función a la resolución del dispositivo.
+
+
+h1 {
+    text-align: center;
+    font-size: 4rem;
+}
+
+p {
+    font-size: 2rem;
+}
+
+@media(min-width: 768px){
+    h1 {
+        font-size: 6rem;
+        text-align: left;
+    }
+    p {
+        font-size: 3rem;
+    }
+}
+
+Contenedor responsivo
+=====================
+
+Generar:
+
+.contenedor {
+  max-width: 120rem;
+  width: 90%;
+  margin: 0 auto;
+}
+
+o:
+
+.contenedor {
+  width: min(90%, 120rem);
+  margin: 0 auto;
+}
+
+Performance del sitio
+=====================
+
+Lazy loading
+------------
+
+Agregar loading="lazy" en los objetos img.
+
+Preload
+-------
+
+<link rel="preload" as="style" href="css/styles.css" />
+
+Prefetch
+--------
+
+<link rel="prefetch" href="nosotros.html" as="document" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
