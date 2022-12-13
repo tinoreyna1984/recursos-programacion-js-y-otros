@@ -1,4 +1,190 @@
 JavaScript en el DOM
 ********************
 
+Agregar una sección <script> en el documento HTML:
+
+<script src="js/scripts.js"></script>
+
+Selectores
+==========
+
+querySelector
+-------------
+
+Devuelve el primer elemento que coincida con el valor de una clase o ID, caso contrario devuelve null.
+
+
+const contenedor = document.querySelector('.contenedor');
+console.log(contenedor);
+const heading = document.querySelector(".header__texto h2")
+console.log(heading)
+console.log(heading.textContent)
+console.log(heading.classList)
+
+
+getElementById
+--------------
+
+Devuelve el elemento que coincide exactamente con el ID ingresado.
+
+<html lang="en">
+  <head>
+    <title>getElementById example</title>
+  </head>
+  <body>
+    <p id="para">Some text here</p>
+    <button onclick="changeColor('blue');">blue</button>
+    <button onclick="changeColor('red');">red</button>
+  </body>
+</html>
+
+function changeColor(newColor) {
+  const elem = document.getElementById('para');
+  elem.style.color = newColor;
+}
+
+getElementsByClassName
+----------------------
+
+Devuelve un array de elementos pertenecientes a la clase o conjunto de clases ingresado.
+
+<html lang="en">
+  <body>
+    <div id="parent-id">
+      <p>hello world 1</p>
+      <p class="test">hello world 2</p>
+      <p>hello world 3</p>
+      <p>hello world 4</p>
+    </div>
+
+    <script>
+      const parentDOM = document.getElementById("parent-id");
+
+      const test = parentDOM.getElementsByClassName("test"); // a list of matching elements, *not* the element itself
+      console.log(test); // HTMLCollection[1]
+
+      const testTarget = parentDOM.getElementsByClassName("test")[0]; // the first element, as we wanted
+      console.log(testTarget); // <p class="test">hello world 2</p>
+    </script>
+  </body>
+</html>
+
+
+querySelectorAll
+----------------
+
+Devuelve un array con todos los elementos que pertenecen a la clase ingresada:
+
+const enlaces = document.querySelectorAll('.navegacion a');
+console.log(enlaces)
+console.log(enlaces[1])
+
+
+createElement (crea elemento HTML)
+----------------------------------
+
+const nuevoEnlace = document.createElement("A"); // el tipo de elemento en mayúscula
+nuevoEnlace.href = "https://google.com"; // dirección
+nuevoEnlace.textContent = "Ir a Google"; // texto
+nuevoEnlace.classList.add("navegacion__enlace"); // agregar clase
+console.log(nuevoEnlace);
+// agrego nuevoEnlace a la barra de navegación
+const navegacion = document.querySelector(".navegacion");
+navegacion.appendChild(nuevoEnlace);
+
+
+
+Manejo de eventos
+=================
+
+addEventListener
+----------------
+
+console.log("1")
+window.addEventListener("load", () => console.log("2"))
+window.onload = () => console.log("3"); // equivalente al addEventListener
+document.addEventListener("DOMContentLoaded", () => console.log("4")); // manejado desde el DOM
+console.log("5")
+
+// El orden de carga es: console.log, document.addEventListener y window.addEventListener
+
+El orden de la carga es debido a que window espera a que se descargue todos los elementos que van al navegador (HTML, JS, etcétera) y toma más tiempo. En cambio, DOMContentLoaded solo espera a la descarga del HTML.
+
+Normalmente debe trabajarse a nivel de documento, en lugar de ventana.
+
+Reacción a clicks
+-----------------
+
+En contacto.html agregar: <script src="js/scripts.js"></script>
+
+Probar:
+
+const pasarEvento = (e) => {
+    console.log(e)
+    e.preventDefault();
+}
+const btnEnviar = document.querySelector(".boton--primario");
+btnEnviar.addEventListener("click", pasarEvento);
+
+
+Manejo de eventos de inputs y textArea
+--------------------------------------
+
+const datos = {
+    nombre: "",
+    email: "",
+    mensaje: ""
+}
+
+const nombre = document.querySelector("#nombre");
+const email = document.querySelector("#email");
+const mensaje = document.querySelector("#mensaje");
+const leerTexto = (e) => {
+    //console.log(e.target.value);
+    datos[e.target.id] = e.target.value;
+    console.log(datos)
+}
+nombre.addEventListener("input", (e) => leerTexto(e))
+email.addEventListener("input", (e) => leerTexto(e))
+mensaje.addEventListener("input", (e) => leerTexto(e))
+
+
+Manejo de formularios: validación de datos y envío
+--------------------------------------------------
+
+
+const formulario = document.querySelector(".formulario");
+formulario.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const {nombre, email, mensaje} = datos;
+
+    if(nombre.length < 1 || email.length < 1 || mensaje.length < 1){
+        alerta("Todos los campos son obligatorios", "error");
+        return;
+    }
+
+    alerta("Se enviaron datos con éxito")
+
+})
+
+const alerta = (msg, tipo = "correcto") => {
+    const alerta = document.createElement("p");
+    alerta.textContent = msg;
+    alerta.classList.add(tipo);
+    formulario.appendChild(alerta)
+    setTimeout(() => {
+        $("." + tipo).fadeOut("slow"); // usando jQuery
+    }, 3000);
+}
+
+NOTA: para jQuery, agregar:
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+
+
+
+
+
+
+
+
 

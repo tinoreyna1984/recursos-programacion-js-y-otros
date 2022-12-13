@@ -1,5 +1,5 @@
-Uso de SASS en React JS
-=======================
+SASS en React
+=============
 
 Instalación de Node SASS:
 
