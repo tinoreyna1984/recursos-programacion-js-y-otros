@@ -500,6 +500,20 @@ Se aplican los mismos conceptos que en React puro, solo que se tiene especial at
 Instalar: npm i @reduxjs/toolkit react-redux next-redux-wrapper
 
 
+Usar normalize.css
+==================
+
+Instalar: npm i normalize.css
+
+En _app.js:
+
+import 'normalize.css/normalize.css';
+
+
+
+
+
+
 
 
 
