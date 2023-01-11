@@ -1,5 +1,319 @@
 SASS + Gulp
+***********
+
+Requiere Node.js.
+
+Crear proyecto SASS + Gulp
+==========================
+
+Crear proyecto Node: npm init o npm init -y
+
+
+Instalar y configurar SASS
+==========================
+
+Aplicar: npm i sass -D
+
+Es dependencia de desarrollo.
+
+Para configurar el compilador de SASS agregar:
+
+  "scripts": {
+    "sass": "sass --watch src/scss:build/css"
+  },
+
+En package.json. "sass --watch src/scss:build/css" ejecuta el compilador de SASS generando el CSS a partir del archivo SCSS, y se puede ejecutar para mantenerlo atento a los cambios en tiempo real.
+
+Luego, en el terminal, ejecutar: npm run sass
+
+Instalar y configurar Gulp
+==========================
+
+Aplicar: npm i -D gulp
+
+Luego, en la raíz del proyecto, crear el archivo gulpfile.js.
+
+Crear tareas con Gulp
+=====================
+
+En el gulpfile, crear una función como la que sigue:
+
+function tarea(done) {
+  console.log("Mi primera tarea");
+  done();
+}
+
+Exportarla en ese gulpfile:
+
+exports.tarea = tarea;
+
+Notar que necesita un callback para una correcta finalización, el cual es el done.
+
+Luego, ejecutar el comando gulp: npx gulp tarea
+
+Para ejecutarlo vía npm:
+
+Agregar a package.json:
+
+  "scripts": {
+    "sass": "sass --watch src/scss:build/css",
+    "gulp": "gulp tarea"
+  },
+
+Luego, ejecutar: npm run tarea
+
+Integrar SASS con Gulp
+======================
+
+Instalar: npm i -D gulp-sass gulp-plumber
+
+NOTA: gulp-plumber es para prever los errores en SASS sin detener abruptamente el watch de SASS.
+
+Editar el gulpfile con lo siguiente:
+
+const {src, dest, watch} = require("gulp");
+const sass = require("gulp-sass")(require("sass"));
+
+function css(done) {
+
+    src("src/scss/**/*.scss") // 1- identificar el archivo SASS
+    .pipe(sass()) // 2- compilar el archivo SASS a CSS
+    .pipe(dest("build/css")); // 3- guardar el CSS en disco duro
+
+    done();
+}
+
+function dev(done) {
+
+    watch("src/scss/**/*.scss", css);
+    done();
+}
+
+exports.css = css;
+exports.css = dev;
+
+Ejecutar: npx gulp css
+
+En general, se usa npx gulp <función>, a fin de llamar a la función exportada.
+
+
+Importación de variables SCSS
+=============================
+
+Tradicional
+-----------
+
+_variables.scss:
+
+$rojo: red;
+
+app.scss
+
+@import 'base/variables';
+
+body {
+  background-color: $rojo;
+}
+
+Nueva
+-----
+
+base/_variables.scss:
+
+$rojo: red;
+
+base/_index.scss:
+
+@forward "variables";
+
+app.scss:
+
+@use "base";
+
+
+Uso de variables
+================
+
+_variables.scss:
+
+$blanco: #ffffff;
+
+_header.scss:
+
+@use "base/variables" as v;
+
+  h1 {
+    color: v.$blanco;
+  }
+
+Anidamiento
 ===========
+
+_header.scss:
+
+.header {
+  background-color: v.$verde;
+
+  h1 {
+    color: v.$blanco;
+  }
+}
+
+Al generar el bloque CSS, se convierte en:
+
+.header {
+  background-color: #4cb8b3;
+}
+.header h1 {
+  color: #ffffff;
+}
+
+Empleo de pseudoclases
+======================
+
+_header.scss:
+
+.navegacion-principal {
+  a {
+    color: v.$blanco;
+    font-size: 2.4rem;
+
+    &:hover {
+      /* & concatena el elemento padre con la pseudoclase. O sea, genera: a:hover */
+      color: v.$amarillo;
+    }
+  }
+}
+
+En CSS queda:
+
+.navegacion-principal a {
+  color: #ffffff;
+  font-size: 2.4rem;
+}
+.navegacion-principal a:hover {
+  /* & concatena el elemento padre con la pseudoclase. O sea, genera: a:hover */
+  color: #fef46d;
+}
+
+Mixins
+======
+
+Son bloques de código reutilizables que se pueden importar en cualquier fichero SASS.
+
+Ejemplo:
+
+@mixin important-text {
+  color: red;
+  font-size: 25px;
+  font-weight: bold;
+  border: 1px solid blue;
+}
+
+Para emplearlos, se usa la directiva @include:
+
+.danger {
+  @include important-text;
+  background-color: green;
+}
+
+Esto genera el siguiente CSS:
+
+.danger {
+  color: red;
+  font-size: 25px;
+  font-weight: bold;
+  border: 1px solid blue;
+  background-color: green;
+}
+
+Un mixin puede emplear más mixins en su contenido:
+
+@mixin special-text {
+  @include important-text;
+  @include link;
+  @include special-border;
+}
+
+Paso de variables a un mixin
+----------------------------
+
+/* Mixin con 2 argumentos */
+@mixin bordered($color, $width) {
+  border: $width solid $color;
+}
+
+.myArticle {
+  @include bordered(blue, 1px);  // Llama al mixin con dos valores
+}
+
+.myNotes {
+  @include bordered(red, 2px); // Llama al mixin con dos valores
+}
+
+CSS resultante:
+
+.myArticle {
+  border: 1px solid blue;
+}
+
+.myNotes {
+  border: 2px solid red;
+}
+
+Mixin con valores por defecto
+-----------------------------
+
+@mixin bordered($color: blue, $width: 1px) {
+  border: $width solid $color;
+}
+
+En este caso, el parámetro ingresado es opcional (para lo cual se emplea el que se definió por defecto):
+
+.myTips {
+  @include bordered($color: orange);
+}
+
+Mixins de contenido variable
+----------------------------
+
+_mixins.scss:
+
+@use "variables" as v;
+
+@mixin telefono {
+    media (min-width: 768px){
+	    @content; // aquí va el contenido personalizable
+	}
+}
+
+Aquí la forma de invocarlos:
+
+_header.scss:
+
+@use "base/variables" as v;
+@use "base/mixins" as m;
+
+.navegacion-principal {
+  a {
+    color: v.$blanco;
+    font-size: 2.4rem;
+	
+	@include m.telefono {
+	    background-color: red;
+	}
+
+    &:hover {
+      /* & concatena el elemento padre con la pseudoclase. O sea, genera: a:hover */
+      color: v.$amarillo;
+    }
+  }
+}
+
+
+
+
+
 
 
 
