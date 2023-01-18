@@ -34,6 +34,25 @@ Formularios
 </form>
 
 
+Video en HTML5
+==============
+
+<video muted autoplay loop>
+	<source type="video/mp4" src="video/concierto.mp4" />
+	<source type="video/ogg" src="video/concierto.ogg" />
+	<source type="video/webm" src="video/concierto.webm" />
+</video>
+
+Atributos generales
+-------------------
+
+muted: sin sonido
+autoplay: se reproduce al cargar la página
+loop: reinicia su reproducción después de finalizar
+
+En cuanto a source, se debe emplear un tipo de video para cada navegador. El orden de tipos de detección es mp4, ogg y webm.
+
+
 CSS
 ***
 
@@ -44,7 +63,6 @@ Hack de ajuste de dimensiones en rem con html y body
 html {
     font-size: 62.5%; /* font-size base a nivel de html */
 }
-/* o: */
 body {
     font-size: 16px; /* font-size base a nivel del documento */
 }
@@ -227,6 +245,16 @@ Media queries
         flex-direction: row;
         justify-content: space-between;
     }
+}
+
+Imagen responsiva
+-----------------
+
+img {
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 CSS Box-model
@@ -711,37 +739,147 @@ Prefetch
 <link rel="prefetch" href="nosotros.html" as="document" />
 
 
+Lograr div con video en background
+==================================
+
+
+SCSS:
+
+@use "base/variables" as v;
+@use "base/mixins" as m;
+
+/* VIDEO DE FONDO */
+
+.video {
+  position: relative; /* relativo al body */
+  max-height: 70rem;
+  min-height: 50rem;
+  overflow: hidden; /* oculta el exceso de la dimensión del video */
+
+  .overlay {
+    position: absolute; /* absoluto dentro del div de video */
+    height: 100%;
+    width: 100%;
+    /* gradiente: */
+    background: rgb(165, 3, 255);
+    background: linear-gradient(
+      270deg,
+      rgba(165, 3, 255, 1) 0%,
+      rgba(255, 0, 110, 0.49933476808692223) 100%
+    );
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  video {
+    /* el objeto de video */
+    display: block;
+    width: auto;
+
+    @include m.tablet{
+        width: 100%; /* toma todo el ancho de pantalla a partir de tablet */
+    }
+    
+  }
+}
+
+.contenido-video {
+    z-index: 10;
+
+    h2 {
+        color: v.$blanco;
+        font-size: 7rem;
+        margin: 0;
+    }
+
+    p {
+        background-color: v.$rosa;
+        display: inline-block;
+        padding: 1rem 2rem;
+        color: v.$blanco;
+        font-weight: 700;
+        font-size: 2.4rem;
+    }
+}
+
+
+CSS:
+
+/* VIDEO DE FONDO */
+.video {
+  position: relative; /* relativo al body */
+  max-height: 70rem;
+  min-height: 50rem;
+  overflow: hidden; /* oculta el exceso de la dimensión del video */
+}
+.video .overlay {
+  position: absolute; /* absoluto dentro del div de video */
+  height: 100%;
+  width: 100%;
+  /* gradiente: */
+  background: rgb(165, 3, 255);
+  background: linear-gradient(270deg, rgb(165, 3, 255) 0%, rgba(255, 0, 110, 0.4993347681) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.video video {
+  /* el objeto de video */
+  display: block;
+  width: auto;
+}
+@media (min-width: 768px) {
+  .video video {
+    width: 100%; /* toma todo el ancho de pantalla a partir de tablet */
+  }
+}
+
+.contenido-video {
+  z-index: 10;
+}
+.contenido-video h2 {
+  color: #ffffff;
+  font-size: 7rem;
+  margin: 0;
+}
+.contenido-video p {
+  background-color: #f53756;
+  display: inline-block;
+  padding: 1rem 2rem;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 2.4rem;
+}
+
+HTML:
+
+<div class="video">
+  <div class="overlay">
+    <div class="contenedor contenido-video">
+      <h2>Rock & EDM Festival</h2>
+      <p>Enero 2023, Guayaquil, Ecuador</p>
+    </div>
+  </div>
+  <video muted autoplay loop>
+    <source type="video/mp4" src="video/concierto.mp4" />
+    <source type="video/ogg" src="video/concierto.ogg" />
+    <source type="video/webm" src="video/concierto.webm" />
+  </video>
+</div>
 
 
 
+Tag <picture>
+=============
 
+Agrupa tags img (imágenes) según el formato que puedan soportar (webp, avif, jpg, png, etcétera).
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<picture>
+  <source srcset="build/img/imagen_vocalista.avif" type="image/avif" /> <!-- Procura cargar esta imagen (si el navegador lo soporta) -->
+  <source srcset="build/img/imagen_vocalista.webp" type="image/webp" /> <!-- Procura cargar esta imagen (si el caso anterior falla) -->
+  <img src="build/img/imagen_vocalista.jpg" alt="vocalista del festival" /> <!-- Fallback (si todos los casos anteriores fallan) -->
+</picture>
 
 
 
