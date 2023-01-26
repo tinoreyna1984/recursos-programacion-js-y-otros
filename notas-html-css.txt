@@ -10,6 +10,8 @@ Uso del main: es la sección más importante de la página. Puede agrupar otros 
 Formularios
 ===========
 
+Uso de fieldset + legend
+------------------------
 
 <form action="">
   <fieldset>
@@ -32,6 +34,27 @@ Formularios
     </div>
   </fieldset>
 </form>
+
+fieldset: agrupa elementos asociados en un formulario.
+legend: es el caption o título que identifica visiblemente a fieldset.
+
+datalist
+--------
+
+<form action="/action_page.php" method="get">
+  <label for="browser">Choose your browser from the list:</label>
+  <input list="browsers" name="browser" id="browser">
+  <datalist id="browsers">
+    <option value="Edge">
+    <option value="Firefox">
+    <option value="Chrome">
+    <option value="Opera">
+    <option value="Safari">
+  </datalist>
+  <input type="submit">
+</form>
+
+Sirve para agrupar elementos predeterminados para una búsqueda efectuada desde un input.
 
 
 Video en HTML5
@@ -101,8 +124,8 @@ Atributo
   color: blue;
 }
 
-Combinación de descendiente
----------------------------
+Combinación de descendiente (clases anidadas)
+---------------------------------------------
 
 .cliente .nombre{
   color: blue;
@@ -191,6 +214,45 @@ a:hover{ /* hover es la pseudoclase */
   grid-column: 1 / 3;
 }
 
+Pseudoclase para hallar elemento específico de un conjunto de elementos
+=======================================================================
+
+Primer elemento a nivel de hijo
+-------------------------------
+
+.campo:first-child{
+  color: red;
+}
+
+Primer elemento a nivel de tipo
+-------------------------------
+
+.campo:first-of-type{
+  color: red;
+}
+
+
+Último elemento a nivel de hijo
+-------------------------------
+
+.campo:last-child{
+  color: blue;
+}
+
+Último elemento a nivel de tipo
+-------------------------------
+
+.campo:last-of-type{
+  color: blue;
+}
+
+Cualquier elemento a nivel de hijo
+----------------------------------
+.campo:nth-child(3) { /* el tercer elemento a nivel de hijos */
+  color: brown;
+}
+
+
 Atributos personalizados
 ========================
 
@@ -228,6 +290,10 @@ display: grid (CSS Grid)
 
 Es el display de las dos dimensiones en simultáneo que permite a los elementos ocupar un área definida.
 
+Animaciones CSS
+===============
+
+
 
 Responsive web design
 =====================
@@ -247,6 +313,97 @@ Media queries
     }
 }
 
+Enfoques
+--------
+
+Mobile first
+------------
+
+Comienza por un tamaño pequeño (orientado al dispositivo móvil);
+
+Por tanto, se aplica el media query del ancho mínimo cuando la resolución es mayor a la de un dispositivo móvil (móvil, tablet, etcétera).
+
+Ejemplo:
+
+.navegacion-principal{
+    display: flex;
+    flex-direction: column;
+}
+
+@media(min-width: 768px){
+    .navegacion-principal{
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+En tal sentido, se prefiere usar el media query basado en el ancho mínimo de pantalla.
+
+Los media queries empleados deben hacerse desde el valor min-width más pequeño al más grande.
+
+
+@media(min-width: 375px){
+    /* ... */
+}
+
+@media(min-width: 768px){
+    /* ... */
+}
+
+@media(min-width: 992px){
+    /* ... */
+}
+
+
+Desktop first
+-------------
+
+Comienza por un tamaño grande (orientado a la PC de escritorio);
+
+Por tanto, se aplica el media query del ancho mínimo cuando la resolución es menor a la de una computadora de escritorio (desktop, laptop, con pantalla 4K, etcétera).
+
+Ejemplo:
+
+.navegacion-principal{
+    display: flex;
+    flex-direction: column;
+}
+
+@media(max-width: 992px){
+    .navegacion-principal{
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+En tal sentido, se prefiere usar el media query basado en el ancho máximo de pantalla.
+
+Los media queries empleados deben hacerse desde el valor max-width más grande al más pequeño.
+
+@media(max-width: 992px){
+    /* ... */
+}
+
+@media(max-width: 768px){
+    /* ... */
+}
+
+@media(max-width: 375px){
+    /* ... */
+}
+
+Consideraciones de los enfoques
+-------------------------------
+
+* Tomar solo uno de los dos enfoques.
+* Respetar el diseño en maqueta.
+
+Tamaños estándar para media queries
+-----------------------------------
+
+https://css-tricks.com/snippets/css/media-queries-for-standard-devices/
+
+
 Imagen responsiva
 -----------------
 
@@ -257,8 +414,8 @@ img {
     display: block;
 }
 
-CSS Box-model
-=============
+CSS Box-model (modelo de cajas CSS)
+===================================
 
 Es una cualidad de los elementos que siguen la directiva:
 
@@ -279,11 +436,14 @@ Si se desea cambiar la posición sin afectar el layout que lo contiene, se aplic
 En caso contrario, se aplica position: absolute
 
 
-Alineamiento
-============
+Flexbox
+=======
 
-flex-direction: row
--------------------
+Es la metodología de agrupamiento de elementos unidireccional, trabajado por fila o por columna.
+Es invocado desde el elemento padre, el cual alberga elementos hijo que son afectados por el criterio de ordenamiento.
+
+flex-direction: row (por defecto)
+---------------------------------
 
 display: flex;
 align-items: center;     /* alínea verticalmente */
@@ -297,6 +457,452 @@ flex-direction: column;
 align-items: center;      /* alínea horizontalmente */
 justify-content: center;  /* alínea verticalmente */
 
+Variantes de los ordenamientos anteriores
+-----------------------------------------
+
+flex-direction: row-reverse;
+flex-direction: column-reverse;
+
+Invierte el orden de los elementos (comienza por el último y termina por el primero), sea en fila o columna.
+
+flex-basis
+----------
+
+Establece una longitud inicial de cada elemento hijo que pertenece a un contenedor flex.
+* Requiere que el contenedor padre tenga "display: flex",
+* No es lo mismo que aplicar width o height del elemento. Es la longitud interna inicial (ancho o alto).
+
+CSS:
+
+#main {
+  width: 300px;
+  height: 100px;
+  border: 1px solid #c3c3c3;
+  display: flex;
+  flex-direction: column;
+}
+
+#main div {
+  flex-grow: 0;
+  flex-shrink: 0;
+  flex-basis: 50px;
+}
+
+#main div:nth-of-type(2) {
+  flex-basis: 100px; /* solo aplica al segundo elemento hijo */
+}
+
+HTML:
+
+<div id="main">
+  <div style="background-color:coral;">50px</div>
+  <div style="background-color:lightblue;">100px</div>
+  <div style="background-color:khaki;">50px</div>
+  <div style="background-color:pink;">50px</div>
+  <div style="background-color:lightgrey;">50px</div>
+</div>
+
+flex-wrap
+---------
+
+Permite ajustar la agrupación de elementos al ancho del contenedor.
+
+Puede tener los siguientes valores: nowrap (no hay ajuste, valor por defecto), wrap (ajusta el contenido), wrap-reverse (ajusta y cambia el orden de colocación de los elementos).
+
+flex-wrap: wrap;
+
+
+flex-grow
+---------
+
+Es el factor de crecimiento de cada elemento hijo en función a la dirección de crecimiento indicada en el elemento contenedor padre (flex-direction: row o column).
+
+HTML:
+
+<div id="content">
+  <div class="box" style="background-color:red;">A</div>
+  <div class="box" style="background-color:lightblue;">B</div>
+  <div class="box" style="background-color:yellow;">C</div>
+  <div class="box1" style="background-color:brown;">D</div>
+  <div class="box1" style="background-color:lightgreen;">E</div>
+  <div class="box" style="background-color:brown;">F</div>
+</div>
+
+CSS:
+
+#content {
+  -ms-box-orient: horizontal;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -moz-flex;
+  display: -webkit-flex;
+  display: flex;
+
+  -webkit-justify-content: space-around;
+  justify-content: space-around;
+  -webkit-flex-flow: row wrap;
+  flex-flow: row wrap;
+  -webkit-align-items: stretch;
+  align-items: stretch;
+}
+
+.box {
+  flex-grow: 1;
+  border: 3px solid rgba(0,0,0,.2);
+}
+
+.box1 {
+  flex-grow: 2;
+  border: 3px solid rgba(0,0,0,.2);
+}
+
+Notar la afectación de los elementos según las clases box y box1, con factores de crecimiento 1 y 2, respectivamente. Los anchos (debido a la dirección de flex, que es row por defecto) son diferentes. La clase 2 da mayor ancho que la clase 1.
+
+flex-shrink
+-----------
+
+Contrario a flex-grow, flex-shrink establece el factor de contracción de cada elemento hijo en función a la dirección de crecimiento indicada en el elemento contenedor padre (flex-direction: row o column).
+
+HTML
+
+<div id="content">
+  <div class="box" style="background-color:red;">A</div>
+  <div class="box" style="background-color:lightblue;">B</div>
+  <div class="box" style="background-color:yellow;">C</div>
+  <div class="box1" style="background-color:brown;">D</div>
+  <div class="box1" style="background-color:lightgreen;">E</div>
+</div>
+
+
+CSS
+
+#content {
+  display: flex;
+  width: 500px;
+}
+
+#content div {
+  flex-basis: 120px;
+  border: 3px solid rgba(0,0,0,.2);
+}
+
+.box {
+  flex-shrink: 1;
+}
+
+.box1 {
+  flex-shrink: 2;
+}
+
+flex (como atributo)
+--------------------
+
+Aplicado a cada elemento hijo de un contenedor Flexbox, resume los atributos:
+* flex-grow
+* flex-shrink
+* flex-basis
+en ese orden.
+
+Ejemplo:
+
+.box {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 33.3%;
+}
+
+Lo indicado en box equivale a:
+
+.box {
+  flex: 1 1 33.3%;
+}
+
+Los valores por defecto son:
+
+.box {
+  flex: 1 1 0%; /* flex-grow: 1, flex-shrink: 1 y flex-basis: 0%; */
+}
+
+
+CSS Grid
+========
+
+Es la metodología de agrupamiento de elementos que trabaja simultáneamente filas y columnas en áreas distribuidas.
+Es invocado desde el elemento padre, el cual alberga elementos hijo que son afectados por el criterio de ordenamiento.
+
+
+Términos principales en CSS Grid
+--------------------------------
+
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 2rem;
+
+display: grid genera el agrupamiento del CSS Grid.
+grid-template-columns: crea columnas. También hay un atributo análogo para filas, grid-template-rows.
+gap: separación de los elementos a nivel de filas y columnas. Equivale a resumir column-gap y row-gap con el mismo valor.
+
+
+grid-template-columns y grid-template-rows
+------------------------------------------
+
+Son propiedades para definir columnas y filas del contenedor Grid:
+
+/* a nivel de columna */
+display: grid;
+grid-template-columns: 33.3% 33.3% 33.3%;
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+
+/* a nivel de fila */
+display: grid;
+grid-template-rows: 33.3% 33.3% 33.3%;
+display: grid;
+grid-template-rows: repeat(2, 1fr);
+
+
+column-span y row-span
+----------------------
+
+El término span ayuda a extender el elemento en todas las regiones indicadas (fila o columna).
+
+Si se tiene:
+
+.box {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+}
+
+Un elemento de esa caja puede tener:
+
+.box:nth-child(3) {
+	grid-column: 2 / 4;
+	/*
+	que equivale a:
+	grid-column-start: 2;
+	grid-column-end: 4;
+	o sea: grid-column: grid-column-start / grid-column-end;
+	*/
+}
+
+o:
+
+.box:nth-child(3) {
+	grid-column: 2 / span 2;
+}
+
+Se le está indicando que ocupe 2 columnas.
+
+grid (como atributo)
+--------------------
+
+Se emplea indicando los atributos grid-template-rows y grid-template-columns (en ese orden).
+
+Esto:
+
+.box {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(4, 1fr);
+}
+
+equivale a:
+
+.box {
+  display: grid;
+  grid: repeat(4, 1fr) / repeat(4, 1fr);
+}
+
+grid-auto-flow
+--------------
+
+Sirve para controlar elementos que se colocan automáticamente en el contenedor Grid.
+Toma uno de los siguientes valores:
+
+row:          Valor por defecto. Coloca los ítems llenando cada fila.	
+column:       Coloca los ítems llenando cada columna.	
+dense:        Coloca los ítems y cubre los espacios en todo el grid.
+row dense:    Coloca los ítems llenando cada fila, y cubre los espacios en todo el grid.
+column dense: Coloca los ítems llenando cada columna, y cubre los espacios en todo el grid.
+
+Ejemplo:
+
+.box {
+  display: grid;
+  grid: repeat(4, 1fr) / repeat(4, 1fr);
+  grid-auto-flow: dense;
+}
+
+Áreas
+-----
+
+Usar grid-template-areas sirve para determinar áreas específicas para distribuir cada componente.
+
+CSS:
+
+.item1 { grid-area: header; }
+.item2 { grid-area: menu; }
+.item3 { grid-area: main; }
+.item4 { grid-area: right; }
+.item5 { grid-area: footer; }
+
+.grid-container {
+  display: grid;
+  grid-template-areas:
+  'header header header header header header'
+  'menu main main main right right'
+  'menu footer footer footer footer footer';
+  grid-gap: 10px;
+  background-color: #2196F3;
+  padding: 10px;
+}
+
+.grid-container > div {
+  background-color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  padding: 20px 0;
+  font-size: 30px;
+}
+
+HTML:
+
+<div class="grid-container">
+  <div class="item1">Header</div>
+  <div class="item2">Menu</div>
+  <div class="item3">Main</div>  
+  <div class="item4">Right</div>
+  <div class="item5">Footer</div>
+</div>
+
+Para colocar un elemento en un área específica determinada previamente por grid-template-areas, se emplea el atributo grid-area:
+
+.grid-container.nth-child(2){
+  grid-area: header;
+}
+
+
+grid-template
+-------------
+
+Atributo que toma los valores de:
+
+* grid-template-rows
+* grid-template-columns
+* grid-template-areas
+
+en ese orden.
+
+Ejemplo:
+
+CSS:
+
+.item1 { grid-area: header; }
+.item2 { grid-area: menu; }
+.item3 { grid-area: main; }
+.item4 { grid-area: right; }
+.item5 { grid-area: footer; }
+
+.grid-container {
+  display: grid;
+  grid-template:
+    'header header header header header header'
+    'menu main main main right right'
+    'menu footer footer footer footer footer';
+  grid-gap: 10px;
+  background-color: #2196F3;
+  padding: 10px;
+}
+
+.grid-container > div {
+  background-color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  padding: 20px 0;
+  font-size: 30px;
+
+HTML:
+
+<div class="grid-container">
+  <div class="item1">Header</div>
+  <div class="item2">Menu</div>
+  <div class="item3">Main</div>  
+  <div class="item4">Right</div>
+  <div class="item5">Footer</div>
+</div>
+
+
+Alineación en Grid
+------------------
+
+La alineación es solo vertical, dado que horizontalmente ya es definido por el Grid.
+
+Se aplican las propiedades:
+* justify-content
+* align-items
+
+Las mismas que en Flexbox.
+
+Ambas propiedades son invocadas a través de place-content.
+
+Ejemplo:
+
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 2rem;
+place-content: center;
+
+El valor de place-content equivale a declarar los atributos:
+justify-content: center
+align-items: center
+
+
+gap y calc
+==========
+
+gap, column-gap, row-gap
+------------------------
+
+Sirven para establecer separación de elementos en un contenedor.
+column-gap: separa a nivel de columna.
+row-gap: separa a nivel de fila.
+gap: separa a nivel de ambos, pudiendo ser un único valor a nivel de fila y columna, o dos valores: uno a nivel de filas y otro a nivel de columnas.
+
+CSS:
+
+.grid-container {
+  border: 1px solid black;
+  background-color: mintcream;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  gap: 50px;
+}
+.grid-container > div {
+  border: 1px solid black;
+  background-color: yellow;
+}
+
+HTML:
+
+<div class="grid-container">
+  <div>1</div>
+  <div>2</div>
+  <div>3</div>  
+  <div>4</div>
+  <div>5</div>
+  <div>6</div>
+  <div>7</div>  
+  <div>8</div>  
+</div>
+
+Nota: antiguamente solo se usaba para CSS Grid como grid-gap (y grid-column-gap con grid-row-gap).
+
+calc
+----
+
+Es una función calculadora.
+
+width: calc(100% - 2rem);
 
 Gradientes en CSS
 =================
@@ -319,7 +925,7 @@ html {
 }
 
 
-Metodología BEM (Block-Element-Modifier)
+Metodología BEM (Block Element Modifier)
 ========================================
 
 Es una metodología para crear CSS reutilizable y ordenado que evita colisión entre nombres (de clases, ids, etcétera).
