@@ -163,9 +163,19 @@ Permite el encabezamiento del sitio, esto es, para definir el título en el brow
 
 Link:
 
+import Link from 'next/link';
+
 <Link href="/posts/first-post">this page!</Link>
 
 Reemplaza a <a> para creación de enlaces orientados al cliente.
+
+Para versiones anteriores a Next.js 13:
+
+<Link href="/about" legacyBehavior>
+  <a>About Us</a>
+</Link>
+
+usar "legacyBehavior" para anidar un elemento <a>.
 
 Definiciones globales
 ---------------------
