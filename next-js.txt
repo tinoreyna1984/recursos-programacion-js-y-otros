@@ -121,6 +121,30 @@ Nota para VS Code
 Si ocurre el mensaje "CSS > Lint: Unknown At Rules" en el paso 4, buscar en Preferencias, filtrar la expresión del error y cambiar la configuración a "ignore".
 
 
+SASS
+====
+
+Instalar: npm i -D sass
+
+Modificar next.config.js: (o ts)
+
+/** @type {import('next').NextConfig} */
+
+const path = require('path'); // agregar
+
+const nextConfig = {
+  reactStrictMode: false,
+  sassOptions: { // agregar
+    includePaths: [path.join(__dirname, 'src/scss')],
+  },
+}
+
+module.exports = nextConfig
+
+Importar globalmente el archivo único que trabajará con SASS (por ejemplo: app.scss) en _app.js:
+
+import '@/scss/app.scss'
+
 
 Uso
 ===
