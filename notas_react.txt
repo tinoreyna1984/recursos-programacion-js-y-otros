@@ -456,6 +456,16 @@ Desinstalación de paquete
 
 npm uninstall <paquete>
 
+SASS
+====
+
+Instalar:
+
+create-react-app: npm i sass
+Vite: npm add sass
+
+
+
 
 
 

@@ -426,6 +426,12 @@ Consideraciones
 * El enrutamiento API permite un uso de vista previa. 
 
 
+Sitio multi-idioma (SSR)
+========================
+
+Instalar y configurar next-intl: https://next-intl-docs.vercel.app/
+
+
 Sitio multi-idioma (estático)
 =============================
 
