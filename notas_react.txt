@@ -304,34 +304,32 @@ git push -u origin master
 
 El proyecto queda registrado en GitHub.
 
-Subir proyecto a Heroku (solo React JS)
-======================================
+Crear proyecto con Vite y PWA
+=============================
 
-Link: https://www.youtube.com/watch?v=gItqzShex5M
+1. Crear proyecto de React con Vite (ya se indicó).
+2. Instalar: npm i -D vite-plugin-pwa workbox-window
+3. Si no hay la librería "serve" globalmente, instalar: npm install --global serve (para probar localmente)
+4. Configurar:
 
-heroku login
-heroku create -b https://github.com/mars/create-react-app-buildpack.git <proyecto de Heroku>
-git add .
-git commit -m "Commit"
-git push heroku master
-heroku open
+vite.config.js / vite.config.ts:
 
-Subir a Heroku:
-===============
+import { defineConfig } from 'vite'
+import { VitePWA } from 'vite-plugin-pwa'
+import react from '@vitejs/plugin-react-swc'
 
-heroku login
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react(), VitePWA({
+    registerType: 'autoUpdate',
+    devOptions: {
+      enabled: true
+    }
+  })],
+})
 
-Si no se ha creado en GitHub:
+5. Crear archivo manifest.json en la raíz del proyecto (ver: https://tomitm.github.io/appmanifest/) y configurar HTML con los valores del manifest.
 
-heroku create -b https://github.com/mars/create-react-app-buildpack.git <proyecto de Heroku>
-git add .
-git commit -m "Commit"
-git push heroku master
-heroku open
-
-Si fue creado previamente en GitHub:
-
-heroku git:remote -a <repositorio-github>
 
 Subir a hosting compartido (solo frontend):
 ===========================================
@@ -464,7 +462,12 @@ Instalar:
 create-react-app: npm i sass
 Vite: npm add sass
 
+Servir distribución localmente
+==============================
 
+Usar comando "serve".
+
+Instalar: npm install --global serve
 
 
 

@@ -22,16 +22,7 @@ Si ocurre el error:
 
 "Parsing error: Cannot find module 'next/babel' Require stack..."
 
-Proceder con lo siguiente:
-
-1. Crear un archivo .babelrc en la raíz del proyecto con lo siguiente:
-
-{
-  "presets": ["next/babel"],
-  "plugins": []
-}
-
-2. En la raíz del proyecto, editar .eslintrc.json con lo siguiente:
+Editar ".eslintrc.json" con lo siguiente:
 
 {
   "extends": ["next/babel","next/core-web-vitals"]
