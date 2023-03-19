@@ -188,6 +188,43 @@ p {
  color: red!important; /* todos los párrafos tendrán este color y anulará la especificidad del párrafo con ID "parrafo" */
 }
 
+Manejo avanzado de selectores
+=============================
+
+Lista general: https://www.w3schools.com/cssref/css_selectors.php
+
+Algunos ejemplos
+----------------
+
+Relación atributo:valor:
+
+[class*="contenedor"] {
+    max-width: 120rem;
+    margin: 0 auto;
+    width: 95%;
+}
+
+Aplica para todos los elementos que llaman a una clase que contenga la palabra "contenedor".
+
+[target]{
+    margin: 0 auto;
+}
+
+Aplica para todos los elementos que tengan atributo "target".
+
+[target="_blank"]{
+    margin: 0 auto;
+}
+
+Aplica para todos los elementos que tengan atributo "target" y su valor sea "_blank".
+
+a[href*="w3schools"]{
+    margin: 0 auto;
+}
+
+Aplica para todos los enlaces que cuyo atributo "href" sea "w3schools".
+
+
 Pseudoclase
 ===========
 
@@ -1486,6 +1523,61 @@ Agrupa tags img (imágenes) según el formato que puedan soportar (webp, avif, j
   <source srcset="build/img/imagen_vocalista.webp" type="image/webp" /> <!-- Procura cargar esta imagen (si el caso anterior falla) -->
   <img src="build/img/imagen_vocalista.jpg" alt="vocalista del festival" /> <!-- Fallback (si todos los casos anteriores fallan) -->
 </picture>
+
+
+Animaciones CSS
+===============
+
+Transición
+----------
+Se define el tipo de efecto, la duración y ralentización para animar el componente deseado.
+
+Transformación
+--------------
+Se define las acciones que ocurrirán para la transición previamente definida.
+
+Ejemplo:
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Animación</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+  <div class="card">
+    <h1 class="title">Hola!</h1>
+  </div>
+</body>
+</html>
+
+body{
+  padding: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 300px;
+  width:250px;
+  border-radius: 10px;
+  background-color: red;
+  color: white;
+  transition: transform 0.3s ease-in-out;/* transición */
+}
+
+.card:hover {
+  transform: rotate(-4deg) scale(1.2); /* transformación */
+}
+
+En este caso, ocurre una rotación de 4 grados a la izquierda y un escalado aumentado 1.2 veces, lo que ocasiona un aumento de tamaño.
+Tal animación ocurre en el hover al componente.
+
 
 
 
