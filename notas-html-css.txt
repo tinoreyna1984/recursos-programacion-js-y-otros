@@ -251,6 +251,55 @@ a:hover{ /* hover es la pseudoclase */
   grid-column: 1 / 3;
 }
 
+Pseudoclases esenciales
+=======================
+
+Eventos
+-------
+
+":hover": empleado cuando se coloca el puntero del ratón por encima del elemento.
+
+.clase-uno:hover {
+	color: yellow;
+}
+
+":active": empleado cuando se hace click en el elemento.
+
+.clase-uno:hover {
+	color: red;
+}
+
+":focus": empleado cuando el elemento es enfocado (por ejemplo, después de recorrer con el botón "Tab").
+
+.clase-uno:focus {
+	color: green;
+}
+
+Tipos "::before" y "::after"
+------------------------
+
+HTML
+
+<div>
+  before
+  <!-- cualquier contenido HTML a ser definido -->
+  after
+</div>
+
+CSS
+
+div::before {
+  content: "before";
+}
+div::after {
+  content: "after";
+}
+
+Estas pseudoclases se emplean para especificar atributos antes o después del contenido definido manualmente en el elemento, como también algunos contenidos (generalmente texto o imagen).
+
+Más información: https://css-tricks.com/almanac/selectors/a/after-and-before/
+
+
 Pseudoclase para hallar elemento específico de un conjunto de elementos
 =======================================================================
 
@@ -326,10 +375,6 @@ display: grid (CSS Grid)
 ------------------------
 
 Es el display de las dos dimensiones en simultáneo que permite a los elementos ocupar un área definida.
-
-Animaciones CSS
-===============
-
 
 
 Responsive web design
@@ -467,10 +512,86 @@ html {
 Posicionamiento de elementos
 ============================
 
+Está referido al atributo "position".
 Por default, la posición es estática, o sea: position: static.
 
-Si se desea cambiar la posición sin afectar el layout que lo contiene, se aplica position: relative
-En caso contrario, se aplica position: absolute
+Caso particular: relative vs absolute
+-------------------------------------
+
+"position: relative": se aplica cuando la posición del elemento es relativa al documento HTML, independientemente de otro. Por defecto, no requiere definir la ubicación inicial.
+"position: absolute": se aplica cuando el elemento está contenido dentro de otro, y su posicionamiento inicial debe especificarse en relación a ese elemento padre. De lo contrario, su posicionamiento está alineado al documento HTML.
+
+Ejemplos:
+
+* Dos elementos con "position: relative"
+
+HTML:
+<div id=”first_element”>First element</div>
+<div id=”second_element”>Second element</div>
+
+CSS:
+#first_element {
+  position: relative;
+  left: 30px;
+  top: 70px;
+
+  width: 500px;
+  background-color: #fafafa;
+  border: solid 3px #ff7347;
+  font-size: 24px;
+  text-align: center;
+}
+
+#second_element {
+   position: relative;
+
+   width: 500px;
+   background-color: #fafafa;
+   border: solid 3px #ff7347;
+   font-size: 24px;
+   text-align: center;
+}
+
+* Un elemento con "position: relative" que contiene a otro con "position: absolute"
+
+HTML:
+<div id=”parent”>
+  <div id=”child”></div>
+</div>
+
+CSS:
+#parent {
+  position: relative;
+  
+  width: 500px; 
+  height: 400px;
+  background-color: #fafafa;
+  border: solid 3px #9e70ba;
+  font-size: 24px;
+  text-align: center;
+}
+
+#child {
+  position: absolute;
+  right: 40px;
+  top: 100px;
+
+  width: 200px;
+  height: 200px;
+  background-color: #fafafa;
+  border: solid 3px #78e382;
+  font-size: 24px;
+  text-align: center;
+}
+
+Más información: https://kolosek.com/css-position-relative-vs-position-absolute/
+
+
+Otros casos
+-----------
+
+"position: fixed": el elemento queda fijo respecto del documento HTML.
+"position: sticky": el elemento está posicionado en relación al recorrido de la página (scroll).
 
 
 Flexbox
