@@ -5,6 +5,16 @@ Preparación e instalación de Docker
 ===================================
 
 Windows: descargar e instalar Docker Desktop Installer.
+Asimismo, instalar WSL2 y configurarlo.
+
+
+Solucionar el error: "A timeout occured while waiting for a WSL integration agent to become ready"
+==================================================================================================
+
+Verificar que en Usuarios/<Tu usuario>/AppData/Roaming/Docker/settings.json las propiedades estén colocadas de esta forma:
+
+"integratedWslDistros" : [ ]
+"enableIntegrationWithDefaultWslDistro" : false,
 
 
 
