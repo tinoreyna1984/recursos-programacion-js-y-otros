@@ -4,7 +4,7 @@ Docker
 Preparación e instalación de Docker
 ===================================
 
-Windows: descargar e instalar Docker Desktop Installer.
+Windows: descargar e instalar Docker Desktop Installer como administrador.
 Asimismo, instalar WSL2 y configurarlo.
 
 
