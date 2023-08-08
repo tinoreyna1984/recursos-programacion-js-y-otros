@@ -53,6 +53,10 @@ Acceder al sitio (navegador): localhost:4200
 El comando de ejecución del proyecto levantará el servicio, pero para refrescar los cambios del sitio hay que pararlo y levantarlo de nuevo.
 Repetir el mismo comando de ejecución de proyecto.
 
+Para ejecutar el proyecto y abrirlo automáticamente en el navegador:
+
+./nombreProyecto > ng serve -o
+
 Crear componentes en línea de comando CLI:
 
 ng g c <ruta relativa carpeta/nombre de proyecto>

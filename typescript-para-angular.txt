@@ -1,0 +1,435 @@
+Typescript para Angular
+***********************
+
+Typescript
+==========
+
+Lenguaje de programación que genera aplicaciones web en JavaScript más robustas y consistentes. Es el superconjunto de JavaScript que agrega aspectos no nativos de este lenguaje, siendo un lenguaje transpilado (traducido a JavaScript para aprovechamiento del navegador web o de Node.js).
+
+Tipado estricto y tipos de dato en Typescript
+=============================================
+
+let name: string = 'Tino'; // estrictamente debe ser solo texto
+let hpPoints:number | string = 25; // puede ser número o texto
+hpPoints = '25';
+
+Objetos, arreglos e interfaces
+==============================
+
+Arreglos
+--------
+
+const skills: string[] = ['Bash', 'Counter', 'Healing']; // tipado de arreglo
+
+
+Interfaz
+--------
+
+Genera un tipado de objeto, en conjunto y a nivel de atributos.
+
+interface Character {
+    name: string;
+    hp: number;
+    skills: string[];
+    hometown?: string; // valor opcional marcado con '?' (por defecto es undefined)
+}
+
+const tino: Character = {
+    name: "Tino",
+    hp: 100,
+    skills: ['Counter', 'Healing'],
+}
+
+tino.hometown = 'Exultia';
+
+console.table(tino);
+
+Funciones
+=========
+
+function suma(a: number, b: number): number {
+    return a + b;
+}
+
+const multiply = (m: number, n:number = 1) => {
+    return m * n;
+}
+
+function cadena(texto01:string, texto02?:string, separador:string = ' '){
+    return `${texto01}${separador}${texto02}`;
+}
+
+console.log(suma(1,2));
+console.log(multiply(3,5));
+console.log(cadena('Tino', 'Reyna'));
+
+
+Paso de objetos de tipo interfaz como parámetro de función
+----------------------------------------------------------
+
+
+interface Character {
+    name: string;
+    hp: number;
+    showHp: () => void; // un procedimiento
+}
+
+const healCharacter = (character: Character, amount: number) => {
+    character.hp += amount;
+}
+
+const linkFromZelda: Character = {
+    name: 'Link',
+    hp: 25,
+    showHp() {
+        console.log('HP: ', this.hp)
+    }
+}
+
+console.log(linkFromZelda);
+healCharacter(linkFromZelda, 25);
+console.log('Healed!')
+console.log(linkFromZelda);
+
+Reutilización de interfaces
+===========================
+
+
+interface Address {
+    calle: string;
+    pais: string;
+    ciudad: string;
+};
+
+interface SuperHero {
+    name: string;
+    age: number;
+    address: Address;
+    showAddress: () => string;
+}
+
+
+const superHeroe: SuperHero = {
+    name: 'Spiderman',
+    age: 30,
+    address: {
+        calle: 'Main St',
+        pais: 'USA',
+        ciudad: 'NY'
+    },
+    showAddress() {
+        return this.name + ', ' + this.address.ciudad + ', ' + this.address.pais;
+    }
+}
+
+
+const address = superHeroe.showAddress();
+console.log( address );
+
+Desestructuración de objetos y  arreglos
+========================================
+
+Objetos
+-------
+
+interface AudioPlayer {
+    audioVolume: number;
+    songDuration: number;
+    song: string;
+    details: Details;
+};
+
+interface Details {
+    author: string;
+    year: number;
+}
+
+const audioPlayer: AudioPlayer = {
+    audioVolume: 90,
+    songDuration: 223,
+    song: "Warning",
+    details: {
+        author: "Green Day",
+        year: 2000
+    }
+}
+
+const { song, songDuration, details: {author, year} } = audioPlayer;
+
+console.log(`${song} - ${author} - ${songDuration} - year: ${year}`);
+
+Arreglos
+--------
+
+console.log(`${song} - ${author} - ${songDuration} - year: ${year}`);
+
+const dbz = ['Goku', 'Vegeta', 'Trunks'];
+
+const [,,trunks = 'Not found'] = dbz; // si no se encuentra en la tercera posición, se lanza el mensaje "Not found"
+
+console.log(trunks);
+
+
+Desestructuración de argumentos de una función
+----------------------------------------------
+
+interface Product {
+    description: string;
+    price: number;
+}
+
+const phone: Product = {
+    description: "Noka 3390",
+    price: 25,
+}
+
+const tablet: Product = {
+    description: "iPad Air",
+    price: 250
+}
+
+interface TaxCalculationOptions {
+    tax: number;
+    products: Product[];
+}
+
+// función con desestructuración de argumentos
+function taxCalculation({products, tax}: TaxCalculationOptions): number[]{
+    let total = 0;
+    products.forEach(( { price } ) => {
+        total += price;
+    });
+    return [total, total * tax];
+}
+
+const shoppingCart = [phone, tablet];
+const tax = 0.15;
+
+const result = taxCalculation({
+    products: shoppingCart,
+    tax,
+})
+
+const[products, tx] = result;
+
+console.log(`Total: ${products}, Tax: ${tx}`);
+
+
+Importación y Exportación
+=========================
+
+exportado.ts:
+
+
+// función con desestructuración de argumentos
+export interface Product {
+    description: string;
+    price: number;
+}
+
+export interface TaxCalculationOptions {
+    tax: number;
+    products: Product[];
+}
+
+export function taxCalculation(options: TaxCalculationOptions): number[]{
+    const {products, tax} = options;
+    let total = 0;
+    products.forEach(( { price } ) => {
+        total += price;
+    });
+    return [total, total * tax];
+}
+
+importado.ts:
+
+import { Product, taxCalculation } from "./06-function-destructuring";
+
+const shoppingCart: Product[] = [
+  {
+    description: "Noka 3390",
+    price: 25,
+  },
+  {
+    description: "iPad Air",
+    price: 250,
+  },
+];
+
+const [total, tax] = taxCalculation({ tax: 15, products: shoppingCart });
+
+POO - Clases
+============
+
+export class Person {
+  constructor(private name: string, private address: string) {}
+
+  public setName(name: string): void {
+    this.name = name;
+  }
+
+  public setAddress(address: string): void {
+    this.address = address;
+  }
+
+  public getName(): string {
+    return this.name;
+  }
+
+  public getAddress(): string {
+    return this.address;
+  }
+}
+
+const tino: Person = new Person("Tino", "Ecuador");
+
+console.log(tino);
+
+Herencia
+--------
+
+export class Hero extends Person {
+    constructor(private alterEgo: string, private age: number, private realName: string){
+        super(realName, 'New York');
+    }
+
+    public setAlterEgo(alterEgo: string){
+        this.alterEgo = alterEgo;
+    }
+    public setAge(age: number){
+        this.age = age;
+    }
+    public setRealName(realName: string){
+        this.realName = realName;
+    }
+}
+
+const ironMan: Hero = new Hero('Iron Man', 45, 'Tony Stark');
+
+console.log(ironMan);
+
+
+Priorizar composición sobre herencia
+------------------------------------
+
+export class Person {
+  constructor(private firstName: string, private lastName: string, private address: string) {}
+}
+
+const tony: Person = new Person("Tony", "Stark", "New York");
+
+console.log(tony);
+
+/* export class Hero extends Person {
+    constructor(private alterEgo: string, private age: number, private realName: string, person: Person){
+        super(realName, 'New York');
+    }
+} */
+
+// una instancia de Person pasa como parámetro en el constructor de Hero
+// esto es explicado en el concepto de inyección de dependencias (DI)
+export class Hero {
+    constructor(private alterEgo: string, private age: number, private realName: string, private person: Person){ }
+}
+
+const ironMan: Hero = new Hero('Iron Man', 45, 'Tony Stark', tony);
+
+console.log(ironMan);
+
+
+Genéricos
+=========
+
+/* export function whatsMyType<T>(argument: T): T {
+    return argument;
+} */
+
+export const whatsMyType = <T>(argument: T): T => {
+    return argument;
+}
+
+const amIString = whatsMyType<string>('Hola Mundo');
+const amINumber = whatsMyType<number>(123);
+const amINumberArray = whatsMyType<number[]>([1,2,3]);
+
+console.log(amIString.split(' '));
+console.log(amINumber.toFixed());
+console.log(amINumberArray.join('-'));
+
+
+Decoradores
+===========
+
+function classDecorator<T extends { new (...args:any[]): {} }>(
+    constructor: T
+) {
+    return class extends constructor {
+        newProperty = 'New Property';
+        hello = 'override';
+    }
+}
+
+@classDecorator
+export class SuperClass {
+
+
+    public myProperty: string = 'Abc123';
+
+    print() {
+        console.log('Hola Mundo')
+    }
+}
+
+
+console.log( SuperClass );
+
+const myClass = new SuperClass();
+console.log( myClass );
+
+
+Encadenamiento opcional
+=======================
+
+
+export interface Passenger {
+    name: string;
+    children?: string[];
+}
+
+const passenger1: Passenger = {
+    name: 'Fernando',
+}
+
+const passenger2: Passenger = {
+    name: 'Melissa',
+    children: ['Natalia','Elizabeth'],
+}
+
+const returnChildrenNumber = ( passenger: Passenger ): number => {
+
+    const howManyChildren = passenger.children?.length || 0;
+    // const howManyChildren = passenger.children!.length;
+
+    console.log( passenger.name, howManyChildren);
+
+    return howManyChildren;
+}
+
+
+returnChildrenNumber( passenger1 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

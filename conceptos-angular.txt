@@ -1,5 +1,854 @@
 Angular
 *******
 
+Manejo básico de un componente
+==============================
+
+Vista (HTML)
+------------
+
+<h1>{{title}}</h1>
+
+<hr>
+
+<p>Curso de Angular</p>
+
+<!-- <input type="text" name="inc" id="inc"> -->
+<p>Counter: {{counter}}</p>
+<button type="button" (click)="increaseBy()">+1</button>
+<button type="button" (click)="decreaseBy()">-1</button>
+<button type="button" (click)="reset()">Reset</button>
+
+
+
+Clase asociada (Typescript)
+---------------------------
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  public title: string = 'Mi primera app de Angular';
+  public counter: number = 10;
+  public inc: number = 1;
+
+  increaseBy(inc: number = 1){
+    this.counter += inc;
+  }
+  decreaseBy(inc: number = 1){
+    this.counter -= inc;
+  }
+  reset(){
+    this.counter = 0;
+  }
+}
+
+Crear un componente desde cero (puro Typescript)
+================================================
+
+counter/counter.component.ts:
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-counter',
+  template: `
+    <p>Counter: {{ counter }}</p>
+    <button type="button" (click)="increaseBy()">+1</button>
+    <button type="button" (click)="decreaseBy()">-1</button>
+    <button type="button" (click)="reset()">Reset</button>
+  `,
+})
+export class CounterComponent {
+  public title: string = 'Mi primera app de Angular';
+  public counter: number = 10;
+  public inc: number = 1;
+
+  increaseBy(inc: number = 1) {
+    this.counter += inc;
+  }
+  decreaseBy(inc: number = 1) {
+    this.counter -= inc;
+  }
+  reset() {
+    this.counter = 0;
+  }
+}
+
+
+app/app.module.ts:
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+
+import { AppComponent } from './app.component';
+import { CounterComponent } from './counter/counter.component';
+
+@NgModule({
+  declarations: [ // declarar componentes
+    AppComponent,
+    CounterComponent // llamar
+  ],
+  imports: [ // importar módulos
+    BrowserModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+
+app/app.component.html:
+
+<h1>{{title}}</h1>
+
+<hr>
+
+<p>Curso de Angular</p>
+
+<!-- <input type="text" name="inc" id="inc"> -->
+<!-- <p>Counter: {{counter}}</p>
+<button type="button" (click)="increaseBy()">+1</button>
+<button type="button" (click)="decreaseBy()">-1</button>
+<button type="button" (click)="reset()">Reset</button> -->
+
+<app-counter></app-counter> <!-- <--------- Aquí llamo al componente visual -->
+
+Componente creado con CLI
+-------------------------
+
+> ng g c <componente>
+
+Se genera un componente dentro de app, el cual incluye varios archivos.
+
+Interpolación de valores
+========================
+
+Clase:
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-heroes-hero',
+  templateUrl: './hero.component.html',
+  styleUrls: ['./hero.component.css']
+})
+export class HeroComponent {
+  public name: string = "Ironman";
+  public age: number = 45;
+}
+
+Vista:
+
+<h1>{{name}}</h1>
+
+<dl>
+  <td>Nombre</td>
+  <dd>{{name}}</dd>
+  <td>Edad</td>
+  <dd>{{age}}</dd>
+  <td>Método</td>
+  <dd>método</dd>
+  <td>Capitalizado</td>
+  <dd>capitalizado</dd>
+</dl>
+
+<button class="btn btn-primary mx-2">Cambiar nombre</button>
+<button class="btn btn-primary">Cambiar edad</button>
+
+Los valores públicos son leídos desde la vista con {{}}
+
+
+One-way data binding
+====================
+
+Los métodos y atributos de las clases en el componente son invocables en la vista.
+One-way data binding implica que la vista refleje lo que está definido en el modelo/clase.
+
+Clase:
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-heroes-hero',
+  templateUrl: './hero.component.html',
+  styleUrls: ['./hero.component.css']
+})
+export class HeroComponent {
+  public name: string = "Ironman";
+  public age: number = 45;
+
+  get capitalizedName(): string{  // método getter
+    return this.name.toUpperCase();
+  }
+
+  getHeroDescription(): string {
+    return `${this.name} - ${this.age}`;
+  }
+}
+
+Vista:
+
+<h1>{{name}}</h1>
+
+<dl>
+  <td>Nombre</td>
+  <dd>{{name}}</dd>
+  <td>Edad</td>
+  <dd>{{age}}</dd>
+  <td>Método</td>
+  <dd>{{getHeroDescription()}}</dd>
+  <td>Mayúsculas</td>
+  <dd>{{capitalizedName}}</dd>
+</dl>
+
+<button class="btn btn-primary mx-2">Cambiar nombre</button>
+<button class="btn btn-primary">Cambiar edad</button>
+
+
+ngIf - ngFor
+============
+
+ngIf
+----
+
+Vista:
+
+<button class="btn btn-primary mx-2" (click)="changeHero()" *ngIf="name !== 'Spiderman'">Cambiar nombre</button>
+<button class="btn btn-primary mx-2" (click)="changeAge()" *ngIf="age !== 25">Cambiar edad</button>
+<button class="btn btn-primary mx-2" (click)="reset()" >Reset</button>
+
+Clase:
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-heroes-hero',
+  templateUrl: './hero.component.html',
+  styleUrls: ['./hero.component.css']
+})
+export class HeroComponent {
+  // ...
+
+  changeHero(): void {
+    this.name = "Spiderman"
+  }
+
+  changeAge(): void {
+    this.age = 25;
+  }
+
+  reset(): void {
+    this.name = "Ironman";
+    this.age = 45;
+  }
+}
+
+Los elementos están condicionados con ngIf: se evalúa la condición y se verifica si se destruyen cuando esta no se cumple.
+
+ngFor
+-----
+
+Clase:
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-heroes-list',
+  templateUrl: './list.component.html',
+  styleUrls: ['./list.component.css']
+})
+export class ListComponent {
+  public heroNames: string[] = ['Hulk', 'Ironman', 'Batman'];
+}
+
+
+Vista:
+
+<h3>Listado de héroes</h3>
+
+<ul class="mt-2 list-group">
+  <li class="list-group-item" *ngFor="let heroName of heroNames">
+    {{heroName}}
+  </li>
+</ul>
+
+La directiva ngFor permite acceder a elementos propios de un arreglo declarado en la clase.
+
+Uso de índices en el ngFor
+--------------------------
+
+<h4>Listado</h4>
+<ul class="list-group">
+  <li class="list-group-item" *ngFor="let character of characterList; let i = index">
+    {{i + 1}} - Nombre: {{character.name}} - Poder: {{character.power}}
+  </li>
+</ul>
+
+Además del objeto index, que devuelve el índice actual (desde 0), existen otros objetos:
+- first: el índice del primer elemento.
+- last: el índice del último elemento.
+- even: verifica si el índice es par (contando desde cero).
+- odd: verifica si el índice es impar (contando desde cero).
+
+En la documentación de Angular hay más objetos utilitarios para minimizar la capa lógica invocada en el ngFor.
+
+
+ngIf-Else - ngTemplate
+=====================
+
+Clase:
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-heroes-list',
+  templateUrl: './list.component.html',
+  styleUrls: ['./list.component.css']
+})
+export class ListComponent {
+  public heroNames: string[] = ['Hulk', 'Ironman', 'Batman', 'Deadpool', 'Wolverine'];
+  public deletedHero?: string;
+
+  removeLastHero(): void {
+    this.deletedHero = this.heroNames.pop();
+  }
+}
+
+Vista:
+
+<h3>Listado de héroes</h3>
+
+<h3 class="alert alert-success" *ngIf="deletedHero; else noHeroDeleted" role="alert">{{deletedHero}} borrado</h3>
+<ng-template #noHeroDeleted>
+  <h3 class="alert alert-info" role="alert">No se borró héroe</h3>
+</ng-template>
+
+
+<button class="btn btn-danger" *ngIf="heroNames.length > 0" (click)="removeLastHero()">Borrar último héroe</button>
+
+<ul class="mt-2 list-group">
+  <li class="list-group-item" *ngFor="let heroName of heroNames">
+    {{heroName}}
+  </li>
+</ul>
+
+*ngIf="deletedHero; else noHeroDeleted" refiere a una condición tipo "if-else" donde, si no se cumple lo indicado en ngIf, debe operar la referencia definida en #noHeroDeleted
+
+
+Módulos en Angular
+==================
+
+Archivo module.ts:
+
+import { NgModule } from "@angular/core";
+import { HeroComponent } from "./hero/hero.component";
+import { ListComponent } from "./list/list.component";
+import { CommonModule } from '@angular/common';
+
+@NgModule({
+  declarations: [
+    HeroComponent,
+    ListComponent
+  ],
+  imports: [
+    CommonModule // agregar siempre para evitar el error NG0303
+  ],
+  exports: [
+    HeroComponent,
+    ListComponent
+  ]
+})
+export class HeroesModule {
+
+}
+
+
+Archivo app.module.ts:
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+
+import { AppComponent } from './app.component';
+import { CounterModule } from './counter/counter.module';
+import { HeroesModule } from './heroes/heroes.module';
+
+@NgModule({
+  declarations: [ // declarar componentes
+    AppComponent,
+  ],
+  imports: [ // importar módulos
+    BrowserModule,
+    CounterModule, // declarar módulo
+    HeroesModule // declarar módulo
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+
+Los módulos son agrupaciones de componentes de uso afín.
+
+Se pueden crear vía CLI con el comando: ng g m [nombre_módulo]
+
+Crear componente dentro del módulo
+----------------------------------
+
+ng g c <módulo/carpeta_componentes>
+
+El valor de <módulo/carpeta_componentes> es arbitrario, pero debe ser accesible para el módulo. Se recomienda esté dentro del módulo para poder manejar el concepto del mismo: un módulo alberga componentes de uso afín.
+
+
+Importar información de entrada con @Input
+==========================================
+
+Se aplica el decorador @Input. Tiene una secuencia ordenada de pasos:
+
+1. Definir el objeto desde la clase padre:
+
+import { Component } from '@angular/core';
+import { Character } from '../interfaces/character.interface';
+
+@Component({
+  selector: 'app-dbz-main-page',
+  templateUrl: './main-page.component.html'
+})
+
+export class MainPageComponent {
+
+  public characters:Character[] = [
+    {
+      name: 'Krillin',
+      power: 1000,
+    },
+    {
+      name: 'Goku',
+      power: 9500
+    },
+    {
+      name: 'Vegeta',
+      power: 9000
+    }
+  ];
+
+}
+
+2. Llamar ese objeto en la vista de la clase padre:
+
+<h1>DBZ Personajes</h1>
+<hr />
+
+<div class="row">
+  <div class="col">
+    <app-dbz-list [characterList]="characters"></app-dbz-list>
+  </div>
+  <div class="col">
+    <app-add-character></app-add-character>
+  </div>
+</div>
+
+Posteriormente se verá casos similares a la declaración [characterList]="characters", conocido como "template syntax".
+
+3. Definir la variable creada en la vista anterior en la clase hijo:
+
+import { Component, Input } from '@angular/core';
+import { Character } from '../../interfaces/character.interface';
+
+@Component({
+  selector: 'app-dbz-list',
+  templateUrl: './list.component.html',
+  styleUrls: ['./list.component.css']
+})
+export class ListComponent {
+  @Input()
+  public characterList:Character[] = [];
+}
+
+Input hace el binding entre characterList (hijo) y characters (padre).
+
+El parámetro de Input es un valor con el cual se aprovechará en la vista del componente hijo. Por defecto, el nombre es el mismo que se ha definido en la clase.
+
+4. Emplear la definición de la clase hijo en su vista correspondiente:
+
+<h4>Listado</h4>
+<ul class="list-group">
+  <li class="list-group-item" *ngFor="let character of characterList">
+    Nombre: {{character.name}} - Poder: {{character.power}}
+  </li>
+</ul>
+
+Si en Input se pasara una cadena diferente, por ejemplo "misPersonajes", entonces se aprovecharía ese nombre en reemplazo de characterList.
+
+
+ngClass
+=======
+
+Permite condicionar la clase HTML según directivas propias de Angular:
+
+<h4>Listado</h4>
+<ul class="list-group">
+  <li
+    class="list-group-item"
+    *ngFor="
+      let character of characterList;
+      let i = index;
+      let isFirst = first;
+      let isLast = last
+    "
+    [ngClass]="{
+      'list-group-item-dark': isFirst,
+      'list-group-item-success': isLast
+    }"
+  >
+    {{ i + 1 }} - Nombre: {{ character.name }} - Poder: {{ character.power }}
+  </li>
+</ul>
+
+Por defecto, la clase de cada ítem está definida como "list-group-item". ngClass establece condiciones basadas en los objetos propios de las demás directivas de Angular y, en este caso, corresponde a las que provienen del ngFor.
+
+
+FormsModule y ngModel
+=====================
+
+Aquí se trata de manera básica el manejo de formularios.
+
+1. Importar, a nivel de archivo module.ts, la dependencia FormsModule:
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MainPageComponent } from './pages/main-page.component';
+import { ListComponent } from './components/list/list.component';
+import { AddCharacterComponent } from './components/add-character/add-character.component';
+import { FormsModule } from '@angular/forms';
+
+
+
+@NgModule({
+  declarations: [
+    MainPageComponent,
+    ListComponent,
+    AddCharacterComponent,
+  ],
+  imports: [
+    CommonModule,
+    FormsModule // para ngModel
+  ],
+  exports: [
+    MainPageComponent,
+  ]
+})
+export class DbzModule { }
+
+
+2. Aplicar la directiva ngModel al formulario en los campos que lo requieran:
+
+<h4>Agregar personaje</h4>
+<form class="row" (ngSubmit)="emitCharacter()">
+  <input class="form-control mb-2" [(ngModel)]="character.name" name="name" type="text" placeholder="Nombre" />
+  <input class="form-control mb-2" [(ngModel)]="character.power" name="power" type="number" placeholder="Poder" />
+  <button type="submit" class="btn btn-primary">Agregar</button>
+</form>
+
+NOTA: Angular requiere el campo "name" para las entradas de forma obligatoria. Asimismo, como se trata de un formulario, no se debe invocar la función en el evento (click), sino a nivel de formulario con (ngSubmit).
+
+3. Definir las variables trabajadas en el ngModel desde la clase (en este caso es character):
+
+import { Component } from '@angular/core';
+import { Character } from '../../interfaces/character.interface';
+
+@Component({
+  selector: 'app-add-character',
+  templateUrl: './add-character.component.html',
+  styleUrls: ['./add-character.component.css']
+})
+export class AddCharacterComponent {
+  public character:Character = {
+    name: "",
+    power: 0,
+  }
+
+  emitCharacter():void{
+    console.log(this.character);
+  }
+}
+
+
+@Output - emisión de componente hijo al padre
+=============================================
+
+Considerando una vista como la que se vio previamente:
+
+<h4>Agregar personaje</h4>
+<form class="row" (ngSubmit)="emitCharacter()">
+  <input class="form-control mb-2" [(ngModel)]="character.name" name="name" type="text" placeholder="Nombre" />
+  <input class="form-control mb-2" [(ngModel)]="character.power" name="power" type="number" placeholder="Poder" />
+  <button type="submit" class="btn btn-primary">Agregar</button>
+</form>
+
+Se tiene que la función emitCharacter debe hacer el envío de formulario con los valores de los inputs en el bloque.
+
+Se procede de la siguiente forma:
+
+1. Crear un objeto EventEmitter (emisor de eventos), el cual maneja tipos genéricos:
+
+import { Component, EventEmitter, Output } from '@angular/core';
+import { Character } from '../../interfaces/character.interface';
+
+@Component({
+  selector: 'app-add-character',
+  templateUrl: './add-character.component.html',
+  styleUrls: ['./add-character.component.css']
+})
+export class AddCharacterComponent {
+
+  @Output()
+  public onNewCharacter: EventEmitter<Character> = new EventEmitter();
+
+  public character:Character = {
+    name: "",
+    power: 0,
+  }
+
+  emitCharacter():void{
+
+    if(this.character.name.length < 1) return;
+
+    this.onNewCharacter.emit(this.character);
+
+    console.log("Componente hijo: ", this.character);
+  }
+}
+
+El decorador @Output se define de forma similar a @Input, solo que aplica sobre el emisor de eventos que capta datos del componente hijo para pasarlos al padre.
+
+2. Como es un two-way data binding en cuanto a comunicación entre vista y clase, hay que crear un método que el padre pueda recibir de parte del hijo:
+
+import { Component } from '@angular/core';
+import { Character } from '../interfaces/character.interface';
+
+@Component({
+  selector: 'app-dbz-main-page',
+  templateUrl: './main-page.component.html'
+})
+
+export class MainPageComponent {
+
+  public characters:Character[] = [
+    {
+      name: 'Krillin',
+      power: 1000,
+    },
+    {
+      name: 'Goku',
+      power: 9500
+    },
+    {
+      name: 'Vegeta',
+      power: 9000
+    }
+  ];
+
+  onNewCharacter(character: Character):void{
+    console.log("Componente padre: ", character);
+  }
+
+}
+
+En este caso es onNewCharacter (tiene el mismo nombre que el definido desde el hijo);
+
+3. En la vista del padre, enlazar los dos métodos definidos:
+
+<h1>DBZ Personajes</h1>
+<hr />
+
+<div class="row">
+  <div class="col">
+    <app-dbz-list [characterList]="characters"></app-dbz-list>
+  </div>
+  <div class="col">
+    <app-add-character (onNewCharacter)="onNewCharacter($event)"></app-add-character>
+  </div>
+</div>
+
+Notar la línea correspondiente a (onNewCharacter)="onNewCharacter($event)" donde se indica cómo se establece el paso del flujo del componente hijo al padre.
+
+Si a la lista actual le agregamos el evento de borrado, podría quedar:
+
+Paso 1:
+
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Character } from '../../interfaces/character.interface';
+
+@Component({
+  selector: 'app-dbz-list',
+  templateUrl: './list.component.html',
+  styleUrls: ['./list.component.css']
+})
+export class ListComponent {
+  @Input()
+  public characterList:Character[] = [];
+
+  // borrado de registro - requiere indicar el índice para borrar el registro
+  @Output()
+  public onDelete:EventEmitter<number> = new EventEmitter();
+  public onDeleteCharacter(index:number):void{
+
+    this.onDelete.emit(index);
+  }
+
+}
+
+Paso 2:
+
+import { Component } from '@angular/core';
+import { Character } from '../interfaces/character.interface';
+
+@Component({
+  selector: 'app-dbz-main-page',
+  templateUrl: './main-page.component.html'
+})
+
+export class MainPageComponent {
+
+  public characters:Character[] = [
+    {
+      name: 'Krillin',
+      power: 1000,
+    },
+    {
+      name: 'Goku',
+      power: 9500
+    },
+    {
+      name: 'Vegeta',
+      power: 9000
+    }
+  ];
+
+  onNewCharacter(character: Character):void{
+    //console.log("Componente padre: ", character);
+    this.characters.push(character); // agrega a la lista
+  }
+
+  // borrado de personaje
+  onDeleteCharacter(index:number):void{
+    //console.log("Borra ítem en posición ", index);
+    this.characters.splice(index, 1);
+  }
+
+}
+
+Paso 3:
+
+<h1>DBZ Personajes</h1>
+<hr />
+
+<div class="row">
+  <div class="col">
+    <app-dbz-list [characterList]="characters" (onDelete)="onDeleteCharacter($event)"></app-dbz-list>
+  </div>
+  <div class="col">
+    <app-add-character (onNewCharacter)="onNewCharacter($event)"></app-add-character>
+  </div>
+</div>
+
+
+En suma, se tiene lo siguiente:
+
+Paso 1: se crea un emisor de eventos llamado onDelete, con el decorador @Output. La misma es aprovechada en la función onDeleteCharacter, la cual toma como parámetro el índice del elemento de la lista a ser borrado. Esto pasa en el componente hijo.
+Paso 2: en el componente padre, declaramos la función onDeleteCharacter, la cual borrará el elemento deseado según el índice recibido.
+Paso 3: para aplicar el principio del two-way data binding, (onDelete)="onDeleteCharacter($event)" implica que onDelete aprovechará los eventos procedentes de onDeleteCharacter para ser emitidos. En cada emisión del hijo, se efectúa el borrado en el componente padre.
+
+
+Servicios
+=========
+
+Los servicios son clases que ayudan a la comunicación del app, tanto interna entre componentes como externa con respecto a alguna API.
+
+Servicio:
+
+import { Injectable } from '@angular/core';
+import { Character } from '../interfaces/character.interface';
+
+@Injectable({providedIn: 'root'})
+export class DbzService {
+  constructor() { }
+
+  public characters:Character[] = [
+    {
+      name: 'Krillin',
+      power: 1000,
+    },
+    {
+      name: 'Goku',
+      power: 9500
+    },
+    {
+      name: 'Vegeta',
+      power: 9000
+    }
+  ];
+
+  onNewCharacter(character: Character):void{
+    //console.log("Componente padre: ", character);
+    this.characters.push(character); // agrega a la lista
+  }
+
+  // borrado de personaje
+  onDeleteCharacter(index:number):void{
+    //console.log("Borra ítem en posición ", index);
+    this.characters.splice(index, 1);
+  }
+
+}
+
+Clase que consume el servicio por inyección de dependencias:
+
+import { Component } from '@angular/core';
+import { Character } from '../interfaces/character.interface';
+import { DbzService } from '../services/dbz.service';
+
+@Component({
+  selector: 'app-dbz-main-page',
+  templateUrl: './main-page.component.html'
+})
+
+export class MainPageComponent {
+
+  // inyección de dependencias en el constructor
+  constructor(public dbzService:DbzService){}
+
+}
+
+Aprovechamiento del servicio empleado en el componente:
+
+<h1>DBZ Personajes</h1>
+<hr />
+
+<div class="row">
+  <div class="col">
+    <app-dbz-list [characterList]="dbzService.characters" (onDelete)="dbzService.onDeleteCharacter($event)"></app-dbz-list>
+  </div>
+  <div class="col">
+    <app-add-character (onNewCharacter)="dbzService.onNewCharacter($event)"></app-add-character>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
