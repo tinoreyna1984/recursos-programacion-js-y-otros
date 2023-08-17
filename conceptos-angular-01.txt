@@ -1,5 +1,5 @@
-Angular
-*******
+Angular - Fundamentos
+*********************
 
 Manejo básico de un componente
 ==============================
@@ -840,12 +840,200 @@ Aprovechamiento del servicio empleado en el componente:
 </div>
 
 
+Decorador @ViewChild para referencia
+====================================
+
+import { Component, ElementRef, ViewChild } from '@angular/core';
+
+@Component({
+  selector: 'gifs-search-box',
+  template: `
+    <h5>Buscar: </h5>
+    <input type="text"
+    class="form-control"
+    placeholder="Buscar gifs"
+    (keyup.enter)="searchTag()"
+    #txtTagInput>
+  `
+})
+export class SearchBoxComponent {
+
+  @ViewChild('txtTagInput')
+  public tagInput!: ElementRef<HTMLInputElement>;
+
+  searchTag(): void{
+    const newTag = this.tagInput.nativeElement.value;
+    console.log(newTag);
+  }
+}
+
+Aplica también para cuando la vista esté en un documento HTML aparte.
+
+El decorador ViewChild ayuda a captar valores de referencia de un tag de entrada HTML como un cuadro de texto. Lo captado pasa al elemento de referencia que usa el decorador y es posible visualizar su valor como lo indica la línea const newTag = this.tagInput.nativeElement.value.
 
 
+HttpClientModule
+================
+
+Módulo que permite generar peticiones HTTP como alternativa a fetch o Axios.
+
+Uso:
+
+1. Importar en el componente principal:
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from "@angular/common/http";
+
+import { AppComponent } from './app.component';
+import { GifsModule } from './gifs/gifs.module';
+import { SharedModule } from './shared/shared.module';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    HttpClientModule, // peticiones HTTP, alternativa a fetch o axios
+    GifsModule,
+    SharedModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+2. Implementar en el servicio que lo requiera:
+
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from "@angular/common/http";
+
+@Injectable({
+  providedIn: 'root'
+})
+export class GifsService {
+
+  private _tagsHistory:string[] = [];
+
+  private apiKey: string = 'mbSXlA2tRoY4skUAIeVYeIUISLet8DJ5';
+  private serviceUrl: string = 'https://api.giphy.com/v1/gifs';
+
+  constructor(private http: HttpClient) { } // por inyección de dependencias
+
+  get tagsHistory(): string[]{
+    return [...this._tagsHistory];
+  }
+
+  private organizeHistory(tag: string): void {
+    //console.log(tag)
+    tag = tag.toLowerCase();
+
+    if(this._tagsHistory.includes(tag))
+      this._tagsHistory = this._tagsHistory.filter( oldTag => oldTag !== tag);
+
+    this._tagsHistory.unshift(tag);
+    this._tagsHistory = this.tagsHistory.splice(0, 10);
+  }
+
+  searchTag(tag: string): void {
+    if(tag.length < 1) return;
+
+    this.organizeHistory(tag);
+
+    const params = new HttpParams()
+      .set('api_key', this.apiKey)
+      .set('limit', '10')
+      .set('q', tag);
+
+    this.http.get(`${this.serviceUrl}/search`, { params }) // empleo del parámetro definido
+      .subscribe(
+        resp => {
+          console.log(resp);
+        }
+      );
+    //
+  }
+}
+
+Comunicación entre componentes
+==============================
+
+Suponiendo que dos componentes o módulos tengan relación en cuanto a importación, se tiene el siguiente caso:
+
+1. Invocar el componente de la siguiente forma:
+
+Vista:
+
+<h2>Por capital</h2>
+<hr>
+
+<div class="row">
+  <div class="col">
+    <!-- search box -->
+    <shared-search-box (onValue)="searchByCapital($event)" placeholder="Buscar por capital"></shared-search-box>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+    <!-- resultados -->
+  </div>
+</div>
+
+Clase:
+
+import { Component, EventEmitter, Output } from '@angular/core';
+
+@Component({
+  selector: 'app-by-capital-page',
+  templateUrl: './by-capital-page.component.html',
+  styles: [
+  ]
+})
+export class ByCapitalPageComponent {
+
+  public searchByCapital(term: string): void {
+    console.log("Desde ByCapital");
+    console.log({term});
+  }
+}
+
+2. Definir la lógica del componente reutilizado:
+
+Vista:
+
+<input
+type="text"
+class="form-control"
+[placeholder]="placeholder"
+(keyup.enter)="emitValue(txtSearchInput.value)"
+#txtSearchInput />
 
 
+Clase:
 
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
+@Component({
+  selector: 'shared-search-box',
+  templateUrl: './search-box.component.html',
+  styles: [
+  ]
+})
+export class SearchBoxComponent {
+
+  @Input()
+  public placeholder: string = '';
+
+  @Output()
+  public onValue: EventEmitter<string> = new EventEmitter<string>();
+
+  public emitValue(value: string): void {
+    this.onValue.emit(value);
+  }
+
+}
 
 
 

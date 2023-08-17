@@ -1,0 +1,447 @@
+Angular - Intermedio
+********************
+
+Nivel para la creación de aplicaciones de una sola página (SPA).
+
+Ruteo en Angular
+================
+
+Forma manual
+------------
+
+Crear un archivo de rutas padre:
+
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { HomePageComponent } from './shared/pages/home-page/home-page.component';
+import { AboutPageComponent } from './shared/pages/about-page/about-page.component';
+import { ContactPageComponent } from './shared/pages/contact-page/contact-page.component';
+
+const routes: Routes = [
+  {
+    path: '', // principal
+    component: HomePageComponent
+  },
+  {
+    path: 'about',
+    component: AboutPageComponent
+  },
+  {
+    path: 'contact',
+    component: ContactPageComponent
+  },
+  {
+    path: '**', // cualquier otra dirección redirige a la principal
+    redirectTo: ''
+  }
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forRoot(routes)
+  ],
+  exports: [
+    RouterModule
+  ]
+})
+
+export class AppRoutingModule { }
+
+
+El archivo invocará los componentes definidos en el arreglo de rutas. Luego, se puede usar el objeto de Angular para aprovechar las rutas desde el componente principal app.component.html:
+
+<div class="row mt-4">
+  <div class="col-3">
+    <shared-sidebar></shared-sidebar>
+  </div>
+  <div class="col">
+    <router-outlet></router-outlet>
+  </div>
+</div>
+
+
+Configuración del ruteo por medio de dos directivas: routerLinkActive y routerLinkActiveOptions:
+
+<h2>Países</h2>
+<hr>
+
+<ul class="list-group">
+  <li routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="list-group-item">
+    Home
+  </li>
+  <li routerLink="about" routerLinkActive="active" class="list-group-item">
+    Acerca de
+  </li>
+  <li routerLink="contact" routerLinkActive="active" class="list-group-item">
+    Contacto
+  </li>
+</ul>
+
+Rutas hijas con carga perezosa (Lazy Load)
+-----------------------------------------
+
+Rutas hijas:
+
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { ByCapitalPageComponent } from './pages/by-capital-page/by-capital-page.component';
+import { ByRegionPageComponent } from './pages/by-region-page/by-region-page.component';
+import { ByCountryPageComponent } from './pages/by-country-page/by-country-page.component';
+import { CountryPageComponent } from './pages/country-page/country-page.component';
+
+const routes: Routes = [
+  {
+    path: 'by-capital',
+    component: ByCapitalPageComponent,
+  },
+  {
+    path: 'by-country',
+    component: ByCountryPageComponent,
+  },
+  {
+    path: 'by-region',
+    component: ByRegionPageComponent,
+  },
+  {
+    path: 'by/:id',
+    component: CountryPageComponent,
+  }
+]
+
+@NgModule({
+  imports: [
+    RouterModule.forChild(routes)
+  ],
+  exports: [
+    RouterModule
+  ],
+  declarations: [],
+  providers: [],
+})
+export class CountriesRoutingModule { }
+
+Importación en el módulo Countries:
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ByCapitalPageComponent } from './pages/by-capital-page/by-capital-page.component';
+import { ByCountryPageComponent } from './pages/by-country-page/by-country-page.component';
+import { ByRegionPageComponent } from './pages/by-region-page/by-region-page.component';
+import { CountryPageComponent } from './pages/country-page/country-page.component';
+import { CountriesRoutingModule } from './countries-routing.module';
+
+
+
+@NgModule({
+  declarations: [
+    ByCapitalPageComponent,
+    ByCountryPageComponent,
+    ByRegionPageComponent,
+    CountryPageComponent
+  ],
+  imports: [
+    CommonModule,
+    CountriesRoutingModule
+  ]
+})
+export class CountriesModule { }
+
+
+Carga perezosa:
+
+En ruta principal:
+
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { HomePageComponent } from './shared/pages/home-page/home-page.component';
+import { AboutPageComponent } from './shared/pages/about-page/about-page.component';
+import { ContactPageComponent } from './shared/pages/contact-page/contact-page.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: HomePageComponent
+  },
+  {
+    path: 'about',
+    component: AboutPageComponent
+  },
+  {
+    path: 'contact',
+    component: ContactPageComponent
+  },
+  {
+    path: 'countries',
+    loadChildren: () => import('./countries/countries.module').then(m => m.CountriesModule), // lazy load
+  },
+  {
+    path: '**',
+    redirectTo: ''
+  }
+];
+
+@NgModule({
+  imports: [
+    RouterModule.forRoot(routes)
+  ],
+  exports: [
+    RouterModule
+  ]
+})
+
+export class AppRoutingModule { }
+
+Aprovechamiento de las rutas:
+
+<h2>Países</h2>
+<hr>
+
+<ul class="list-group">
+  <li routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="list-group-item">
+    Home
+  </li>
+  <li routerLink="about" routerLinkActive="active" class="list-group-item">
+    Acerca de
+  </li>
+  <li routerLink="contact" routerLinkActive="active" class="list-group-item">
+    Contacto
+  </li>
+  <li routerLink="countries/by-capital" routerLinkActive="active" class="list-group-item">
+    Por capital
+  </li>
+  <li routerLink="countries/by-country" routerLinkActive="active" class="list-group-item">
+    Por país
+  </li>
+  <li routerLink="countries/by-region" routerLinkActive="active" class="list-group-item">
+    Por región
+  </li>
+</ul>
+
+
+Manejo de errores (catchError)
+==============================
+
+Suponiendo que se necesita resolver los errores en un request a un backend, teniendo el servicio:
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Country } from '../interfaces/country';
+import { Observable, of,catchError } from "rxjs";
+
+@Injectable({providedIn: 'root'})
+export class CountriesService {
+
+  private apiUrl: string = 'https://restcountries.com/v3.1';
+
+  constructor(private http: HttpClient) { }
+
+  searchCapital(term: string): Observable<Country[]> {
+    return this.http.get<Country[]>(`${this.apiUrl}/capital/${term}`);
+  }
+
+}
+
+La función searchByCapital debe responder así:
+
+  searchCapital(term: string): Observable<Country[]> {
+    return this.http.get<Country[]>(`${this.apiUrl}/capital/${term}`)
+    .pipe(
+      catchError(() => of([]))
+    );
+  }
+
+A través de un pipe, se hace una transformación de una respuesta procedente del request indicando la forma en el argumento de catchError.
+
+
+Generar enlace a página
+=======================
+
+1. Crear función desde el servicio:
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Country } from '../interfaces/country';
+import { Observable, of, catchError, map } from "rxjs";
+
+@Injectable({providedIn: 'root'})
+export class CountriesService {
+
+  private apiUrl: string = 'https://restcountries.com/v3.1';
+
+  constructor(private http: HttpClient) { }
+
+  searchCountryByAlphaCode(alphaCode: string): Observable<Country | null> {
+    return this.http.get<Country[]>(`${this.apiUrl}/alpha/${alphaCode}`)
+    .pipe(
+      map( countries => countries.length > 0 ? countries[0] : null),
+      catchError(() => of(null))
+    );
+  }
+
+  // ...
+
+}
+
+2. Asegurarse de tener la ruta dinámica con la variable a ser usada:
+
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { ByCapitalPageComponent } from './pages/by-capital-page/by-capital-page.component';
+import { ByRegionPageComponent } from './pages/by-region-page/by-region-page.component';
+import { ByCountryPageComponent } from './pages/by-country-page/by-country-page.component';
+import { CountryPageComponent } from './pages/country-page/country-page.component';
+
+const routes: Routes = [
+  // ...
+  {
+    path: 'by/:id',
+    component: CountryPageComponent,
+  },
+  {
+    path: '**',
+    redirectTo: 'by-capital'
+  }
+]
+
+@NgModule({
+  imports: [
+    RouterModule.forChild(routes)
+  ],
+  exports: [
+    RouterModule
+  ],
+  declarations: [],
+  providers: [],
+})
+export class CountriesRoutingModule { }
+
+3. Inyectar:
+
+- Una instancia de ActivatedRoute para pasar información al componente.
+- El servicio previamente creado.
+- Una instancia de Router para redirección en caso de error.
+
+La clase del componente quedaría así:
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { CountriesService } from '../../services/countries.service';
+import { switchMap } from 'rxjs';
+import { Country } from '../../interfaces/country';
+
+@Component({
+  selector: 'app-country-page',
+  templateUrl: './country-page.component.html',
+  styles: [],
+})
+export class CountryPageComponent implements OnInit {
+  public country?: Country;
+
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private countriesService: CountriesService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.activatedRoute.params
+      .pipe(
+        switchMap( ({id}) => this.countriesService.searchCountryByAlphaCode(id) )
+      )
+      .subscribe(
+        country =>{
+          if(!country) return this.router.navigateByUrl('');
+          console.log(country)
+          return this.country = country;
+        }
+      )
+  }
+}
+
+Una vez inyectado el componente de forma apropiada se podrá aprovechar los parámetros obtenidos:
+
+<ng-template #loading>
+  <div class="alert alert-info">Espere por favor...</div>
+</ng-template>
+
+<div *ngIf="country; else loading">
+  <div class="row">
+    <div class="col-12">
+      <h1>{{ country.name.common }}</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-4">
+      <h3>Bandera</h3>
+      <img
+        class="img-thumbnail"
+        [src]="country.flags.svg"
+        [alt]="country.name.common"
+      />
+    </div>
+    <div class="col">
+      <h3>Información</h3>
+      <ul class="list-group">
+        <li class="list-group-item">
+          <strong>Población: </strong> {{ country.population | number }}
+        </li>
+        <li class="list-group-item">
+          <strong>Código: </strong> {{ country.cca3 }}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+Navegar al enlace creado
+------------------------
+
+<div *ngIf="countries.length === 0; else table" class="alert alert-warning text-center">
+  No hay países que mostrar.
+</div>
+
+<ng-template #table>
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Bandera</th>
+        <th>Imagen</th>
+        <th>Nombre</th>
+        <th>Capital</th>
+        <th>Población</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let country of countries; let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>{{ country.flag }}</td>
+        <td>
+          <img [src]="country.flags.svg" [alt]="country.name.common" />
+        </td>
+        <td>
+          {{ country.name.common }}
+        </td>
+        <td>
+          {{ country.capital }}
+        </td>
+        <td>
+          {{ country.population | number }}
+        </td>
+        <td>
+          <a [routerLink]="['/countries/by', country.cca3]">Info</a> <---------------------------- usar el routerLink de esta forma
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</ng-template>
+
+
+Pipes
+=====
+
+
+
+
+
+
