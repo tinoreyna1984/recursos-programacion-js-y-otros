@@ -3,8 +3,8 @@ Angular - Intermedio
 
 Nivel para la creación de aplicaciones de una sola página (SPA).
 
-Ruteo en Angular
-================
+Introducción al ruteo en Angular
+================================
 
 Forma manual
 ------------
@@ -437,8 +437,463 @@ Navegar al enlace creado
 </ng-template>
 
 
+Ruteo en Angular (Angular Router)
+=================================
+
+Al crear el proyecto se puede incluir Angular Router para desarrollar las rutas como se vieron en la parte introductoria.
+
+La forma de distribuir las rutas puede operar como sigue:
+
+1. Ruteo principal (el archivo generado app-routing.module.ts):
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+const routes: Routes = [
+  {
+    path: '',
+    loadChildren: () => import('./products/products.module').then( m => m.ProductsModule ),
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+
+2. Rutas hijas:
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+import { BasicsPageComponent } from './pages/basics-page/basics-page.component';
+import { NumbersPageComponent } from './pages/numbers-page/numbers-page.component';
+import { OrderComponent } from './pages/order/order.component';
+import { UncommonPageComponent } from './pages/uncommon-page/uncommon-page.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: BasicsPageComponent
+  },
+  {
+    path: 'numbers',
+    component: NumbersPageComponent
+  },
+  {
+    path: 'uncommon',
+    component: UncommonPageComponent
+  },
+  {
+    path: 'custom',
+    component: OrderComponent
+  },
+  {
+    path: '**',
+    redirectTo: ''
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class ProductsRoutingModule { }
+
+ProductsRoutingModule debe ser llamada dentro de ProductsModule:
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { ProductsRoutingModule } from './products-routing.module';
+import { BasicsPageComponent } from './pages/basics-page/basics-page.component';
+import { NumbersPageComponent } from './pages/numbers-page/numbers-page.component';
+import { UncommonPageComponent } from './pages/uncommon-page/uncommon-page.component';
+import { PrimeNgModule } from '../prime-ng/prime-ng.module';
+import { OrderComponent } from './pages/order/order.component';
+
+import { CanFlyPipe } from './pipes/can-fly.pipe';
+import { ToggleCasePipe } from './pipes/toggle-case.pipe';
+import { SortByPipe } from './pipes/sort-by.pipe';
+
+
+@NgModule({
+  declarations: [
+    BasicsPageComponent,
+    NumbersPageComponent,
+    UncommonPageComponent,
+    OrderComponent,
+
+    // Pipes
+    CanFlyPipe,
+    ToggleCasePipe,
+    SortByPipe,
+  ],
+  imports: [
+    CommonModule,
+    PrimeNgModule,
+    ProductsRoutingModule,
+  ]
+})
+export class ProductsModule { }
+
+
+Ruteo Avanzado: rutas padres e hijas y carga floja (lazy load)
+==============================================================
+
+Rutas principales
+-----------------
+
+app-routing.module.ts:
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { Error404PageComponent } from './shared/pages/error404-page/error404-page.component';
+
+// rutas
+const routes: Routes = [
+  {
+    path: 'auth',
+    loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule),
+  },
+  {
+    path: 'heroes',
+    loadChildren: () => import('./heroes/heroes.module').then(m => m.HeroesModule),
+  },
+  {
+    path: '404',
+    component: Error404PageComponent
+  },
+  {
+    path: '',
+    redirectTo: 'heroes',
+    pathMatch: 'full'
+  },
+  {
+    path: '**',
+    redirectTo: '404'
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+
+Estas rutas se llaman desde el componente principal:
+
+<!-- Home -->
+<router-outlet></router-outlet>
+
+Notar que cualquier ruta desconocida redirige a la que muestra error 404 y la raíz va a /heroes
+
+Asimismo, se debe asegurar que en app.module.ts se llame al ruteador principal AppRoutingModule:
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { SharedModule } from './shared/shared.module';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    SharedModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+
+Rutas hija del módulo 'auth'
+----------------------------
+
+Se definen las rutas en el ruteador hijo:
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { LayoutPageComponent } from './pages/layout-page/layout-page.component';
+import { LoginPageComponent } from './pages/login-page/login-page.component';
+import { RegisterPageComponent } from './pages/register-page/register-page.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: LayoutPageComponent,
+    children: [
+      {
+        path: 'login',
+        component: LoginPageComponent
+      },
+      {
+        path: 'new-account',
+        component: RegisterPageComponent
+      },
+      {
+        path: '**',
+        redirectTo: 'login'
+      },
+    ]
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class AuthRoutingModule { }
+
+En este caso, la raíz para las rutas hijas es /auth, de modo que deben accederse a las rutas /auth/login y /auth/new-account y, si la dirección es /auth u otra compuesta desde la raíz, será redirigida a 'login'.
+
+Los componentes hijos se alojan en el padre LayoutPageComponent:
+
+<p>Auth</p>
+
+<router-outlet></router-outlet>
+
+
+Dicho ruteador debe importarse del módulo auth asociado:
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AuthRoutingModule } from './auth-routing.module';
+import { LayoutPageComponent } from './pages/layout-page/layout-page.component';
+import { LoginPageComponent } from './pages/login-page/login-page.component';
+import { RegisterPageComponent } from './pages/register-page/register-page.component';
+
+@NgModule({
+  declarations: [
+    LayoutPageComponent,
+    LoginPageComponent,
+    RegisterPageComponent
+  ],
+  imports: [
+    CommonModule,
+    AuthRoutingModule
+  ]
+})
+export class AuthModule { }
+
+
+
+Rutas hija del módulo 'heroes'
+------------------------------
+
+Se definen las rutas en el ruteador hijo:
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { LayoutPageComponent } from './pages/layout-page/layout-page.component';
+import { NewPageComponent } from './pages/new-page/new-page.component';
+import { HeroPageComponent } from './pages/hero-page/hero-page.component';
+import { ListPageComponent } from './pages/list-page/list-page.component';
+import { SearchPageComponent } from './pages/search-page/search-page.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: LayoutPageComponent,
+    children: [
+      {
+        path: 'new-hero',
+        component: NewPageComponent
+      },
+      {
+        path: 'search',
+        component: SearchPageComponent
+      },
+      {
+        path: 'edit/:id',
+        component: NewPageComponent
+      },
+      {
+        path: 'list',
+        component: ListPageComponent
+      },
+      {
+        path: ':id',
+        component: HeroPageComponent
+      },
+      {
+        path: '**',
+        redirectTo: 'list'
+      },
+    ]
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class HeroesRoutingModule { }
+
+
+En este caso, la raíz para las rutas hijas es /heroes, lo que las demás rutas vayan precedidas de dicha raíz y, si la dirección es /heroes u otra compuesta desde la raíz, será redirigida a 'list'.
+
+Los componentes hijos se alojan en el padre LayoutPageComponent:
+
+<p>Heroes</p>
+
+<router-outlet></router-outlet>
+
+
+Dicho ruteador debe importarse del módulo heroes asociado:
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { HeroesRoutingModule } from './heroes-routing.module';
+import { HeroPageComponent } from './pages/hero-page/hero-page.component';
+import { LayoutPageComponent } from './pages/layout-page/layout-page.component';
+import { ListPageComponent } from './pages/list-page/list-page.component';
+import { NewPageComponent } from './pages/new-page/new-page.component';
+import { SearchPageComponent } from './pages/search-page/search-page.component';
+
+
+@NgModule({
+  declarations: [
+    HeroPageComponent,
+    LayoutPageComponent,
+    ListPageComponent,
+    NewPageComponent,
+    SearchPageComponent
+  ],
+  imports: [
+    CommonModule,
+    HeroesRoutingModule
+  ]
+})
+export class HeroesModule { }
+
+
 Pipes
 =====
+
+Pipes básicos
+-------------
+
+<p-panel header="Pipes básicos" class="p-1">
+  <p>
+    Pipes incluídos en Angular - Usualmente en el Common Module
+  </p>
+</p-panel>
+
+
+<div class="grid">
+
+  <div class="col-12 md:col-4">
+    <p-card header="uppercase">
+      {{ nameLower | uppercase }}
+    </p-card>
+  </div>
+
+  <div class="col-12 md:col-4">
+    <p-card header="lowercase">
+      {{ nameUpper | lowercase }}
+    </p-card>
+  </div>
+
+  <div class="col-12 md:col-4">
+    <p-card header="titlecase">
+      {{ fullName | titlecase }}
+    </p-card>
+  </div>
+
+
+  <div class="col-12 md:col-6">
+    <p-card header="titlecase">
+
+      <ol>
+        <li> fecha </li>
+        <li> fecha | date </li>
+        <li> fecha | date:'short' </li>
+        <li> fecha | date:'long' </li>
+        <li> fecha | date:'MMMM' </li>
+        <li> fecha | date:'MMMM dd, yyyy' </li>
+      </ol>
+
+      <hr>
+      <ol>
+        <li> fecha | date:'long':'GMT-6' </li>
+        <li> fecha | date:'long':'GMT-4' </li>
+        <li> fecha | date:'long':'':'es-HN' </li>
+        <li> fecha | date:'long':'':'en-US' </li>
+        <li> fecha | date:'long':'':'fr-CA' </li>
+      </ol>
+
+    </p-card>
+  </div>
+
+  <div class="col-12 md:col-6">
+    <p-card header="titlecase">
+
+      <ol>
+        <li> {{ customDate }} </li>
+        <li> {{ customDate | date }} </li>
+        <li> {{ customDate | date:'short' }} </li>
+        <li> {{ customDate | date:'long' }} </li>
+        <li> {{ customDate | date:'MMMM' }} </li>
+        <li> {{ customDate | date:'MMMM dd, yyyy' }} </li>
+      </ol>
+
+      <hr>
+      <ol>
+        <li> {{ customDate | date:'long':'GMT-6' }} </li>
+        <li> {{ customDate | date:'long':'GMT-4' }} </li>
+        <li> {{ customDate | date:'long':'':'es-HN' }} </li>
+        <li> {{ customDate | date:'long':'':'en-US' }} </li>
+        <li> {{ customDate | date:'long':'':'fr-CA' }} </li>
+      </ol>
+
+    </p-card>
+  </div>
+
+
+
+</div>
+
+
+Pipes personalizados
+--------------------
+
+Ejemplo:
+
+import { Pipe, PipeTransform } from "@angular/core";
+
+// fernando | toggleCase  = 'FERNANDO'
+// FERNANDO | toggleCase  = 'fernando'
+
+@Pipe({
+  name: 'toggleCase'
+})
+export class ToggleCasePipe implements PipeTransform {
+
+  transform( value: string, toUpper: boolean = false ): string {
+
+    return ( toUpper )
+      ? value.toUpperCase()
+      : value.toLowerCase();
+  }
+
+}
+
+Uso:
+
+<p-panel header="Pipes personalizados" class="p-1">
+  <p>
+    Pipes personalizados - creados por {{ 'nosotros' | toggleCase:isUpperCase }}
+  </p>
+</p-panel>
+
 
 
 

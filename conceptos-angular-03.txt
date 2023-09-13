@@ -1,0 +1,245 @@
+Angular - Intermedio
+********************
+
+CRUD básico en Angular
+**********************
+
+Rutas
+=====
+
+Se tomará nuevamente las rutas expresadas en las anotaciones anteriores.
+
+
+Rutas principales
+-----------------
+
+app-routing.module.ts:
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { Error404PageComponent } from './shared/pages/error404-page/error404-page.component';
+
+// rutas
+const routes: Routes = [
+  {
+    path: 'auth',
+    loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule),
+  },
+  {
+    path: 'heroes',
+    loadChildren: () => import('./heroes/heroes.module').then(m => m.HeroesModule),
+  },
+  {
+    path: '404',
+    component: Error404PageComponent
+  },
+  {
+    path: '',
+    redirectTo: 'heroes',
+    pathMatch: 'full'
+  },
+  {
+    path: '**',
+    redirectTo: '404'
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+
+Estas rutas se llaman desde el componente principal:
+
+<!-- Home -->
+<router-outlet></router-outlet>
+
+Notar que cualquier ruta desconocida redirige a la que muestra error 404 y la raíz va a /heroes
+
+Asimismo, se debe asegurar que en app.module.ts se llame al ruteador principal AppRoutingModule:
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { SharedModule } from './shared/shared.module';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    SharedModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+
+Rutas hija del módulo 'auth'
+----------------------------
+
+Se definen las rutas en el ruteador hijo:
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { LayoutPageComponent } from './pages/layout-page/layout-page.component';
+import { LoginPageComponent } from './pages/login-page/login-page.component';
+import { RegisterPageComponent } from './pages/register-page/register-page.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: LayoutPageComponent,
+    children: [
+      {
+        path: 'login',
+        component: LoginPageComponent
+      },
+      {
+        path: 'new-account',
+        component: RegisterPageComponent
+      },
+      {
+        path: '**',
+        redirectTo: 'login'
+      },
+    ]
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class AuthRoutingModule { }
+
+En este caso, la raíz para las rutas hijas es /auth, de modo que deben accederse a las rutas /auth/login y /auth/new-account y, si la dirección es /auth u otra compuesta desde la raíz, será redirigida a 'login'.
+
+Los componentes hijos se alojan en el padre LayoutPageComponent:
+
+<p>Auth</p>
+
+<router-outlet></router-outlet>
+
+
+Dicho ruteador debe importarse del módulo auth asociado:
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AuthRoutingModule } from './auth-routing.module';
+import { LayoutPageComponent } from './pages/layout-page/layout-page.component';
+import { LoginPageComponent } from './pages/login-page/login-page.component';
+import { RegisterPageComponent } from './pages/register-page/register-page.component';
+
+@NgModule({
+  declarations: [
+    LayoutPageComponent,
+    LoginPageComponent,
+    RegisterPageComponent
+  ],
+  imports: [
+    CommonModule,
+    AuthRoutingModule
+  ]
+})
+export class AuthModule { }
+
+
+
+Rutas hija del módulo 'heroes'
+------------------------------
+
+Se definen las rutas en el ruteador hijo:
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { LayoutPageComponent } from './pages/layout-page/layout-page.component';
+import { NewPageComponent } from './pages/new-page/new-page.component';
+import { HeroPageComponent } from './pages/hero-page/hero-page.component';
+import { ListPageComponent } from './pages/list-page/list-page.component';
+import { SearchPageComponent } from './pages/search-page/search-page.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: LayoutPageComponent,
+    children: [
+      {
+        path: 'new-hero',
+        component: NewPageComponent
+      },
+      {
+        path: 'search',
+        component: SearchPageComponent
+      },
+      {
+        path: 'edit/:id',
+        component: NewPageComponent
+      },
+      {
+        path: 'list',
+        component: ListPageComponent
+      },
+      {
+        path: ':id',
+        component: HeroPageComponent
+      },
+      {
+        path: '**',
+        redirectTo: 'list'
+      },
+    ]
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class HeroesRoutingModule { }
+
+
+En este caso, la raíz para las rutas hijas es /heroes, lo que las demás rutas vayan precedidas de dicha raíz y, si la dirección es /heroes u otra compuesta desde la raíz, será redirigida a 'list'.
+
+Los componentes hijos se alojan en el padre LayoutPageComponent:
+
+<p>Heroes</p>
+
+<router-outlet></router-outlet>
+
+
+Dicho ruteador debe importarse del módulo heroes asociado:
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { HeroesRoutingModule } from './heroes-routing.module';
+import { HeroPageComponent } from './pages/hero-page/hero-page.component';
+import { LayoutPageComponent } from './pages/layout-page/layout-page.component';
+import { ListPageComponent } from './pages/list-page/list-page.component';
+import { NewPageComponent } from './pages/new-page/new-page.component';
+import { SearchPageComponent } from './pages/search-page/search-page.component';
+
+
+@NgModule({
+  declarations: [
+    HeroPageComponent,
+    LayoutPageComponent,
+    ListPageComponent,
+    NewPageComponent,
+    SearchPageComponent
+  ],
+  imports: [
+    CommonModule,
+    HeroesRoutingModule
+  ]
+})
+export class HeroesModule { }
+
+
