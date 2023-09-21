@@ -4,6 +4,37 @@ Angular - Intermedio
 CRUD básico en Angular
 **********************
 
+Instalaciones recomendadas
+==========================
+
+Angular Material:
+
+ng add @angular/material
+
+JSON Server (para desarrollo):
+
+npm i -D json-server
+
+En package.json configurar el comando backend:
+
+"backend": "json-server --watch data/db.json",
+
+Ejecutar backend (en un terminal aparte) con el comando: npm run backend
+
+Agregar PrimeFlex (en index.html):
+
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/primeflex@^3/primeflex.css"
+/>
+
+
+Crear data de prueba (desarrollo) para backend interno
+======================================================
+
+En la raíz del proyecto, crear una carpeta llamada data y un conjunto de datos como, por ejemplo, db.json
+
+
 Rutas
 =====
 
@@ -241,5 +272,949 @@ import { SearchPageComponent } from './pages/search-page/search-page.component';
   ]
 })
 export class HeroesModule { }
+
+Creación de componentes
+=======================
+
+Notar que, por lo configurado en el ruteo, la ruta principal es /heroes/list. Entonces se debe trabajar los siguientes componentes:
+
+LayoutPageComponent:
+
+<mat-sidenav-container fullscreen>
+
+  <mat-sidenav #sidenav mode="push" [ngStyle]="{width: '250px'}">
+    <mat-toolbar color="primary">
+      <span>Menú</span>
+      <span class="spacer"></span>
+      <button mat-icon-button (click)="sidenav.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <mat-nav-list>
+      <mat-list-item *ngFor="let item of sidebarItems" [routerLink]="item.url" (click)="sidenav.toggle()">
+        <mat-icon>{{item.icon}}</mat-icon>
+        {{item.label}}
+      </mat-list-item>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-toolbar color="primary">
+    <button mat-icon-button (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span class="spacer"></span>
+    <button mat-button>
+      Logout
+    </button>
+  </mat-toolbar>
+
+  <div class="container">
+    <router-outlet></router-outlet>
+  </div>
+
+</mat-sidenav-container>
+
+layout-page.component.ts:
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-layout-page',
+  templateUrl: './layout-page.component.html',
+  styles: [
+  ]
+})
+export class LayoutPageComponent {
+  public sidebarItems = [
+    { label: 'Listado', icon: 'label', url: './list' },
+    { label: 'Añadir', icon: 'add', url: './new-hero' },
+    { label: 'Buscar', icon: 'search', url: './search' },
+  ];
+}
+
+
+Variables de entorno
+====================
+
+Crear dentro de src la carpeta environments con dos archivos: environments.ts y environments.prod.ts con el siguiente contenido:
+
+export const environments = {
+  baseUrl : 'http://localhost:3000'
+};
+
+
+Y en angular.json editar:
+
+En configurations > production, agregar:
+
+"fileReplacements": [
+{
+  "replace": "src/environments/environments.ts",
+  "with": "src/environments/environments.prod.ts"
+}
+
+
+Crear interfaces y servicios
+============================
+
+Interfaz
+--------
+
+export interface Hero {
+  id:               string;
+  superhero:        string;
+  publisher:        Publisher;
+  alter_ego:        string;
+  first_appearance: string;
+  characters:       string;
+}
+
+export enum Publisher {
+  DCComics = "DC Comics",
+  MarvelComics = "Marvel Comics",
+}
+
+
+Servicio
+--------
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environments } from 'src/environments/environments';
+import { Observable } from 'rxjs';
+import { Hero } from '../interfaces/heroes.interface';
+
+@Injectable({providedIn: 'root'})
+export class HeroesService {
+
+  private baseUrl: string = environments.baseUrl;
+
+  constructor(private http: HttpClient) { }
+
+  getHeroes():Observable<Hero[]> {
+
+    return this.http.get<Hero[]>(`${this.baseUrl}/heroes`);
+  }
+
+}
+
+Inyección de servicio
+---------------------
+
+import { Component, OnInit } from '@angular/core';
+import { Hero } from '../../interfaces/heroes.interface';
+import { HeroesService } from '../../services/heroes.service';
+
+@Component({
+  selector: 'app-list-page',
+  templateUrl: './list-page.component.html',
+  styles: [
+  ]
+})
+export class ListPageComponent implements OnInit {
+
+  public heroes:Hero[] = [];
+
+  constructor(private heroesService:HeroesService){
+
+  }
+  ngOnInit(): void {
+    this.heroesService.getHeroes()
+      .subscribe(heroes => this.heroes = heroes);
+  }
+
+}
+
+Diseño de las vistas
+====================
+
+Lista de elementos
+------------------
+
+list-page.component.html:
+
+<h1>Listado de héroes</h1>
+
+<mat-divider>
+</mat-divider>
+
+<div class="grid mb-8 pt-2">
+  <div *ngFor="let hero of heroes" class="col-12 sm:col-4 md:col-3 xl:col-2">
+    <heroes-hero-card [hero]="hero"></heroes-hero-card>
+  </div>
+</div>
+
+
+Diseño del elemento
+-------------------
+
+card.component.html:
+
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ hero.superhero }}</mat-card-title>
+    <mat-card-subtitle>{{ hero.alter_ego }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <img mat-card-image [src]="hero | heroImage" [alt]="hero.superhero">
+
+  <mat-card-content class="mt-2">
+    <h4>{{ hero.publisher }}</h4>
+    <p>
+      <strong>Primera aparición</strong> {{ hero.first_appearance }}
+      <br />
+      <mat-chip-listbox>
+        <mat-chip
+          *ngFor="let name of hero.characters.split(',') | slice : 0 : 3"
+        >
+          {{ name }}
+        </mat-chip>
+      </mat-chip-listbox>
+    </p>
+  </mat-card-content>
+
+  <mat-divider></mat-divider>
+
+  <mat-card-actions>
+    <button
+      mat-button
+      mat-raised
+      color="primary"
+      [routerLink]="['/heroes/edit', hero.id]"
+    >
+      <mat-icon>edit</mat-icon>
+      Editar
+    </button>
+    <span class="spacer"></span>
+    <button
+      mat-button
+      mat-raised
+      color="primary"
+      [routerLink]="['/heroes', hero.id]"
+    >
+      Ver más
+    </button>
+  </mat-card-actions>
+</mat-card>
+
+
+card.component.ts:
+
+import { Component, OnInit, Input } from '@angular/core';
+import { Hero } from '../../interfaces/heroes.interface';
+
+@Component({
+  selector: 'heroes-hero-card',
+  templateUrl: './card.component.html',
+  styles: [
+  ]
+})
+export class CardComponent implements OnInit {
+
+  @Input()
+  public hero!: Hero;
+
+  ngOnInit(): void {
+    if(!this.hero)
+      throw new Error('Héroe no existe.');
+  }
+
+}
+
+
+Pipes
+-----
+
+Este pipe en particular genera ruta de imágenes a partir de un objeto tipo Hero:
+
+hero-image.pipe.ts:
+
+import { Pipe, PipeTransform } from '@angular/core';
+import { Hero } from '../interfaces/heroes.interface';
+
+@Pipe({
+  name: 'heroImage'
+})
+export class HeroImagePipe implements PipeTransform {
+
+  transform(hero: Hero): string {
+    if(!hero.id && !hero.alt_img)
+      return "assets/no-image.png";
+
+    if(hero.alt_img) return hero.alt_img;
+
+    return `assets/heroes/${hero.id}.jpg`;
+  }
+
+}
+
+Generar enlace al elemento unitario
+===================================
+
+Crear método para el servicio
+-----------------------------
+
+  getHeroById(id: string):Observable<Hero|undefined> {
+    return this.http.get<Hero>(`${this.baseUrl}/heroes/${id}`)
+      .pipe(
+        catchError(e => of(undefined))
+      );
+  }
+
+Diseñar la vista que mostrará el objeto
+---------------------------------------
+
+<ng-template #divLoading>
+  <mat-grid-list cols="1">
+    <mat-grid-tile>
+      <mat-spinner></mat-spinner>
+    </mat-grid-tile>
+  </mat-grid-list>
+</ng-template>
+
+<div *ngIf="hero; else divLoading" class="grid p-2">
+  <mat-card class="col-12 sm:col-6">
+    <mat-card-header>
+      <mat-card-title>{{hero.alter_ego}}</mat-card-title>
+      <mat-card-subtitle>{{hero.superhero}}</mat-card-subtitle>
+    </mat-card-header>
+
+    <img [src]="hero | heroImage" [alt]="hero.superhero" mat-card-image>
+  </mat-card>
+  <mat-card class="col-12 sm:col-6">
+    <mat-card-header>
+      <mat-card-title>Información del héroe</mat-card-title>
+      <mat-card-subtitle>{{hero.superhero}}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <mat-list>
+        <mat-list-item>{{hero.first_appearance}}</mat-list-item>
+        <mat-list-item>{{hero.characters}}</mat-list-item>
+        <mat-list-item>{{hero.publisher}}</mat-list-item>
+        <mat-list-item>{{hero.alter_ego}}</mat-list-item>
+      </mat-list>
+
+      <button mat-button color="warn" (click)="goBack()">
+        Regresar
+      </button>
+    </mat-card-content>
+
+  </mat-card>
+</div>
+
+Desarrollar la clase asociada
+-----------------------------
+
+import { Component, OnInit } from '@angular/core';
+import { HeroesService } from '../../services/heroes.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { switchMap } from 'rxjs';
+import { Hero } from '../../interfaces/heroes.interface';
+
+@Component({
+  selector: 'app-hero-page',
+  templateUrl: './hero-page.component.html',
+  styles: [
+  ]
+})
+export class HeroPageComponent implements OnInit {
+
+  public hero?: Hero;
+
+  constructor(
+    private heroesService: HeroesService,
+    private activatedRoute: ActivatedRoute,
+    private router: Router){}
+
+  ngOnInit(): void {
+    this.activatedRoute.params
+      .pipe(
+        switchMap( ({id}) => this.heroesService.getHeroById(id) ),
+      )
+      .subscribe(hero => {
+        if(!hero) return this.router.navigate(['/heroes/list']);
+        this.hero = hero;
+        console.log(hero)
+        return;
+      })
+  }
+
+  goBack():void{
+    this.router.navigateByUrl('heroes/list');
+  }
+
+}
+
+Bases de la búsqueda
+====================
+
+Agregar módulo
+--------------
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { HeroesRoutingModule } from './heroes-routing.module';
+import { HeroPageComponent } from './pages/hero-page/hero-page.component';
+import { LayoutPageComponent } from './pages/layout-page/layout-page.component';
+import { ListPageComponent } from './pages/list-page/list-page.component';
+import { NewPageComponent } from './pages/new-page/new-page.component';
+import { SearchPageComponent } from './pages/search-page/search-page.component';
+import { MaterialModule } from '../material/material.module';
+import { CardComponent } from './components/card/card.component';
+import { HeroImagePipe } from './pipes/hero-image.pipe';
+import { ReactiveFormsModule } from '@angular/forms';
+
+
+@NgModule({
+  declarations: [
+    HeroPageComponent,
+    LayoutPageComponent,
+    ListPageComponent,
+    NewPageComponent,
+    SearchPageComponent,
+    CardComponent,
+    HeroImagePipe
+  ],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,  // <------------------------ agregar
+    HeroesRoutingModule,
+    MaterialModule
+  ]
+})
+export class HeroesModule { }
+
+Agregar método al servicio
+--------------------------
+
+  getSuggestions(query: string):Observable<Hero[]>{
+    return this.http.get<Hero[]|[]>(`${this.baseUrl}/heroes?q=${query}&_limit=6`);
+  }
+
+
+Componente
+----------
+
+<div class="flex flex-column p-2">
+  <h3>Buscador</h3>
+  <mat-form-field>
+    <mat-label>Buscador de héroes</mat-label>
+    <input
+      type="text"
+      matInput
+      [formControl]="searchInput"
+      (input)="searchHero()"
+      [matAutocomplete]="auto"
+    />
+    <mat-autocomplete autoActiveFirstOption
+      #auto="matAutocomplete"
+      (optionSelected)="onSelectedOption($event)"
+    >
+      <mat-option *ngFor="let hero of heroes" [value]="hero">
+        {{ hero.superhero }}
+      </mat-option>
+      <mat-option
+        *ngIf="
+          heroes.length === 0 &&
+          searchInput.value &&
+          searchInput.value.length > 0
+        "
+        value=""
+      >
+        No se encontró nada con el término {{ searchInput.value }}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</div>
+
+
+Clase del componente
+--------------------
+
+import { Component } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { Hero } from '../../interfaces/heroes.interface';
+import { HeroesService } from '../../services/heroes.service';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+
+@Component({
+  selector: 'app-search-page',
+  templateUrl: './search-page.component.html',
+  styles: [
+  ]
+})
+export class SearchPageComponent {
+
+  public searchInput = new FormControl('');
+  public heroes: Hero[] = [];
+  public selectedHero?:Hero;
+
+  constructor(private heroesService: HeroesService){}
+
+  searchHero() {
+    const value: string = this.searchInput.value || '';
+
+    this.heroesService.getSuggestions(value)
+      .subscribe( heroes => this.heroes = heroes );
+  }
+
+  onSelectedOption(event: MatAutocompleteSelectedEvent):void{
+    if(!event.option.value) {
+      this.selectedHero = undefined;
+      return;
+    }
+
+    const hero: Hero = event.option.value;
+    this.searchInput.setValue(hero.superhero);
+
+    this.selectedHero = hero;
+  }
+
+}
+
+Diseño del agregar/actualizar/editar elemento
+=============================================
+
+Vista
+-----
+
+<h1>Editar/agregar héroe <small>Superman</small></h1>
+
+<mat-divider class="mb-2"></mat-divider>
+
+<div class="grid">
+  <div class="col-12 sm:col-6">
+    <mat-card>
+      <mat-card-content>
+        <div class="grid">
+          <mat-form-field class="col-12 sm:col-6">
+            <mat-label>Superhéroe</mat-label>
+            <input type="text" matInput required />
+          </mat-form-field>
+          <mat-form-field class="col-12 sm:col-6">
+            <mat-label>Alter ego</mat-label>
+            <input type="text" matInput required />
+          </mat-form-field>
+          <mat-form-field class="col-12">
+            <mat-label>Primera aparición</mat-label>
+            <input type="text" matInput required />
+          </mat-form-field>
+          <mat-form-field class="col-12">
+            <mat-label>Personajes</mat-label>
+            <input type="text" matInput required />
+          </mat-form-field>
+          <mat-form-field class="col-12">
+            <mat-label>Creador</mat-label>
+            <mat-select required="">
+              <mat-option
+                *ngFor="let publisher of publishers"
+                [value]="publisher.id"
+              >
+                {{ publisher.desc }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="flex justify-content-between">
+          <button mat-flat-button color="warn">Borrar</button>
+          <button mat-flat-button color="primary">
+            <mat-icon>save</mat-icon> Guardar
+          </button>
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+
+<div class="col-12 sm:col-6">
+  <mat-card>
+    <img src="" alt="imagen del héroe" mat-card-image>
+  </mat-card>
+</div>
+
+
+Clase
+-----
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-new-page',
+  templateUrl: './new-page.component.html',
+  styles: [
+  ]
+})
+export class NewPageComponent {
+  public publishers = [
+    {
+      id: 'DC Comics',
+      desc: 'DC - Comics'
+    },
+    {
+      id: 'Marvel Comics',
+      desc: 'Marvel - Comics'
+    }
+  ];
+}
+
+Formularios Reactivos
+=====================
+
+Formulario - HTML
+-----------------
+
+<h1>{{currentHero.id ? 'Editar' : 'Agregar'}} {{currentHero.id ? currentHero.superhero : 'héroe'}}</h1>
+
+<mat-divider class="mb-2"></mat-divider>
+
+<div class="grid">
+  <div class="col-12 sm:col-6">
+    <mat-card>
+      <mat-card-content>
+        <form class="grid" [formGroup]="heroForm" (ngSubmit)="onSubmit()">
+          <mat-form-field class="col-12 sm:col-6">
+            <mat-label>Superhéroe</mat-label>
+            <input type="text" matInput required formControlName="superhero" />
+          </mat-form-field>
+          <mat-form-field class="col-12 sm:col-6">
+            <mat-label>Alter ego</mat-label>
+            <input type="text" matInput required formControlName="alter_ego" />
+          </mat-form-field>
+          <mat-form-field class="col-12">
+            <mat-label>Primera aparición</mat-label>
+            <input type="text" matInput required formControlName="first_appearance" />
+          </mat-form-field>
+          <mat-form-field class="col-12">
+            <mat-label>Personajes</mat-label>
+            <input type="text" matInput required formControlName="characters" />
+          </mat-form-field>
+          <mat-form-field class="col-12">
+            <mat-label>Creador</mat-label>
+            <mat-select required="" formControlName="publisher">
+              <mat-option
+                *ngFor="let publisher of publishers"
+                [value]="publisher.id"
+              >
+                {{ publisher.desc }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field class="col-12">
+            <mat-label>Imagen alternativa</mat-label>
+            <input type="text" matInput required formControlName="alt_img" />
+          </mat-form-field>
+        </form>
+
+        <div class="flex justify-content-between">
+          <button *ngIf="currentHero.id" mat-flat-button color="warn" (click)="onDeleteHero()">Borrar</button>
+          <span></span>
+          <button mat-flat-button color="primary" (click)="onSubmit()">
+            <mat-icon>save</mat-icon> Guardar
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="col-12 sm:col-6">
+    <mat-card>
+      <img [src]="currentHero | heroImage" alt="imagen del héroe" mat-card-image />
+    </mat-card>
+  </div>
+</div>
+
+
+Formulario -  TS
+----------------
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormControl, FormGroup } from '@angular/forms';
+import { switchMap } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { Hero, Publisher } from '../../interfaces/heroes.interface';
+import { HeroesService } from '../../services/heroes.service';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component';
+
+@Component({
+  selector: 'app-new-page',
+  templateUrl: './new-page.component.html',
+  styles: [],
+})
+export class NewPageComponent implements OnInit {
+  // formulario reactivo
+  public heroForm = new FormGroup({
+    id: new FormControl<string>(''),
+    superhero: new FormControl<string>('', { nonNullable: true }),
+    publisher: new FormControl<Publisher>(Publisher.DCComics),
+    alter_ego: new FormControl(''),
+    first_appearance: new FormControl(''),
+    characters: new FormControl(''),
+    alt_img: new FormControl(''),
+  });
+
+  public publishers = [
+    {
+      id: 'DC Comics',
+      desc: 'DC - Comics',
+    },
+    {
+      id: 'Marvel Comics',
+      desc: 'Marvel - Comics',
+    },
+  ];
+
+  constructor(
+    private heroesService: HeroesService,
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
+  ) {}
+
+  ngOnInit(): void {
+    if (!this.router.url.includes('edit')) return;
+
+    this.activatedRoute.params
+      .pipe(switchMap(({ id }) => this.heroesService.getHeroById(id)))
+      .subscribe((hero) => {
+        if (!hero) return this.router.navigateByUrl('/');
+        this.heroForm.reset(hero);
+        return;
+      });
+  }
+
+  get currentHero(): Hero {
+    const hero: Hero = this.heroForm.value as Hero;
+    return hero;
+  }
+
+  onSubmit(): void {
+    if (this.heroForm.invalid) return;
+
+    if (this.currentHero.id) {
+      this.heroesService.updateHero(this.currentHero).subscribe((hero) => {
+        this.showSnackbar(`${hero.superhero} actualizado`);
+      });
+      return;
+    }
+    this.heroesService.addHero(this.currentHero).subscribe((hero) => {
+      this.router.navigate(['/heroes/edit', hero.id]);
+      this.showSnackbar(`${hero.superhero} creado`);
+    });
+  }
+
+  onDeleteHero():void {
+    if(!this.currentHero.id) throw new Error('Se requiere ID de héroe');
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: this.heroForm.value,
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if(!result) return;
+
+      this.heroesService.deleteHeroById(this.currentHero.id)
+        .subscribe(
+          wasDeleted => {
+            if(wasDeleted)
+              this.router.navigate(['/heroes']);
+          }
+        );
+    });
+  }
+
+  showSnackbar(message: string): void {
+    this.snackBar.open(message, 'done', {
+      duration: 2500,
+    });
+  }
+}
+
+Ajuste en el servicio
+---------------------
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environments } from 'src/environments/environments';
+import { Observable, catchError, map, of } from 'rxjs';
+import { Hero } from '../interfaces/heroes.interface';
+
+@Injectable({providedIn: 'root'})
+export class HeroesService {
+
+  private baseUrl: string = environments.baseUrl;
+
+  constructor(private http: HttpClient) { }
+
+  getHeroes():Observable<Hero[]> {
+
+    return this.http.get<Hero[]>(`${this.baseUrl}/heroes`);
+  }
+
+  getHeroById(id: string):Observable<Hero|undefined> {
+    return this.http.get<Hero>(`${this.baseUrl}/heroes/${id}`)
+      .pipe(
+        catchError(e => of(undefined))
+      );
+  }
+
+  getSuggestions(query: string):Observable<Hero[]>{
+    return this.http.get<Hero[]|[]>(`${this.baseUrl}/heroes?q=${query}&_limit=6`);
+  }
+
+  addHero(hero: Hero):Observable<Hero>{
+    return this.http.post<Hero>(`${this.baseUrl}/heroes`, hero);
+  }
+
+  updateHero(hero: Hero):Observable<Hero>{
+    if(!hero.id) throw new Error("ID de héroe es requerido");
+    return this.http.patch<Hero>(`${this.baseUrl}/heroes/${hero.id}`, hero);
+  }
+
+
+  deleteHeroById(id: string):Observable<boolean>{
+    return this.http.delete(`${this.baseUrl}/heroes/${id}`)
+      .pipe(
+        catchError( err => of(false)),
+        map(resp => true)
+      );
+  }
+
+}
+
+Componente adicional - HTML
+---------------------------
+
+<h1 mat-dialog-title>Eliminar a {{data.superhero}}</h1>
+<div mat-dialog-content>
+  <p>¿Estás seguro? No se podrá deshacer...</p>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No</button>
+  <button mat-button (click)="onConfirm()" cdkFocusInitial>Sí</button>
+</div>
+
+
+Componente adicional - TS
+-------------------------
+
+import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Hero } from '../../interfaces/heroes.interface';
+
+@Component({
+  selector: 'app-confirm-dialog',
+  templateUrl: './confirm-dialog.component.html',
+  styles: [
+  ]
+})
+export class ConfirmDialogComponent {
+  constructor(
+    public dialogRef: MatDialogRef<ConfirmDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: Hero,
+  ) {}
+
+  onNoClick(): void {
+    this.dialogRef.close(false);
+  }
+
+  onConfirm(): void {
+    console.log("click!");
+    this.dialogRef.close(true);
+  }
+}
+
+
+Protección de rutas (Angular Guards)
+====================================
+
+Definición de los guards
+------------------------
+
+// Angular 16+ - no se crea una clase para los guards
+
+import {
+  ActivatedRouteSnapshot,
+  CanActivateFn,
+  CanMatchFn,
+  Route,
+  RouterStateSnapshot,
+  UrlSegment,
+} from '@angular/router';
+
+/* No hay necesidad de crear una clase, simplemente definiendo una función flecha y exportándola
+podemos utilizar sus funcionalidades de guard en el app-routing */
+export const canActivateGuard: CanActivateFn = ( //Hay que tener en cuenta el tipado CanActiveFn
+  route: ActivatedRouteSnapshot,
+  state: RouterStateSnapshot
+) => {
+  console.log('CanActivate');
+  console.log({ route, state });
+
+  return false;
+};
+
+export const canMatchGuard: CanMatchFn = ( //Tipado CanMatchFn
+  route: Route,
+  segments: UrlSegment[]
+) => {
+  console.log('CanMatch');
+  console.log({ route, segments });
+
+  return false;
+};
+
+Protección de rutas con los guards
+----------------------------------
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { Error404PageComponent } from './shared/pages/error404-page/error404-page.component';
+import { canActivateGuard, canMatchGuard } from './auth/guards/auth.guard';
+
+// rutas
+const routes: Routes = [
+  {
+    path: 'auth',
+    loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule),
+  },
+  {
+    path: 'heroes',
+    loadChildren: () => import('./heroes/heroes.module').then(m => m.HeroesModule),
+    canActivate: [canActivateGuard], //Anclamos la función del canActive
+    canMatch: [canMatchGuard], //Anclamos la función del canMatch
+  },
+  {
+    path: '404',
+    component: Error404PageComponent
+  },
+  {
+    path: '',
+    redirectTo: 'heroes',
+    pathMatch: 'full'
+  },
+  {
+    path: '**',
+    redirectTo: '404'
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+
+
+
+
 
 

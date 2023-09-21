@@ -895,7 +895,281 @@ Uso:
 </p-panel>
 
 
+Angular Material
+================
 
+Instalación (Angular CLI)
+-------------------------
+
+ng add @angular/material
+
+
+Documentación: https://material.angular.io/
+
+
+Formularios Reactivos
+=====================
+
+En HTML:
+
+        <form class="grid" [formGroup]="heroForm" (ngSubmit)="onSubmit()">
+          <mat-form-field class="col-12 sm:col-6">
+            <mat-label>Superhéroe</mat-label>
+            <input type="text" matInput required formControlName="superhero" />
+          </mat-form-field>
+          <mat-form-field class="col-12 sm:col-6">
+            <mat-label>Alter ego</mat-label>
+            <input type="text" matInput required formControlName="alter_ego" />
+          </mat-form-field>
+          <mat-form-field class="col-12">
+            <mat-label>Primera aparición</mat-label>
+            <input type="text" matInput required formControlName="first_appearance" />
+          </mat-form-field>
+          <mat-form-field class="col-12">
+            <mat-label>Personajes</mat-label>
+            <input type="text" matInput required formControlName="characters" />
+          </mat-form-field>
+          <mat-form-field class="col-12">
+            <mat-label>Creador</mat-label>
+            <mat-select required="" formControlName="publisher">
+              <mat-option
+                *ngFor="let publisher of publishers"
+                [value]="publisher.id"
+              >
+                {{ publisher.desc }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field class="col-12">
+            <mat-label>Imagen alternativa</mat-label>
+            <input type="text" matInput required formControlName="alt_img" />
+          </mat-form-field>
+        </form>
+		
+En la clase:
+
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { FormControl, FormGroup } from '@angular/forms';
+import { switchMap } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { Hero, Publisher } from '../../interfaces/heroes.interface';
+import { HeroesService } from '../../services/heroes.service';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component';
+
+@Component({
+  selector: 'app-new-page',
+  templateUrl: './new-page.component.html',
+  styles: [],
+})
+export class NewPageComponent implements OnInit {
+  // formulario reactivo
+  public heroForm = new FormGroup({
+    id: new FormControl<string>(''),
+    superhero: new FormControl<string>('', { nonNullable: true }),
+    publisher: new FormControl<Publisher>(Publisher.DCComics),
+    alter_ego: new FormControl(''),
+    first_appearance: new FormControl(''),
+    characters: new FormControl(''),
+    alt_img: new FormControl(''),
+  });
+
+  public publishers = [
+    {
+      id: 'DC Comics',
+      desc: 'DC - Comics',
+    },
+    {
+      id: 'Marvel Comics',
+      desc: 'Marvel - Comics',
+    },
+  ];
+
+  constructor(
+    private heroesService: HeroesService,
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog,
+  ) {}
+
+  ngOnInit(): void {
+    if (!this.router.url.includes('edit')) return;
+
+    this.activatedRoute.params
+      .pipe(switchMap(({ id }) => this.heroesService.getHeroById(id)))
+      .subscribe((hero) => {
+        if (!hero) return this.router.navigateByUrl('/');
+        this.heroForm.reset(hero);
+        return;
+      });
+  }
+
+  get currentHero(): Hero {
+    const hero: Hero = this.heroForm.value as Hero;
+    return hero;
+  }
+
+  onSubmit(): void {
+    if (this.heroForm.invalid) return;
+
+    if (this.currentHero.id) {
+      this.heroesService.updateHero(this.currentHero).subscribe((hero) => {
+        this.showSnackbar(`${hero.superhero} actualizado`);
+      });
+      return;
+    }
+    this.heroesService.addHero(this.currentHero).subscribe((hero) => {
+      this.router.navigate(['/heroes/edit', hero.id]);
+      this.showSnackbar(`${hero.superhero} creado`);
+    });
+  }
+
+  onDeleteHero():void {
+    if(!this.currentHero.id) throw new Error('Se requiere ID de héroe');
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: this.heroForm.value,
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if(!result) return;
+
+      this.heroesService.deleteHeroById(this.currentHero.id)
+        .subscribe(
+          wasDeleted => {
+            if(wasDeleted)
+              this.router.navigate(['/heroes']);
+          }
+        );
+    });
+  }
+
+  showSnackbar(message: string): void {
+    this.snackBar.open(message, 'done', {
+      duration: 2500,
+    });
+  }
+}
+
+Objeto de confirmación de dialog
+--------------------------------
+
+HTML:
+
+<h1 mat-dialog-title>Eliminar a {{data.superhero}}</h1>
+<div mat-dialog-content>
+  <p>¿Estás seguro? No se podrá deshacer...</p>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No</button>
+  <button mat-button (click)="onConfirm()" cdkFocusInitial>Sí</button>
+</div>
+
+
+Clase:
+
+import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Hero } from '../../interfaces/heroes.interface';
+
+@Component({
+  selector: 'app-confirm-dialog',
+  templateUrl: './confirm-dialog.component.html',
+  styles: [
+  ]
+})
+export class ConfirmDialogComponent {
+  constructor(
+    public dialogRef: MatDialogRef<ConfirmDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: Hero,
+  ) {}
+
+  onNoClick(): void {
+    this.dialogRef.close(false);
+  }
+
+  onConfirm(): void {
+    console.log("click!");
+    this.dialogRef.close(true);
+  }
+}
+
+
+Protección de rutas (Angular Guards)
+====================================
+
+Los guards de Angular son justamente eso: guardias. O sea, funciones que protegen las rutas según elementos que rigen el acceso de las mismas.
+
+Archivo de guards
+-----------------
+
+auth.guard.ts:
+
+// Angular 16+ - no se crea una clase para los guards
+
+import {
+  ActivatedRouteSnapshot,
+  CanActivateFn,
+  CanMatchFn,
+  Route,
+  RouterStateSnapshot,
+  UrlSegment,
+} from '@angular/router';
+
+/* No hay necesidad de crear una clase, simplemente definiendo una función flecha y exportándola
+podemos utilizar sus funcionalidades de guard en el app-routing */
+export const canActivateGuard: CanActivateFn = ( //Hay que tener en cuenta el tipado CanActiveFn
+  route: ActivatedRouteSnapshot,
+  state: RouterStateSnapshot
+) => {
+  console.log('CanActivate');
+  console.log({ route, state });
+
+  return false;
+};
+
+export const canMatchGuard: CanMatchFn = ( //Tipado CanMatchFn
+  route: Route,
+  segments: UrlSegment[]
+) => {
+  console.log('CanMatch');
+  console.log({ route, segments });
+
+  return false;
+};
+
+Aplicación en rutas
+-------------------
+
+// rutas
+const routes: Routes = [
+  {
+    path: 'auth',
+    loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule),
+  },
+  {
+    path: 'heroes',
+    loadChildren: () => import('./heroes/heroes.module').then(m => m.HeroesModule),
+    canActivate: [canActivateGuard], //Anclamos la función del canActive
+    canMatch: [canMatchGuard], //Anclamos la función del canMatch
+  },
+  {
+    path: '404',
+    component: Error404PageComponent
+  },
+  {
+    path: '',
+    redirectTo: 'heroes',
+    pathMatch: 'full'
+  },
+  {
+    path: '**',
+    redirectTo: '404'
+  }
+];
 
 
 
