@@ -1,0 +1,229 @@
+Docker
+******
+
+Preparación e instalación de Docker
+===================================
+
+Windows: descargar e instalar Docker Desktop Installer como administrador.
+Asimismo, instalar WSL2 y configurarlo.
+
+
+Solucionar el error: "A timeout occured while waiting for a WSL integration agent to become ready" en Windows
+-------------------------------------------------------------------------------------------------------------
+
+Verificar que en Usuarios/<Tu usuario>/AppData/Roaming/Docker/settings.json las propiedades estén colocadas de esta forma:
+
+"integratedWslDistros" : [ ]
+"enableIntegrationWithDefaultWslDistro" : false,
+
+
+Comandos generales y básicos de gestión en Docker
+=================================================
+
+Hola mundo:
+docker run hello-world
+
+Comandos de Docker para imágenes
+================================
+
+Descargar imagen:
+docker pull <nombre de imagen>
+
+Ver las imágenes creadas:
+docker images
+
+Borrar imagen:
+docker image rm -f <id de la imagen> # -f es de forzado
+o:
+docker rmi <id de la imagen>
+
+Tags:
+Por defecto se descarga una versión "latest". Para una versión diferente, por ejemplo, se haría:
+docker pull mongo:7.0.2
+donde se ordena descargar la versión 7.0.2.
+
+Borrar una imagen de una versión específica:
+docker image rm <nombre imagen>:<versión>
+Ej: docker image rm mongo:latest
+
+Eliminar todas las imágenes a partir de un query:
+docker rmi $(docker images -q)
+La consulta está en el argumento "docker images -q".
+
+
+Comandos de Docker para contenedores
+====================================
+
+Crear contenedor:
+docker container create <imagen>
+o:
+docker create <imagen>
+
+Crear contenedor con alias:
+docker create --name <nombre contenedor> <imagen>
+
+Ver los contenedores creados y activos:
+docker ps
+
+Ver todos los contenedores:
+docker ps -a
+
+Ejecutar contenedor:
+docker start <id del contenedor o alias del contenedor>
+
+Detener contenedor:
+docker stop <id del contenedor o alias del contenedor>
+
+Borrar contenedor:
+docker rm <id del contenedor o alias del contenedor>
+
+Crear contenedor con puerto expuesto:
+docker create -p<puerto físico de la máquina>:<puerto empleado por Docker> --name <nombre contenedor> <imagen>
+Ej: docker create -p5050:5050 --name mongodb mongo
+
+Comando para descargar imagen, crear contenedor y arrancar contenedor:
+docker run <imagen>
+
+"docker run" con alias y puerto expuesto:
+docker run -p<puerto físico de la máquina>:<puerto empleado por Docker> --name <nombre contenedor> <imagen>
+Ej: docker run -p5050:5050 --name mongodb mongo
+
+Ejecutar en background:
+docker run -p<puerto físico de la máquina>:<puerto empleado por Docker> --name <nombre contenedor> -d <imagen>
+Ej: docker run -p5050:5050 --name mongodb -d mongo
+
+Ver logs del contenedor:
+docker logs <nombre contenedor>
+
+
+Variables de entorno
+====================
+
+Hay imágenes que requieren variables de entorno expresadas en su ejecución. Por ejemplo, bases de datos PostegreSQL:
+
+docker run -p5432:5432 --name postgresdb -e POSTGRES_PASSWORD=MiClave123 -e POSTGRES_DB=demodb -d postgres
+
+Se le está asignando dos variables de entorno requeridas para crear un contenedor que maneje una imagen de PostegreSQL.
+
+
+Dockerfile
+==========
+
+Es el archivo de comandos requeridos para crear el contenedor. No puede tener otro nombre ni ir acompañado de alguna extensión. Por ejemplo:
+
+# declara la imagen
+FROM maven:3.8.3-openjdk-17
+
+# el directorio a trabajar
+WORKDIR /tinocrm
+# copia lo que se quiere trabajar
+COPY . .
+# comando a ser ejecutado para la instalación
+RUN mvn clean install -DskipTests
+
+# comando a ser ejecutado para correr el programa
+CMD mvn spring-boot:run
+
+De esta forma se puede ejecutar el comando "docker run" con las especificaciones dadas en el Dockerfile.
+
+
+docker-compose
+==============
+
+Es una herramienta que permite crear contenedores e integrar imágenes que serán requeridas para una aplicación en Docker. Ej:
+
+version: '4.22'
+
+services:
+  mysqldb:
+    image: mysql:5.7
+    restart: unless-stopped
+    env_file: ./.env
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=1
+      - MYSQL_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
+      - MYSQL_DATABASE=$MYSQLDB_DATABASE
+    ports:
+      - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
+    volumes:
+      - db:/var/lib/mysql
+  app:
+    depends_on:
+      - mysqldb
+    build: .
+    restart: on-failure
+    env_file: ./.env
+    ports:
+      - $SPRING_LOCAL_PORT:$SPRING_DOCKER_PORT
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.datasource.url"  : "jdbc:mysql://mysqldb:$MYSQLDB_DOCKER_PORT/$MYSQLDB_DATABASE?useSSL=false",
+        "spring.datasource.username" : "$MYSQLDB_USER",
+        "spring.datasource.password" : "$MYSQLDB_ROOT_PASSWORD",
+        "spring.jpa.hibernate.ddl-auto" : "create-drop"
+      }'
+    volumes:
+      - .m2:/root/.m2
+    stdin_open: true
+    tty: true
+
+volumes:
+  db:
+
+Este archivo requiere de un archivo .env para variables de entorno:
+
+MYSQLDB_USER=root
+MYSQLDB_ROOT_PASSWORD=
+MYSQLDB_DATABASE=tinocrm
+MYSQLDB_LOCAL_PORT=3306
+MYSQLDB_DOCKER_PORT=3306
+
+SPRING_LOCAL_PORT=4004
+SPRING_DOCKER_PORT=4004
+
+El archivo del compose siempre es el mismo: docker-compose.yml (o docker-compose.yaml). El archivo debe respetar una indentación de dos caracteres entre niveles.
+
+Se emplean comandos que simplifican la creación de contenedores sin tener que escribir manualmente en consola.
+
+Comandos en docker-compose
+--------------------------
+
+Crear imágenes y contenedor:
+docker-compose up
+
+Ejecución en background:
+docker-compose up -d
+
+Monitorear ejecuciones:
+Contenedores activos:
+docker ps
+
+Borrar contenedores:
+Contenedor específico:
+docker kill :container_id
+
+Todos los contenedores:
+docker-compose down
+
+Ver todas las imágenes:
+docker images
+
+Ingresar al terminal de un contenedor particular:
+docker exec -it :container_id bash
+
+Logs:
+docker-compose logs
+
+Detener contenedor:
+docker-compose stop
+
+Iniciar contenedor:
+docker-compose start
+
+Reniciar contenedor:
+docker-compose restart
+
+
+
+
+
