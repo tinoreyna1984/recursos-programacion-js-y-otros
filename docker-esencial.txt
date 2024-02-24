@@ -95,6 +95,15 @@ Ej: docker run -p5050:5050 --name mongodb -d mongo
 Ver logs del contenedor:
 docker logs <nombre contenedor>
 
+Borrar todos los contenedores:
+docker rm -f $(docker ps -a -q)
+
+Listar volúmenes:
+docker volume ls -q
+
+Borrar todos los volúmenes creados:
+docker volume rm $(docker volume ls -q)
+
 
 Variables de entorno
 ====================
@@ -199,11 +208,8 @@ Contenedores activos:
 docker ps
 
 Borrar contenedores:
-Contenedor específico:
-docker kill :container_id
-
-Todos los contenedores:
-docker-compose down
+Contenedor específico: docker kill :container_id
+Todos los contenedores: docker-compose down
 
 Ver todas las imágenes:
 docker images
